@@ -1,0 +1,89 @@
+// Rol
+{
+"rol_id": "rol id"
+"descripcion": "descripcion rol"
+}
+
+// Administradores
+{
+"administrador_id": "administrador_id",
+"rol": "rol_id",
+"nombre": "Nombre del Administrador",
+"contacto": {
+"email_cliente": "contacto@ejemplo.com",
+"telefono": "555-5555"
+},
+"fecha_registro": "2024-10-23",
+}
+
+// Clientes
+{
+"cliente_id": "cliente_id",
+"rol": "rol_id",
+"nombre": "Nombre de la Empresa",
+"contacto": {
+"email_cliente": "contacto@ejemplo.com",
+"telefono": "555-5555"
+"email_empresa": "contacto@ejemplo.com",
+},
+"fecha_registro": "2024-10-23",
+"descripcion_servicios": "Descripción de los servicios prestados",
+"servicios_requeridos": ["Asesoría Empresarial", "Asesoría Financiera", "Asesoría Tecnológica", "Apoyo con una asociación y/o cooperativa", "Otro"],
+"conocio_CMU": ["RED SOCIAL CENTRO MIPYMES UNPHU", "RED SOCIAL UNPHU", "RED SOCIAL MICM", "RED SOCIAL BHD LEON", "Otro"],
+"ingresos":""
+}
+
+// Asesores
+{
+"asesor_id": "asesor_id",
+"nombre": "Nombre del Asesor",
+"contacto": {
+"email": "asesor@ejemplo.com",
+"telefono": "555-5556"
+},
+"especialidades": ["Marketing", "Finanzas", "Legal"],
+"clientes_asignados": ["cliente_id_1", "cliente_id_2"],
+"max_clientes": 10
+}
+
+// Asesorías
+{
+"asesoria_id": "asesoria id",
+"nombre_asesoria": "xxxxxxxxxxxxxx",
+}
+
+// Registro_Asesorías
+{
+"registro_asesoria_id": "asesoria_id",
+"asesoria_id": "asesoria_id",
+"cliente_id": "cliente_id",
+"asesor_id": "asesor_id",
+"fecha": "2024-10-15",
+"hora": "hora",
+"duracion_sesion": "",
+"tema_principal": "",
+"documentos_compartidos": ["doc1.pdf", "doc2.pdf"],
+"temas_tratados": ["Marketing", "Finanzas"],
+"objetivos_acordados": Desarrollar estrategia de marketing digital",
+"talleres_recomendados": ["taller_id 1", "taller_id 2"],
+"observaciones_adicionales": "El cliente necesita mejorar su estrategia en redes sociales.",
+"estado": "completada",
+"foto": ""
+}
+
+// Talleres
+{
+"taller_id": "taller_id",
+"titulo": "Taller de Marketing Digital",
+"descripcion": "Aprender a desarrollar estrategias digitales efectivas",
+"fecha": "2024-12-05",
+"instructor": "Nombre del Instructor"
+}
+
+// Historial de Asignaciones
+{
+"\_id": "asignacion_id",
+"cliente_id": "cliente_id",
+"asesor_id": "asesor_id",
+"fecha_asignacion": "2024-10-23"
+}

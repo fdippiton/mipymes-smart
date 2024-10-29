@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const docAsesoriaSchema = new Schema({
-  registro_asesoria_id: { type: String, required: true },
+  doc_asesoria_id: { type: String, required: true, unique: true },
   asesoria_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Asesoria",

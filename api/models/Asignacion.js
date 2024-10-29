@@ -6,6 +6,7 @@ const asignacionSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Cliente",
     required: true,
+    unique: true,
   },
   asesor_id: {
     type: mongoose.Schema.Types.ObjectId,

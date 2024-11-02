@@ -9,11 +9,11 @@ const { default: mongoose } = require("mongoose");
 const app = express();
 const PORT = config.SERVER_PORT;
 
-app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 
 // Connect database
-const connectionString = config.database.CONNECTIONSTRING;
-mongoose.connect(connectionString);
+// const connectionString = config.database.CONNECTIONSTRING;
+// mongoose.connect(connectionString);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

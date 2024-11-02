@@ -4,6 +4,7 @@ const { Schema, model } = mongoose;
 const asesorSchema = new Schema({
   asesor_id: { type: String, required: true, unique: true },
   nombre: { type: String, required: true },
+  contrasena: { type: String, required: true },
   contacto: {
     email: { type: String, required: true },
     telefono: { type: String, required: true },

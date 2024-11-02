@@ -5,6 +5,7 @@ const clienteSchema = new Schema({
   cliente_id: { type: String, required: true, unique: true },
   rol: { type: mongoose.Schema.Types.ObjectId, ref: "Rol", required: true },
   nombre: { type: String, required: true },
+  contrasena: { type: String, required: true },
   contacto: {
     email_cliente: { type: String, required: true },
     telefono: { type: String, required: true },

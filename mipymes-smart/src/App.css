@@ -65,10 +65,10 @@ header a.logo {
 a.logo h6 {
   margin: 0 0 0 5px;
   font-size: 23px;
-  background: #27ae60;
-  -webkit-background-clip: text;
+  /* background: #27ae60; */
+  /* -webkit-background-clip: text; */
   background-clip: text;
-  color: transparent;
+  /* color: transparent; */
 }
 
 header nav {
@@ -94,7 +94,7 @@ header nav {
   text-align: center;
   font-size: 12px;
   bottom: 0;
-  /* position: fixed; */
+  position: fixed;
   width: 100%;
   font-weight: bold;
   font-family: "Inter", sans-serif;

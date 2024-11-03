@@ -97,7 +97,7 @@ function Signup() {
             <div className="my-6 sm:col-span-3">
               <label
                 htmlFor="nombre-cliente"
-                className="block text-sm/6 font-medium text-gray-900"
+                className="block text-sm/6 font-normal text-gray-900"
               >
                 Nombre del Cliente
               </label>
@@ -116,7 +116,7 @@ function Signup() {
             <div className="my-6 sm:col-span-3">
               <label
                 htmlFor="email"
-                className="block text-sm/6 font-medium text-gray-900"
+                className="block text-sm/6 font-normal text-gray-900"
               >
                 Correo del cliente
               </label>
@@ -135,7 +135,7 @@ function Signup() {
             <div className="my-6  sm:col-span-3">
               <label
                 htmlFor="password"
-                className="block text-sm/6 font-medium text-gray-900"
+                className="block text-sm/6 font-normal text-gray-900"
               >
                 Contraseña
               </label>
@@ -172,7 +172,7 @@ function Signup() {
                   />
                   <label
                     htmlFor="red-social-cmu"
-                    className="block text-sm/6 font-medium text-gray-900"
+                    className="block text-sm/6 font-normal text-gray-900"
                   >
                     Red Social Centro MiPymes Unphu
                   </label>
@@ -189,7 +189,7 @@ function Signup() {
                   />
                   <label
                     htmlFor="red-social-unphu"
-                    className="block text-sm/6 font-medium text-gray-900"
+                    className="block text-sm/6 font-normal text-gray-900"
                   >
                     Red Social Unphu
                   </label>
@@ -206,7 +206,7 @@ function Signup() {
                   />
                   <label
                     htmlFor="red-social-micm"
-                    className="block text-sm/6 font-medium text-gray-900"
+                    className="block text-sm/6 font-normal text-gray-900"
                   >
                     Red Social MICM
                   </label>
@@ -225,7 +225,7 @@ function Signup() {
                   />
                   <label
                     htmlFor="red-social-banco-leon"
-                    className="block text-sm/6 font-medium text-gray-900"
+                    className="block text-sm/6 font-normal text-gray-900"
                   >
                     Red Social Banco Leon
                   </label>
@@ -243,7 +243,7 @@ function Signup() {
                   />
                   <label
                     htmlFor="otro-medio"
-                    className="block text-sm/6 font-medium text-gray-900"
+                    className="block text-sm/6 font-normal text-gray-900"
                   >
                     Otro
                   </label>
@@ -253,7 +253,7 @@ function Signup() {
                   <div className="mt-4">
                     <label
                       htmlFor="customMessage"
-                      className="text-sm/6 font-medium text-gray-900"
+                      className="text-sm/6 font-normal text-gray-900"
                     >
                       Ingrese su mensaje:
                     </label>
@@ -287,7 +287,7 @@ function Signup() {
           <div className="my-6  sm:col-span-3">
             <label
               htmlFor="telefono-empresa"
-              className="block text-sm/6 font-medium text-gray-900"
+              className="block text-sm/6 font-normal text-gray-900"
             >
               Telefono del cliente
             </label>
@@ -310,7 +310,7 @@ function Signup() {
             <div className="my-6 sm:col-span-3">
               <label
                 htmlFor="nombre-empresa"
-                className="block text-sm/6 font-medium text-gray-900"
+                className="block text-sm/6 font-normal text-gray-900"
               >
                 Nombre de empresa
               </label>
@@ -329,7 +329,7 @@ function Signup() {
             <div className="my-6 sm:col-span-3">
               <label
                 htmlFor="correo-empresa"
-                className="block text-sm/6 font-medium text-gray-900"
+                className="block text-sm/6 font-normal text-gray-900"
               >
                 Correo de empresa
               </label>
@@ -348,7 +348,7 @@ function Signup() {
             <div className="my-6  sm:col-span-3">
               <label
                 htmlFor="descripcion-servicios"
-                className="block text-sm/6 font-medium text-gray-900"
+                className="block text-sm/6 font-normal text-gray-900"
               >
                 Breve descripción de los servicios o productos que ofrece
               </label>
@@ -367,7 +367,7 @@ function Signup() {
             <div className="my-6 sm:col-span-3">
               <label
                 htmlFor="rubro-empresa"
-                className="block text-sm/6 font-medium text-gray-900"
+                className="block text-sm/6 font-normal text-gray-900"
               >
                 Rubro/Sector de empresa
               </label>
@@ -403,7 +403,7 @@ function Signup() {
                   />
                   <label
                     htmlFor="si-ingresos"
-                    className="block text-sm/6 font-medium text-gray-900"
+                    className="block text-sm/6 font-normal text-gray-900"
                   >
                     Si
                   </label>
@@ -422,7 +422,7 @@ function Signup() {
                   />
                   <label
                     htmlFor="no-ingresos"
-                    className="block text-sm/6 font-medium text-gray-900"
+                    className="block text-sm/6 font-normal text-gray-900"
                   >
                     No
                   </label>
@@ -451,7 +451,7 @@ function Signup() {
                   <div className="text-sm/6">
                     <label
                       htmlFor="asesoria-empresarial"
-                      className="font-medium text-gray-900"
+                      className="font-normal text-gray-900"
                     >
                       Asesoría Empresarial
                     </label>
@@ -474,7 +474,7 @@ function Signup() {
                   <div className="text-sm/6">
                     <label
                       htmlFor="asesoria-financiera"
-                      className="font-medium text-gray-900"
+                      className="font-normal text-gray-900"
                     >
                       Asesoría Financiera
                     </label>
@@ -497,7 +497,7 @@ function Signup() {
                   <div className="text-sm/6">
                     <label
                       htmlFor="asesoria-tecnologica"
-                      className="font-medium text-gray-900"
+                      className="font-normal text-gray-900"
                     >
                       Asesoría Tecnológica
                     </label>
@@ -520,7 +520,7 @@ function Signup() {
                   <div className="text-sm/6">
                     <label
                       htmlFor="apoyo-asociacion-cooperativa"
-                      className="font-medium text-gray-900"
+                      className="font-normal text-gray-900"
                     >
                       Apoyo con una asociación y/o cooperativa
                     </label>
@@ -543,7 +543,7 @@ function Signup() {
                   <div className="text-sm/6">
                     <label
                       htmlFor="otro-servicio"
-                      className="font-medium text-gray-900"
+                      className="font-normal text-gray-900"
                     >
                       Otro
                     </label>
@@ -584,7 +584,7 @@ function Signup() {
         </button>
         <button
           type="submit"
-          className="rounded-md bg-green-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="rounded-md bg-emerald-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Guardar
         </button>

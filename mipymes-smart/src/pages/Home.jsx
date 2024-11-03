@@ -46,15 +46,15 @@ export default function Home() {
         ></div>
         <div className="text-left" style={{ maxWidth: "800px", zIndex: 2 }}>
           <h1 className=" font-bold text-5xl">
-            Bienvenido al Centro MiPymes Unphu
+            Bienvenido a MiPymes Unphu Smart
           </h1>
-          <p className=" mt-3 mb-8 font-medium text-xl">
+          <p className=" mt-3 mb-8 font-medium text-lg">
             Apoyamos el crecimiento de emprendedores y pequeñas empresas con
             asesorías, recursos y herramientas para su éxito.
           </p>
           <Link
             to="/signup"
-            className=" px-10 py-5 mt-8 cursor-pointer  bg-green-500 rounded-lg p-3"
+            className=" px-10 py-3 mt-8 cursor-pointer text-sm bg-green-500 rounded-lg p-3"
           >
             Registrate
           </Link>

@@ -20,6 +20,7 @@
     "rol": "rol_id",
     "nombre": "Nombre de la Empresa",
     "contraseña": "xxxxxxxx",
+    "nombre_empresa": "Nombre empresa",
     "contacto": {
       "email_cliente": "contacto@ejemplo.com",
       "telefono": "555-5555",

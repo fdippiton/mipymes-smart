@@ -55,7 +55,7 @@ export default function Header() {
 
   return (
     <header className="m-0">
-      <Link to="/" className="logo">
+      <Link to="/" className="logo flex align-middle">
         <img
           src={unphuMiPymes}
           alt="Logo"
@@ -83,20 +83,13 @@ export default function Header() {
             <div className="py-1">
               <MenuItem>
                 <Link
-                  to="#"
+                  to="/login"
                   className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
                 >
-                  Iniciar Sesion Cliente
+                  Iniciar Sesion
                 </Link>
               </MenuItem>
-              <MenuItem>
-                <Link
-                  to="#"
-                  className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                >
-                  Iniciar Sesion Admin
-                </Link>
-              </MenuItem>
+
               <MenuItem>
                 <Link
                   to="#"

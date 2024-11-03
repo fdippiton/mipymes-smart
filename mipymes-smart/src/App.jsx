@@ -3,6 +3,7 @@ import "./App.css";
 import Layout from "./Layout";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup";
+import Login from "./pages/Login";
 import { UserContextProvider } from "./UserContext";
 import { Routes, Route } from "react-router-dom";
 
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
           {/* <Route index element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

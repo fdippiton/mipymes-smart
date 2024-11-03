@@ -6,10 +6,11 @@ const clienteSchema = new Schema({
   rol: { type: mongoose.Schema.Types.ObjectId, ref: "Rol", required: true },
   nombre: { type: String, required: true },
   contrasena: { type: String, required: true },
+  nombre_empresa: { type: String, required: true },
   contacto: {
     email_cliente: { type: String, required: true },
-    telefono: { type: String, required: true },
     email_empresa: { type: String, required: true },
+    telefono: { type: String, required: true },
   },
   fecha_registro: { type: Date, default: Date.now },
   rubro: { type: String, required: true },

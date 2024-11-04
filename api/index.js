@@ -7,7 +7,7 @@ const cors = require("cors");
 const { default: mongoose } = require("mongoose");
 
 const app = express();
-const PORT = config.SERVER_PORT;
+const PORT = config.SERVER_PORT || 3000;
 
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 

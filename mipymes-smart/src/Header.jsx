@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { UserContext } from "./UserContext";
 import { Dropdown } from "react-bootstrap";
-import unphuMiPymes from "./assets/unphuMiPymes.jpg";
+// import unphuMiPymes from "./assets/unphuMiPymes.jpg";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";

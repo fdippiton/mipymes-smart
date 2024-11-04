@@ -26,9 +26,9 @@ function CrearAsesores() {
   return (
     <div>
       <form className="">
-        <div className="space-y-6 flex justify-start flex-col">
-          <div className=" border-gray-900/10 ">
-            <h2 className="text-xl font-semibold ">Crear asesor</h2>
+        <div className=" flex justify-start flex-col">
+          <div className="border-b border-gray-300 mb-3">
+            <h2 className="text-xl font-normal mb-3">Crear asesor</h2>
             {/* <h2 className="text-base/7 font-semibold text-gray-900">
               Iniciar sesion
             </h2> */}
@@ -79,7 +79,7 @@ function CrearAsesores() {
               </div>
 
               <fieldset className="mt-4">
-                <legend className="text-sm/6 font-semibold text-gray-900">
+                <legend className="text-sm/6 font-semibold text-gray-800">
                   Especialidades
                 </legend>
                 <div className="mt-3">
@@ -183,7 +183,7 @@ function CrearAsesores() {
                   value={meta}
                   onChange={handleChangeMeta}
                   min="0"
-                  className="border w-20 rounded mt-2 ml-3"
+                  className="w-20 ring-1 border-0 ring-inset ring-gray-300 rounded mt-2 ml-3 p-1"
                 />
               </div>
             </div>
@@ -193,7 +193,7 @@ function CrearAsesores() {
         <div className="mt-3 flex justify-start gap-x-6">
           <Link
             type="submit"
-            className="rounded-md  bg-emerald-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-tradewind focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="rounded-md w-50 text-center text-sm bg-green-700 py-1.5 px-3  font-normal text-white shadow-sm hover:bg-verdementa focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Crear asesor
           </Link>

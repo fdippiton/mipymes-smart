@@ -64,7 +64,7 @@ header a.logo {
 
 a.logo h6 {
   margin: 0 0 0 5px;
-  font-size: 23px;
+  font-size: 18px;
   /* background: #27ae60; */
   /* -webkit-background-clip: text; */
   background-clip: text;
@@ -88,7 +88,7 @@ header nav {
 }
 
 .footer {
-  background-color: #1b2833;
+  background-color: #1abc9c;
   padding: 12px;
   color: white;
   text-align: center;

@@ -61,7 +61,7 @@ export default function Header() {
           alt="Logo"
           style={{ width: "70px", height: "70px" }}
         /> */}
-        <h6 className="text-emerald-400 drop-shadow-lg">MiPymes Unphu Smart</h6>
+        <h6 className="text-emerald-400 ">MiPymes Unphu Smart</h6>
       </Link>
 
       <nav>
@@ -101,7 +101,7 @@ export default function Header() {
               <MenuItem className="rounded-b-md">
                 <Link
                   to="#"
-                  className="bg-red-500 hover:bg-red-700 block px-4 py-2 text-xs text-white data-[focus]:bg-red-700 data-[focus]:text-gray-50 data-[focus]:outline-none"
+                  className=" block px-4 py-2 text-xs text-red-600  data-[focus]:bg-gray-100 data-[focus]:text-red-800 data-[focus]:outline-none"
                 >
                   Salir
                 </Link>

@@ -73,7 +73,7 @@ function Signup() {
   // }
 
   return (
-    <form className="px-16 py-8">
+    <form className="px-32 py-8">
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
           <h2 className="text-xl font-semibold text-gray-900">
@@ -525,18 +525,18 @@ function Signup() {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center justify-end gap-x-6">
+      <div className="mt-6 flex items-center justify-start gap-x-6">
         <button type="button" className="text-sm/6 font-semibold text-gray-900">
           Cancelar
         </button>
         <button
           type="submit"
-          className="rounded-md bg-emerald-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-tradewind focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="rounded-md  text-sm bg-green-700 py-1.5 px-3  font-semibold text-white shadow-sm hover:bg-verdementa focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Guardar
         </button>
       </div>
-      <div className="text-xs text-end mt-3">
+      <div className="text-xs text-start mt-3">
         ¿Ya te has registrado?
         <Link to="/login" className="ml-2 text-sky-500">
           Iniciar sesión

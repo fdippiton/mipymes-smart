@@ -70,7 +70,7 @@ function VisualizarClientes() {
 
       {/* Clients List */}
       <div className="bg-white p-6 rounded-lg shadow mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Lista de Clientes</h2>
+        <h2 className="text-xl font-semibold mb-4">Lista de Clientes</h2>
         <table className="min-w-full bg-white">
           <thead>
             <tr>
@@ -81,7 +81,10 @@ function VisualizarClientes() {
             </tr>
           </thead>
           <tbody>
-            <tr className="cursor-pointer" onClick={() => handleRowClick(1)}>
+            <tr
+              className="cursor-pointer text-sm"
+              onClick={() => handleRowClick(1)}
+            >
               <td className="py-2">Cliente A</td>
               <td className="py-2">Asesor 1</td>
               <td className="py-2">1/4</td>

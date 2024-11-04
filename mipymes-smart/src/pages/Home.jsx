@@ -53,54 +53,53 @@ export default function Home() {
             Bienvenido a{" "}
             <span className="text-emerald-500">MiPymes Unphu Smart</span>
           </h1>
-          <p className=" mt-3 mb-8 font-normal text-lg tracking-normal">
+          <p className=" mt-3 mb-8 font-normal text-xl tracking-normal">
             Apoyamos el crecimiento de emprendedores y pequeñas empresas con
             asesorías, recursos y herramientas para su éxito.
           </p>
           <Link
             to="/signup"
-            className="tracking-normal px-14 py-3 mt-8 hover:bg-tradewind cursor-pointer text-sm bg-emerald-500 rounded-lg p-3 drop-shadow-2xl"
+            className="tracking-normal px-14 py-3 mt-8 hover:bg-emerald-500 cursor-pointer text-sm bg-verdementa rounded-lg p-3 drop-shadow-2xl"
           >
             Registrate
           </Link>
         </div>
       </section>
-      <div>
-        <h3 className="text-emerald-500 text-center font-bold text-2xl py-10 italic drop-shadow-lg">
-          Nuestros servicios
+      <div className="bg-white py-20 px-4">
+        <h3 className="text-emerald-600 text-center font-extrabold text-3xl mb-10 tracking-wide">
+          Nuestros Servicios
         </h3>
 
-        <div className="px-32">
-          <div className="flex flex-wrap justify-between items-center ">
-            <div className="">
-              <h1 className="font-medium flex flex-col items-center">
-                <IoBusiness
-                  className=""
-                  style={{ width: "70px", height: "70px" }}
-                />{" "}
-                <span>Asesoría Empresarial</span>
-              </h1>
-            </div>
-            <div className="flex flex-wrap justify-between items-center">
-              <h1 className="font-medium flex flex-col items-center">
-                <FaMoneyCheckAlt style={{ width: "70px", height: "70px" }} />
-                Asesoría Financiera
-              </h1>
-            </div>
-            <div className="flex flex-wrap justify-between items-center">
-              <h1 className="font-medium flex flex-col items-center">
-                <FaComputer style={{ width: "70px", height: "70px" }} />
-                Asesoría Tecnologica
-              </h1>
-            </div>
-            <div className="flex flex-wrap justify-between items-center">
-              <h1 className="font-medium flex flex-col items-center">
-                <MdOutlineSupportAgent
-                  style={{ width: "70px", height: "70px" }}
-                />
-                Apoyo con una asociación y/o cooperativa{" "}
-              </h1>
-            </div>
+        <div className="flex flex-wrap justify-center gap-10 px-8">
+          <div className="flex flex-col items-center bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
+            <IoBusiness className="text-emerald-700 mb-3" size={50} />
+            <h4 className="text-lg font-bold text-gray-800">
+              Asesoría Empresarial
+            </h4>
+          </div>
+
+          <div className="flex flex-col items-center bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
+            <FaMoneyCheckAlt className="text-emerald-700 mb-3" size={50} />
+            <h4 className="text-lg font-bold text-gray-800">
+              Asesoría Financiera
+            </h4>
+          </div>
+
+          <div className="flex flex-col items-center bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
+            <FaComputer className="text-emerald-700 mb-3" size={50} />
+            <h4 className="text-lg font-bold text-gray-800">
+              Asesoría Tecnológica
+            </h4>
+          </div>
+
+          <div className="flex flex-col items-center bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
+            <MdOutlineSupportAgent
+              className="text-emerald-700 mb-3"
+              size={50}
+            />
+            <h4 className="text-lg font-bold text-gray-800">
+              Apoyo Asociaciones y Cooperativas
+            </h4>
           </div>
         </div>
       </div>

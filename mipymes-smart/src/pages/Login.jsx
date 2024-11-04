@@ -31,9 +31,7 @@ function Login() {
           <h2 className="text-xl font-semibold text-emerald-400">
             Unphu MiPymes Smart
           </h2>
-          <h2 className="text-base/7 font-semibold text-gray-900">
-            Iniciar sesión
-          </h2>
+          <h2 className="text-sm font-bold text-gray-900">Iniciar sesión</h2>
         </div>
 
         <div className=" border-gray-900/10 h-max">
@@ -72,9 +70,9 @@ function Login() {
       <div className="mt-2 flex justify-center gap-x-6">
         <Link
           type="submit"
-          className="rounded-md w-96 text-center bg-emerald-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-tradewind focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="rounded-md w-96 text-center  text-sm bg-green-700 py-1.5 px-3 font-semibold text-white shadow-sm hover:bg-verdementa focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
-          Iniciar sesion
+          Iniciar sesión
         </Link>
       </div>
       <div className="text-xs text-center mt-3">

@@ -10,25 +10,61 @@ function VisualizarClientes() {
   return (
     <div>
       <div className=" grid grid-cols-5 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold">Clientes Totales</h2>
-          <p className="text-3xl font-bold text-blue-500">320</p>
+        <div
+          className=" p-4 rounded-lg shadow"
+          style={{ backgroundColor: "#e8cbf3" }}
+        >
+          <h2 className="text-xl font-semibold" style={{ color: "#47097d" }}>
+            Clientes Totales
+          </h2>
+          <p className="text-3xl font-bold " style={{ color: "#47097d" }}>
+            320
+          </p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold">Activos</h2>
-          <p className="text-3xl font-bold text-blue-500">20</p>
+        <div
+          className=" p-4 rounded-lg shadow"
+          style={{ backgroundColor: "#6ba8b3" }}
+        >
+          <h2 className="text-xl font-semibold" style={{ color: "#d8e9e7" }}>
+            Activos
+          </h2>
+          <p className="text-3xl font-bold " style={{ color: "#d8e9e7" }}>
+            20
+          </p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold">Inactivos</h2>
-          <p className="text-3xl font-bold text-blue-500">2</p>
+
+        <div
+          className=" p-4 rounded-lg shadow"
+          style={{ backgroundColor: "#fdd8b0" }}
+        >
+          <h2 className="text-xl font-semibold" style={{ color: "#827597" }}>
+            En proceso
+          </h2>
+          <p className="text-3xl font-bold " style={{ color: "#827597" }}>
+            20
+          </p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold">En proceso</h2>
-          <p className="text-3xl font-bold text-blue-500">20</p>
+        <div
+          className=" p-4 rounded-lg shadow"
+          style={{ backgroundColor: "#7b94de" }}
+        >
+          <h2 className="text-xl font-semibold" style={{ color: "#15315d" }}>
+            Cerrados
+          </h2>
+          <p className="text-3xl font-bold" style={{ color: "#15315d" }}>
+            20
+          </p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-xl font-semibold">Cerrados</h2>
-          <p className="text-3xl font-bold text-blue-500">20</p>
+        <div
+          className=" p-4 rounded-lg shadow"
+          style={{ backgroundColor: "#9c1323" }}
+        >
+          <h2 className="text-xl font-semibold" style={{ color: "#e0bdcb" }}>
+            Inactivos
+          </h2>
+          <p className="text-3xl font-bold" style={{ color: "#e0bdcb" }}>
+            2
+          </p>
         </div>
       </div>
 

@@ -36,68 +36,53 @@ function CrearAsesores() {
 
           <div className=" border-gray-900/10 h-max">
             <div className="sm:grid-cols-6">
-              <div className=" sm:col-span-3">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-normal text-gray-900 "
-                >
-                  Correo
-                </label>
+              <div className=" sm:col-span-2">
                 <div className="">
                   <input
                     id="email"
                     name="email"
-                    type="text"
-                    className="block w-96 rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                    type="email"
+                    placeholder="Correo"
+                    className="block w-96 placeholder:text-xs rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                     value={email}
                     onChange={(ev) => setEmail(ev.target.value)}
                   />
                 </div>
               </div>
 
-              <div className="mt-3 sm:col-span-3">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-normal text-gray-900"
-                >
-                  Contraseña
-                </label>
+              <div className="mt-3 sm:col-span-2">
                 <div className="">
                   <input
                     id="password"
                     name="password"
                     type="password"
-                    className="block w-96 rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                    placeholder="Contraseña"
+                    className="block w-96 placeholder:text-xs rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                     value={contrasena}
                     onChange={(ev) => setContrasena(ev.target.value)}
                   />
                 </div>
               </div>
 
-              <div className="mt-3 sm:col-span-3">
-                <label
-                  htmlFor="telefono"
-                  className="block text-sm font-normal text-gray-900"
-                >
-                  Teléfono
-                </label>
+              <div className="mt-3 sm:col-span-2">
                 <div className="">
                   <input
                     id="telefono"
                     name="telefono"
-                    type="telefono"
-                    className="block w-96 rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                    type="text"
+                    placeholder="Teléfono"
+                    className="block w-96 placeholder:text-xs rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                     value={telefono}
                     onChange={(ev) => setTelefono(ev.target.value)}
                   />
                 </div>
               </div>
 
-              <fieldset className="mt-8">
+              <fieldset className="mt-4">
                 <legend className="text-sm/6 font-semibold text-gray-900">
                   Especialidades
                 </legend>
-                <div className="mt-6 space-y-6">
+                <div className="mt-3">
                   <div className="relative flex gap-x-3">
                     <div className="flex h-6 items-center">
                       <input
@@ -198,7 +183,7 @@ function CrearAsesores() {
                   value={meta}
                   onChange={handleChangeMeta}
                   min="0"
-                  className="border p-2 rounded mt-2 ml-3"
+                  className="border w-20 rounded mt-2 ml-3"
                 />
               </div>
             </div>
@@ -208,7 +193,7 @@ function CrearAsesores() {
         <div className="mt-3 flex justify-start gap-x-6">
           <Link
             type="submit"
-            className="rounded-md bg-emerald-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="rounded-md  bg-emerald-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-tradewind focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Crear asesor
           </Link>

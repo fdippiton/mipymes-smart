@@ -2,7 +2,11 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        tradewind: "#6ba8b3",
+      },
+    },
   },
   plugins: [require("@tailwindcss/forms")],
 };

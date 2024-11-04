@@ -59,7 +59,7 @@ export default function Home() {
           </p>
           <Link
             to="/signup"
-            className="tracking-normal px-14 py-3 mt-8 hover:bg-indigo-500 cursor-pointer text-sm bg-emerald-500 rounded-lg p-3 drop-shadow-2xl"
+            className="tracking-normal px-14 py-3 mt-8 hover:bg-tradewind cursor-pointer text-sm bg-emerald-500 rounded-lg p-3 drop-shadow-2xl"
           >
             Registrate
           </Link>

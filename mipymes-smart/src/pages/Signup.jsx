@@ -84,7 +84,7 @@ function Signup() {
           </p>
         </div>
 
-        <div className="border-b border-gray-900/10 pb-12">
+        <div className="border-b border-gray-900/10 pb-6">
           <h2 className="text-base/7 font-semibold text-gray-900">
             Informacion Personal
           </h2>
@@ -94,57 +94,42 @@ function Signup() {
           </p>
 
           <div className="mt-10 gap-y-8 sm:grid-cols-6">
-            <div className="my-6 sm:col-span-3">
-              <label
-                htmlFor="nombre-cliente"
-                className="block text-sm/6 font-normal text-gray-900"
-              >
-                Nombre del Cliente
-              </label>
+            <div className="sm:col-span-3">
               <div className="mt-2">
                 <input
                   id="nombre-cliente"
                   name="nombre-cliente"
                   type="text"
-                  className="block w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                  placeholder="Nombre del cliente"
+                  className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={nombre}
                   onChange={(ev) => setNombre(ev.target.value)}
                 />
               </div>
             </div>
 
-            <div className="my-6 sm:col-span-3">
-              <label
-                htmlFor="email"
-                className="block text-sm/6 font-normal text-gray-900"
-              >
-                Correo del cliente
-              </label>
+            <div className=" sm:col-span-3">
               <div className="mt-2">
                 <input
                   id="email"
                   name="email"
-                  type="text"
-                  className="block w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                  type="email"
+                  placeholder="Correo del cliente"
+                  className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={email_cliente}
                   onChange={(ev) => setEmail_cliente(ev.target.value)}
                 />
               </div>
             </div>
 
-            <div className="my-6  sm:col-span-3">
-              <label
-                htmlFor="password"
-                className="block text-sm/6 font-normal text-gray-900"
-              >
-                Contraseña
-              </label>
-              <div className="mt-2">
+            <div className="sm:col-span-3">
+              <div className="mb-4 mt-2">
                 <input
                   id="password"
                   name="password"
                   type="password"
-                  className="block w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                  placeholder="Contraseña"
+                  className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={contrasena}
                   onChange={(ev) => setContrasena(ev.target.value)}
                 />
@@ -153,11 +138,11 @@ function Signup() {
 
             <fieldset>
               <legend className="text-sm/6 font-semibold text-gray-900">
-                ¿Como se enteró del CMU?
+                ¿Cómo se enteró del CMU?
               </legend>
 
-              <div className="mt-6 space-y-6">
-                <div className="flex items-center gap-x-3">
+              <div className="mt-6 ">
+                <div className="flex items-center gap-x-3 mb-1">
                   <input
                     id="red-social-cmu"
                     name="red-social-cmu"
@@ -177,7 +162,7 @@ function Signup() {
                     Red Social Centro MiPymes Unphu
                   </label>
                 </div>
-                <div className="flex items-center gap-x-3">
+                <div className="flex items-center gap-x-3 mb-1">
                   <input
                     id="red-social-unphu"
                     name="red-social-unphu"
@@ -194,7 +179,7 @@ function Signup() {
                     Red Social Unphu
                   </label>
                 </div>
-                <div className="flex items-center gap-x-3">
+                <div className="flex items-center gap-x-3 mb-1">
                   <input
                     id="red-social-micm"
                     name="red-social-micm"
@@ -211,7 +196,7 @@ function Signup() {
                     Red Social MICM
                   </label>
                 </div>
-                <div className="flex items-center gap-x-3">
+                <div className="flex items-center gap-x-3 mb-1">
                   <input
                     id="red-social-banco-leon"
                     name="red-social-banco-leon"
@@ -231,7 +216,7 @@ function Signup() {
                   </label>
                 </div>
 
-                <div className="flex items-center gap-x-3">
+                <div className="flex items-center gap-x-3 ">
                   <input
                     id="otro-medio"
                     name="otro-medio"
@@ -247,26 +232,19 @@ function Signup() {
                   >
                     Otro
                   </label>
+                  {selectedOptionConocio_CMU === "Otro medio" && (
+                    <div className="mt-4">
+                      <input
+                        id="customMessage"
+                        type="text"
+                        value={customMessage}
+                        onChange={handleCustomMessageChange}
+                        placeholder="Escriba como aquí"
+                        className="ml-2 border placeholder:text-xs border-gray-300 rounded text-sm/6"
+                      />
+                    </div>
+                  )}
                 </div>
-
-                {selectedOptionConocio_CMU === "Otro" && (
-                  <div className="mt-4">
-                    <label
-                      htmlFor="customMessage"
-                      className="text-sm/6 font-normal text-gray-900"
-                    >
-                      Ingrese su mensaje:
-                    </label>
-                    <input
-                      id="customMessage"
-                      type="text"
-                      value={customMessage}
-                      onChange={handleCustomMessageChange}
-                      placeholder="Escriba su mensaje aquí"
-                      className="ml-2 p-2 border border-gray-300 rounded text-sm/6"
-                    />
-                  </div>
-                )}
               </div>
             </fieldset>
           </div>
@@ -284,19 +262,14 @@ function Signup() {
             consentimiento.
           </p>
 
-          <div className="my-6  sm:col-span-3">
-            <label
-              htmlFor="telefono-empresa"
-              className="block text-sm/6 font-normal text-gray-900"
-            >
-              Telefono del cliente
-            </label>
+          <div className="sm:col-span-3">
             <div className="mt-2">
               <input
                 id="telefono-empresa"
                 name="telefono-empresa"
                 type="text"
-                className="block w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                placeholder="Teléfono del cliente"
+                className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                 value={telefono}
                 onChange={(ev) => setTelefono(ev.target.value)}
               />
@@ -307,76 +280,56 @@ function Signup() {
             Información sobre la empresa
           </h6>
           <div className="mt-2 gap-y-8 sm:grid-cols-6">
-            <div className="my-6 sm:col-span-3">
-              <label
-                htmlFor="nombre-empresa"
-                className="block text-sm/6 font-normal text-gray-900"
-              >
-                Nombre de empresa
-              </label>
+            <div className="sm:col-span-3">
               <div className="mt-2">
                 <input
                   id="nombre-empresa"
                   name="nombre-empresa"
                   type="text"
-                  className="block w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                  placeholder="Nombre de empresa"
+                  className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={nombre_empresa}
                   onChange={(ev) => setNombre_empresa(ev.target.value)}
                 />
               </div>
             </div>
 
-            <div className="my-6 sm:col-span-3">
-              <label
-                htmlFor="correo-empresa"
-                className="block text-sm/6 font-normal text-gray-900"
-              >
-                Correo de empresa
-              </label>
+            <div className="sm:col-span-3">
               <div className="mt-2">
                 <input
                   id="correo-empresa"
                   name="correo-empresa"
                   type="email"
-                  className="block w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                  placeholder="Correo de empresa"
+                  className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={email_empresa}
                   onChange={(ev) => setEmail_empresa(ev.target.value)}
                 />
               </div>
             </div>
 
-            <div className="my-6  sm:col-span-3">
-              <label
-                htmlFor="descripcion-servicios"
-                className="block text-sm/6 font-normal text-gray-900"
-              >
-                Breve descripción de los servicios o productos que ofrece
-              </label>
+            <div className=" sm:col-span-3">
               <div className="mt-2">
                 <textarea
                   id="descripcion-servicios"
                   name="descripcion-servicios"
                   rows={3}
-                  className="block w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                  placeholder="Breve descripción de los servicios o productos que ofrece"
+                  className="block w-96 placeholder:text-xs rounded-md border-0 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={descripcion_servicios}
                   onChange={(ev) => setDescripcion_servicios(ev.target.value)}
                 />
               </div>
             </div>
 
-            <div className="my-6 sm:col-span-3">
-              <label
-                htmlFor="rubro-empresa"
-                className="block text-sm/6 font-normal text-gray-900"
-              >
-                Rubro/Sector de empresa
-              </label>
-              <div className="mt-2">
+            <div className="sm:col-span-3">
+              <div className="mt-2 mb-4">
                 <input
                   id="rubro-empresa"
                   name="rubro-empresa"
                   type="text"
-                  className="block w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                  placeholder="Rubro/Sector de empresa"
+                  className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={rubro}
                   onChange={(ev) => setRubro(ev.target.value)}
                 />
@@ -388,7 +341,7 @@ function Signup() {
                 Su empresa ha generado más de 8,000 pesos mensuales?
               </legend>
 
-              <div className="mt-6 space-y-6">
+              <div className="mt-6 ">
                 <div className="flex items-center gap-x-3">
                   <input
                     id="si-ingresos"
@@ -433,7 +386,7 @@ function Signup() {
               <legend className="text-sm/6 font-semibold text-gray-900">
                 ¿Que servicios necesita actualmente?
               </legend>
-              <div className="mt-6 space-y-6">
+              <div className="mt-6">
                 <div className="relative flex gap-x-3">
                   <div className="flex h-6 items-center">
                     <input
@@ -526,7 +479,7 @@ function Signup() {
                     </label>
                   </div>
                 </div>
-                <div className="relative flex gap-x-3">
+                <div className="relative flex gap-x-3 items-center">
                   <div className="flex h-6 items-center">
                     <input
                       id="otro-servicio"
@@ -553,12 +506,6 @@ function Signup() {
                     "Otro servicio"
                   ) && (
                     <div className="mt-4">
-                      <label
-                        htmlFor="customMessageServicios"
-                        className="text-sm/6 font-medium text-gray-900"
-                      >
-                        Ingrese su mensaje:
-                      </label>
                       <input
                         id="customMessageServicios"
                         type="text"
@@ -567,7 +514,7 @@ function Signup() {
                           setCustomMessageServicios(ev.target.value)
                         }
                         placeholder="Escriba el servicio aquí"
-                        className="ml-2 p-2 border border-gray-300 rounded text-sm/6"
+                        className="ml-2 border placeholder:text-xs border-gray-300 rounded text-sm/6"
                       />
                     </div>
                   )}
@@ -584,7 +531,7 @@ function Signup() {
         </button>
         <button
           type="submit"
-          className="rounded-md bg-emerald-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="rounded-md bg-emerald-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-tradewind focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Guardar
         </button>
@@ -594,29 +541,3 @@ function Signup() {
 }
 
 export default Signup;
-
-{
-  /* <form className="register" onSubmit={register}>
-      <h4>MiPymes Unphu Smart</h4>
-      <h6>Register</h6>
-      <input
-        type="text"
-        placeholder="Nombre Cliente"
-        value={username}
-        onChange={(ev) => setNombre(ev.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(ev) => setPassword(ev.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(ev) => setPassword(ev.target.value)}
-      />
-      <button>Register</button>
-    </form> */
-}

@@ -55,12 +55,12 @@ export default function Header() {
 
   return (
     <header className="m-0">
-      <Link to="/" className="logo flex align-middle">
-        <img
+      <Link to="/" className="logo flex align-middle py-4">
+        {/* <img
           src={unphuMiPymes}
           alt="Logo"
           style={{ width: "70px", height: "70px" }}
-        />
+        /> */}
         <h6 className="text-emerald-400 drop-shadow-lg">MiPymes Unphu Smart</h6>
       </Link>
 
@@ -80,7 +80,7 @@ export default function Header() {
             transition
             className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
           >
-            <div className="my-1">
+            <div className="">
               <MenuItem>
                 <Link
                   to="/login"
@@ -98,10 +98,10 @@ export default function Header() {
                   Registrate
                 </Link>
               </MenuItem>
-              <MenuItem>
+              <MenuItem className="rounded-b-md">
                 <Link
                   to="#"
-                  className="bg-red-500 block px-4 py-2 text-sm text-white data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
+                  className="bg-red-500 hover:bg-red-700 block px-4 py-2 text-sm text-white data-[focus]:bg-red-700 data-[focus]:text-gray-50 data-[focus]:outline-none"
                 >
                   Salir
                 </Link>

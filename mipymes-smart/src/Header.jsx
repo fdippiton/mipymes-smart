@@ -84,7 +84,7 @@ export default function Header() {
               <MenuItem>
                 <Link
                   to="/login"
-                  className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
+                  className="block px-4 py-2 text-xs text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
                 >
                   Iniciar sesión
                 </Link>
@@ -93,7 +93,7 @@ export default function Header() {
               <MenuItem>
                 <Link
                   to="/signup"
-                  className="block px-4 py-2 text-sm  text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none "
+                  className="block px-4 py-2 text-xs text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none "
                 >
                   Registrate
                 </Link>
@@ -101,7 +101,7 @@ export default function Header() {
               <MenuItem className="rounded-b-md">
                 <Link
                   to="#"
-                  className="bg-red-500 hover:bg-red-700 block px-4 py-2 text-sm text-white data-[focus]:bg-red-700 data-[focus]:text-gray-50 data-[focus]:outline-none"
+                  className="bg-red-500 hover:bg-red-700 block px-4 py-2 text-xs text-white data-[focus]:bg-red-700 data-[focus]:text-gray-50 data-[focus]:outline-none"
                 >
                   Salir
                 </Link>

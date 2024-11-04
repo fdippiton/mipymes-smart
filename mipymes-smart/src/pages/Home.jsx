@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import unphuMiPymes from "../assets/unphuMiPymes.jpg";
+// import unphuMiPymes from "../assets/unphuMiPymes.jpg";
 import miPymes from "../assets/miPymes.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { IoBusiness } from "react-icons/io5";

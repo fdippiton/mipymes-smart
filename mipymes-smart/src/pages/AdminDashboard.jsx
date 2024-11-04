@@ -32,17 +32,17 @@ const AdminDashboard = () => {
       <div className="flex gap-x-20 px-10">
         <div className="flex flex-col w-80 gap-y-3">
           <div
-            className="bg-white p-4 rounded-lg shadow text-lg font-semibold cursor-pointer"
+            className="bg-white p-4 rounded-lg shadow text-sm font-semibold cursor-pointer"
             onClick={() => handleToggleComponent("Visualizar clientes")}
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2 ">
               <BsFillPeopleFill />
               Visualizar clientes
             </span>
           </div>
 
           <div
-            className="bg-white p-4 rounded-lg shadow text-lg font-semibold cursor-pointer"
+            className="bg-white p-4 rounded-lg shadow text-sm font-semibold cursor-pointer"
             onClick={() => handleToggleComponent("Metas")}
           >
             <span className="flex items-center gap-2">
@@ -51,7 +51,7 @@ const AdminDashboard = () => {
             </span>
           </div>
           <div
-            className="bg-white p-4 rounded-lg shadow text-lg font-semibold cursor-pointer"
+            className="bg-white p-4 rounded-lg shadow text-sm font-semibold cursor-pointer"
             onClick={() => handleToggleComponent("Generar reportes")}
           >
             <span className="flex items-center gap-2">
@@ -60,7 +60,7 @@ const AdminDashboard = () => {
             </span>
           </div>
           <div
-            className="bg-white p-4 rounded-lg shadow text-lg font-semibold cursor-pointer"
+            className="bg-white p-4 rounded-lg shadow text-sm font-semibold cursor-pointer"
             onClick={() => handleToggleComponent("Crear asesores")}
           >
             <span className="flex items-center gap-2">

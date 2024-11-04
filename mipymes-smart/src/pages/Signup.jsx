@@ -76,7 +76,7 @@ function Signup() {
     <form className="px-16 py-8">
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base/7 font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-gray-900">
             Registrate en Unphu MiPymes Smart
           </h2>
           <p className="mt-1 text-sm/6 text-gray-600">
@@ -535,6 +535,12 @@ function Signup() {
         >
           Guardar
         </button>
+      </div>
+      <div className="text-xs text-end mt-3">
+        ¿Ya te has registrado?
+        <Link to="/login" className="ml-2 text-sky-500">
+          Iniciar sesión
+        </Link>
       </div>
     </form>
   );

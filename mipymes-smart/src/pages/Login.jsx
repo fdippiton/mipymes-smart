@@ -26,18 +26,18 @@ function Login() {
 
   return (
     <form className="px-16 py-8">
-      <div className="space-y-12 flex justify-center flex-col items-center">
+      <div className="space-y-6 flex justify-center flex-col items-center">
         <div className=" border-gray-900/10 text-center">
-          <h2 className="text-base/7 font-semibold text-emerald-400">
+          <h2 className="text-xl font-semibold text-emerald-400">
             Unphu MiPymes Smart
           </h2>
           <h2 className="text-base/7 font-semibold text-gray-900">
-            Iniciar sesion
+            Iniciar sesión
           </h2>
         </div>
 
         <div className=" border-gray-900/10 h-max">
-          <div className="mt-10 gap-y-8 sm:grid-cols-6">
+          <div className=" gap-y-8 sm:grid-cols-6">
             <div className=" sm:col-span-3">
               <div className="mb-2">
                 <input
@@ -75,6 +75,12 @@ function Login() {
           className="rounded-md w-96 text-center bg-emerald-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-tradewind focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Iniciar sesion
+        </Link>
+      </div>
+      <div className="text-xs text-center mt-3">
+        ¿Aún no te has registrado?
+        <Link to="/signup" className="ml-2 text-sky-500">
+          Registrate
         </Link>
       </div>
     </form>

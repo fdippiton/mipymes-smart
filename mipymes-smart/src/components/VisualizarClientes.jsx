@@ -11,7 +11,7 @@ function VisualizarClientes() {
     <div>
       <div className=" grid grid-cols-5 gap-4">
         <div
-          className=" p-4 rounded-lg shadow"
+          className=" p-4 rounded-md shadow"
           style={{ backgroundColor: "#e8cbf3" }}
         >
           <h2 className="text-xl font-semibold" style={{ color: "#47097d" }}>
@@ -22,7 +22,7 @@ function VisualizarClientes() {
           </p>
         </div>
         <div
-          className=" p-4 rounded-lg shadow"
+          className=" p-4 rounded-md shadow"
           style={{ backgroundColor: "#6ba8b3" }}
         >
           <h2 className="text-xl font-semibold" style={{ color: "#d8e9e7" }}>
@@ -34,7 +34,7 @@ function VisualizarClientes() {
         </div>
 
         <div
-          className=" p-4 rounded-lg shadow"
+          className=" p-4 rounded-md shadow"
           style={{ backgroundColor: "#fdd8b0" }}
         >
           <h2 className="text-xl font-semibold" style={{ color: "#827597" }}>
@@ -45,7 +45,7 @@ function VisualizarClientes() {
           </p>
         </div>
         <div
-          className=" p-4 rounded-lg shadow"
+          className=" p-4 rounded-md shadow"
           style={{ backgroundColor: "#7b94de" }}
         >
           <h2 className="text-xl font-semibold" style={{ color: "#15315d" }}>
@@ -56,7 +56,7 @@ function VisualizarClientes() {
           </p>
         </div>
         <div
-          className=" p-4 rounded-lg shadow"
+          className=" p-4 rounded-md shadow"
           style={{ backgroundColor: "#9c1323" }}
         >
           <h2 className="text-xl font-semibold" style={{ color: "#e0bdcb" }}>

@@ -5,7 +5,7 @@ import Footer from "./Footer";
 export default function Layout() {
   return (
     <>
-      <main className="">
+      <main className="h-screen">
         <Header />
         <Outlet />
         <Footer />

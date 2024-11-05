@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { UserContext } from "./UserContext";
 import { Dropdown } from "react-bootstrap";
+import Centro from "./assets/Centro.svg";
+import centromipymes from "./assets/centromipymes.png";
 // import unphuMiPymes from "./assets/unphuMiPymes.jpg";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
@@ -55,13 +57,14 @@ export default function Header() {
 
   return (
     <header className="m-0">
-      <Link to="/" className="logo flex align-middle py-4">
-        {/* <img
-          src={unphuMiPymes}
+      <Link to="/" className="logo flex align-middle py-2">
+        <img
+          src={centromipymes}
           alt="Logo"
-          style={{ width: "70px", height: "70px" }}
-        /> */}
-        <h6 className="text-emerald-400 ">MiPymes Unphu Smart</h6>
+          style={{ width: "90px", height: "50px" }}
+          className=""
+        />
+        <h6 className=" text-emerald-400 ">MiPymes Unphu Smart</h6>
       </Link>
 
       <nav>

@@ -8,6 +8,8 @@ import VisualizarClientes from "../components/VisualizarClientes";
 import Metas from "../components/Metas";
 import GenerarReportes from "../components/GenerarReportes";
 import CrearAsesores from "../components/CrearAsesores";
+import Centro from "../assets/Centro.svg";
+import centromipymes from "../assets/centromipymes.png";
 
 const AdminDashboard = () => {
   const [visibleComponent, setVisibleComponent] = useState(null);
@@ -64,11 +66,25 @@ const AdminDashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-grow  p-6">
-          {visibleComponent === "Visualizar clientes" && <VisualizarClientes />}
-          {visibleComponent === "Metas" && <Metas />}
-          {visibleComponent === "Generar reportes" && <GenerarReportes />}
-          {visibleComponent === "Crear asesores" && <CrearAsesores />}
+        <div className="flex-grow relative p-6">
+          {!visibleComponent && (
+            <div
+              className="absolute inset-0 bg-center bg-no-repeat z-0"
+              style={{
+                backgroundImage: `url(${Centro})`,
+                opacity: 0.2,
+                backgroundSize: "400px 400px",
+              }}
+            ></div>
+          )}
+          <div className="relative z-10">
+            {visibleComponent === "Visualizar clientes" && (
+              <VisualizarClientes />
+            )}
+            {visibleComponent === "Metas" && <Metas />}
+            {visibleComponent === "Generar reportes" && <GenerarReportes />}
+            {visibleComponent === "Crear asesores" && <CrearAsesores />}
+          </div>
         </div>
       </div>
 

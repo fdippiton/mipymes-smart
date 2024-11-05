@@ -1,7 +1,7 @@
 import React from "react";
 
 function GenerarReportes() {
-  return <div>GenerarReportes</div>;
+  return <div>Generar Reportes</div>;
 }
 
 export default GenerarReportes;

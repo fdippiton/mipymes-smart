@@ -1,7 +1,7 @@
 import React from "react";
 
 function AsesorDashboard() {
-  return <div>AsesorDashboard</div>;
+  return <div>Asesor Dashboard</div>;
 }
 
 export default AsesorDashboard;

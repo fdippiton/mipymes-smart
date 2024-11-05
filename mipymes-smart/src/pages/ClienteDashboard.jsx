@@ -5,6 +5,7 @@ import Talleres from "../components/Talleres";
 import { CgProfile } from "react-icons/cg";
 import { FaPersonChalkboard } from "react-icons/fa6";
 import { GiTeacher } from "react-icons/gi";
+import Centro from "../assets/Centro.svg";
 
 function ClienteDashboard() {
   const [visibleComponent, setVisibleComponent] = useState(null);
@@ -50,10 +51,22 @@ function ClienteDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
-        {visibleComponent === "Mi perfil" && <MiPerfil />}
-        {visibleComponent === "Asesorias" && <Asesorias />}
-        {visibleComponent === "Talleres" && <Talleres />}
+      <div className="flex-grow relative p-6">
+        {!visibleComponent && (
+          <div
+            className="absolute inset-0 bg-center bg-no-repeat z-0"
+            style={{
+              backgroundImage: `url(${Centro})`,
+              opacity: 0.2,
+              backgroundSize: "400px 400px",
+            }}
+          ></div>
+        )}
+        <div className="relative z-10">
+          {visibleComponent === "Mi perfil" && <MiPerfil />}
+          {visibleComponent === "Asesorias" && <Asesorias />}
+          {visibleComponent === "Talleres" && <Talleres />}
+        </div>
       </div>
     </div>
   );

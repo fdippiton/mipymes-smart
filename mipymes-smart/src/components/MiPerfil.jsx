@@ -1,7 +1,7 @@
 import React from "react";
 
 function MiPerfil() {
-  return <div>MiPerfil</div>;
+  return <div>Mi Perfil</div>;
 }
 
 export default MiPerfil;

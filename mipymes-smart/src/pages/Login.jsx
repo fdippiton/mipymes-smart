@@ -2,6 +2,8 @@ import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import Centro from "../assets/Centro.svg";
+import centromipymes from "../assets/centromipymes.png";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -28,6 +30,14 @@ function Login() {
     <form className="px-16 py-8">
       <div className="space-y-6 flex justify-center flex-col items-center">
         <div className=" border-gray-900/10 text-center">
+          <Link to="/" className="logo flex justify-center py-2">
+            <img
+              src={Centro}
+              alt="Logo"
+              style={{ width: "90px", height: "50px" }}
+              className=""
+            />
+          </Link>
           <h2 className="text-xl font-semibold text-emerald-400">
             Unphu MiPymes Smart
           </h2>

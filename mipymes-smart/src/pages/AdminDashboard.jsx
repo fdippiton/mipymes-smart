@@ -18,9 +18,9 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <div className="h-screen flex bg-gray-100">
+      <div className="flex h-screen  bg-gray-100">
         {/* Sidebar */}
-        <div className="w-72 bg-gray-50 shadow-lg p-7 flex flex-col space-y-1">
+        <div className=" w-72 bg-gray-50 shadow-lg p-7 flex flex-col space-y-1">
           <h2 className="text-xl font-normal mb-4">
             Centro MiPymes - Admin Dashboard
           </h2>
@@ -64,7 +64,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
+        <div className="flex-grow  p-6">
           {visibleComponent === "Visualizar clientes" && <VisualizarClientes />}
           {visibleComponent === "Metas" && <Metas />}
           {visibleComponent === "Generar reportes" && <GenerarReportes />}

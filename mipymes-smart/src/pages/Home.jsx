@@ -65,7 +65,7 @@ export default function Home() {
           </Link>
         </div>
       </section>
-      <div className="bg-white py-20 px-4">
+      <div className="bg-white pb-20 pt-14 px-4">
         <h3 className="text-emerald-600 text-center font-extrabold text-3xl mb-10 tracking-wide">
           Nuestros Servicios
         </h3>

@@ -2,58 +2,15 @@ import { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { UserContext } from "./UserContext";
-import { Dropdown } from "react-bootstrap";
 import Centro from "./assets/Centro.svg";
 import centromipymes from "./assets/centromipymes.png";
-// import unphuMiPymes from "./assets/unphuMiPymes.jpg";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 export default function Header() {
   const { userInfo, setUserInfo } = useContext(UserContext);
-  //   const username = userInfo?.username;
   const navigate = useNavigate();
-
-  //   useEffect(() => {
-  //     const fetchData = async () => {
-  //       try {
-  //         const response = await fetch("http://localhost:4000/profile", {
-  //           credentials: "include",
-  //         });
-
-  //         if (!response.ok) {
-  //           throw new Error("Network response was not ok");
-  //         }
-
-  //         const data = await response.json();
-  //         setUserInfo(data);
-  //         console.log(data);
-  //       } catch (error) {
-  //         console.error("Error fetching data:", error);
-  //       }
-  //     };
-
-  //     fetchData();
-  //   }, []);
-
-  //   async function logout() {
-  //     try {
-  //       await fetch("http://localhost:4000/logout", {
-  //         method: "POST",
-  //         credentials: "include",
-  //       });
-
-  //       // Después de la solicitud fetch, actualiza el estado
-  //       setUserInfo(null);
-
-  //       // Redirecciona a la página principal
-  //       navigate("/");
-  //     } catch (error) {
-  //       console.error("Error during logout:", error);
-  //       // Puedes manejar el error según tus necesidades
-  //     }
-  //   }
 
   return (
     <header className="m-0">

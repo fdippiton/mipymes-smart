@@ -8,21 +8,6 @@ import { FaComputer } from "react-icons/fa6";
 import { MdOutlineSupportAgent } from "react-icons/md";
 
 export default function Home() {
-  //   useEffect(() => {
-  //     const fetchData = async () => {
-  //       try {
-  //         const response = await fetch("http://localhost:4000/post");
-  //         const responseToJson = await response.json();
-  //         setPosts(responseToJson);
-  //         console.log(responseToJson);
-  //       } catch (error) {
-  //         console.error("Error fetching data:", error);
-  //       }
-  //     };
-
-  //     fetchData();
-  //   }, []);
-
   return (
     <>
       <section
@@ -71,28 +56,28 @@ export default function Home() {
         </h3>
 
         <div className="flex flex-wrap justify-center gap-10 px-8">
-          <div className="flex flex-col items-center bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
+          <div className="flex flex-col items-center cursor-pointer bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
             <IoBusiness className="text-emerald-700 mb-3" size={50} />
             <h4 className="text-lg font-bold text-gray-800">
               Asesoría Empresarial
             </h4>
           </div>
 
-          <div className="flex flex-col items-center bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
+          <div className="flex flex-col items-center cursor-pointer bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
             <FaMoneyCheckAlt className="text-emerald-700 mb-3" size={50} />
             <h4 className="text-lg font-bold text-gray-800">
               Asesoría Financiera
             </h4>
           </div>
 
-          <div className="flex flex-col items-center bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
+          <div className="flex flex-col items-center cursor-pointer bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
             <FaComputer className="text-emerald-700 mb-3" size={50} />
             <h4 className="text-lg font-bold text-gray-800">
               Asesoría Tecnológica
             </h4>
           </div>
 
-          <div className="flex flex-col items-center bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
+          <div className="flex flex-col items-center cursor-pointer bg-emerald-100 rounded-lg p-8 w-60 hover:shadow-2xl transition duration-300">
             <MdOutlineSupportAgent
               className="text-emerald-700 mb-3"
               size={50}

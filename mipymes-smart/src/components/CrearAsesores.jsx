@@ -29,9 +29,6 @@ function CrearAsesores() {
         <div className=" flex justify-start flex-col">
           <div className="border-b border-gray-300 mb-3">
             <h2 className="text-xl font-normal mb-3">Crear asesor</h2>
-            {/* <h2 className="text-base/7 font-semibold text-gray-900">
-              Iniciar sesion
-            </h2> */}
           </div>
 
           <div className=" border-gray-900/10 h-max">

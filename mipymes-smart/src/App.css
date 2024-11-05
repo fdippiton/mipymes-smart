@@ -3,13 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-} */
-
 * {
   box-sizing: border-box;
 }
@@ -28,7 +21,6 @@ img {
 }
 
 main {
-  /* padding: 10px 10px 0 10px; */
   max-width: 100%;
   margin: 0 auto 100px auto;
 }
@@ -59,16 +51,13 @@ header a.logo {
   font-family: "Roboto", sans-serif;
   font-weight: 700;
   font-style: italic;
-  /* font-family: "Press Start 2P"; */
 }
 
 a.logo h6 {
   margin: 0 0 0 5px;
   font-size: 18px;
-  /* background: #27ae60; */
   /* -webkit-background-clip: text; */
   background-clip: text;
-  /* color: transparent; */
 }
 
 header nav {

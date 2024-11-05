@@ -55,23 +55,6 @@ function Signup() {
     }
   };
 
-  // async function register(ev) {
-  //   ev.preventDefault();
-
-  //   const response = await fetch("http://localhost:3000/register", {
-  //     method: "POST",
-  //     body: JSON.stringify({ username, password }),
-  //     headers: { "Content-Type": "application/json" },
-  //   });
-
-  //   if (response.status === 200) {
-  //     alert("Registration successful.");
-  //     navigate("/login");
-  //   } else {
-  //     alert("Registration failed. Try again.");
-  //   }
-  // }
-
   return (
     <form className="px-32 py-8 h-full">
       <div className="space-y-12">

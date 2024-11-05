@@ -21,13 +21,6 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/cliente" element={<ClienteDashboard />} />
           <Route path="/asesor" element={<AsesorDashboard />} />
-          {/* <Route index element={<Home />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/create" element={<CreatePost />} />
-          <Route path="/post/:id" element={<PostPage />} />
-          <Route path="/edit/:id" element={<EditPost />} />
-          <Route path="/delete/:id" element={<DeletePost />} /> */}
         </Route>
       </Routes>
     </UserContextProvider>

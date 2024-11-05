@@ -87,56 +87,6 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Header */}
-
-      {/* Main Dashboard */}
-      {/* <div className="flex gap-x-20 px-10 flex-grow">
-        <div className="flex flex-col w-80 gap-y-3">
-          <div
-            className="bg-white p-4 rounded-lg shadow text-sm font-semibold cursor-pointer"
-            onClick={() => handleToggleComponent("Visualizar clientes")}
-          >
-            <span className="flex items-center gap-2 ">
-              <BsFillPeopleFill className="w-6 h-6" />
-              Visualizar clientes
-            </span>
-          </div>
-          <div
-            className="bg-white p-4 rounded-lg shadow text-sm font-semibold cursor-pointer"
-            onClick={() => handleToggleComponent("Crear asesores")}
-          >
-            <span className="flex items-center gap-2">
-              <FaPeopleGroup className="w-6 h-6" /> Crear asesores
-            </span>
-          </div>
-
-          <div
-            className="bg-white p-4 rounded-lg shadow text-sm font-semibold cursor-pointer"
-            onClick={() => handleToggleComponent("Metas")}
-          >
-            <span className="flex items-center gap-2">
-              <GoGoal className="w-6 h-6" />
-              Metas
-            </span>
-          </div>
-          <div
-            className="bg-white p-4 rounded-lg shadow text-sm font-semibold cursor-pointer"
-            onClick={() => handleToggleComponent("Generar reportes")}
-          >
-            <span className="flex items-center gap-2">
-              <BiSolidReport className="w-6 h-6" />
-              Generar reportes
-            </span>
-          </div>
-        </div>
-        <div className="w-full">
-          {visibleComponent === "Visualizar clientes" && <VisualizarClientes />}
-          {visibleComponent === "Metas" && <Metas />}
-          {visibleComponent === "Generar reportes" && <GenerarReportes />}
-          {visibleComponent === "Crear asesores" && <CrearAsesores />}
-        </div>
-      </div> */}
     </>
   );
 };

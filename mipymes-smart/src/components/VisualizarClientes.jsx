@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { MdOutlineExpandMore } from "react-icons/md";
 
 function VisualizarClientes() {
   const [expandedRow, setExpandedRow] = useState(null);

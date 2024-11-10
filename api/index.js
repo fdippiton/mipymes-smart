@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const { default: mongoose } = require("mongoose");
+const Cookies = require("js-cookie");
 
 // Models
 const Clientes = require("./models/Clientes");
@@ -143,17 +144,31 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", (req, res) => {
+app.get("/userInfo", async (req, res) => {
   // Get token from cookies
-  const { token } = req.cookies;
+  // const token = Cookies.get("token");
+  const token = await req.cookies.token;
 
-  // Verify token with secret key
-  jwt.verify(token, secretKey, {}, (err, info) => {
-    // Check for error and throw it
-    if (err) throw err;
-    // Send user information as JSON
-    res.json(info);
-  });
+  if (!token) {
+    return res.status(401).json({ error: "Token not found" });
+  }
+
+  try {
+    // Verificamos el token usando la clave secreta
+    const decoded = jwt.verify(token, secretKey);
+
+    // Buscamos al usuario en la base de datos usando el ID del token decodificado
+    const userDoc = await Clientes.findById({ _id: decoded.id }).populate(
+      "rol"
+    );
+    if (userDoc) {
+      res.json(userDoc); // Enviamos la información del usuario
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.listen(PORT, () => {

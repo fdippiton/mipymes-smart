@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const ClientesSchema = new Schema({
-  rol: { type: mongoose.Schema.Types.ObjectId, ref: "Rol", required: true },
+  rol: { type: mongoose.Schema.Types.ObjectId, ref: "Roles", required: true },
   nombre: { type: String, required: true },
   contrasena: { type: String, required: true },
   nombre_empresa: { type: String, required: true },

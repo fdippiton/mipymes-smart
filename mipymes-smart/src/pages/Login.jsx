@@ -13,10 +13,10 @@ function Login() {
   const [email_cliente, setEmail_cliente] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [redirect, setRedirect] = useState(false);
-  const { setUserInfo } = useContext(UserContext);
+  const { userInfo, setUserInfo } = useContext(UserContext);
   const [authenticated, setAuthenticated] = useState(false);
 
-  async function login(ev) {
+  async function handleLogin(ev) {
     ev.preventDefault();
 
     const data = {
@@ -34,20 +34,9 @@ function Login() {
       });
 
       if (response.ok) {
-        const userInfo = await response.json();
-
-        // Verificar si existe el token en las cookies
-        const token = Cookies.get("token");
-
-        if (token) {
-          console.log("Token:", token);
-          const decoded = jwtDecode(token); // Decodificar el token
-          setUserInfo(decoded);
-          setAuthenticated(true);
-          setRedirect(true); // Establecer redirección a la página de cliente
-        } else {
-          console.log("No se encontró la cookie.");
-        }
+        setAuthenticated(true);
+        console.log("Login successful");
+        console.log(authenticated);
       } else {
         alert("Login failed. Try again.");
       }
@@ -61,7 +50,7 @@ function Login() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/profile", {
+        const response = await fetch("http://localhost:3000/userInfo", {
           credentials: "include", // Incluir cookies en la solicitud
         });
 
@@ -70,8 +59,11 @@ function Login() {
         }
 
         const data = await response.json();
-        setUserInfo(data); // Almacenar la información del perfil en el estado
-        console.log(data);
+        console.log(data.rol);
+        // Almacenar la información del perfil en el estado
+        setUserInfo(data);
+        // Establecer redirección a la página de cliente
+        setRedirect(true);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -84,11 +76,17 @@ function Login() {
   }, [authenticated]);
 
   if (redirect) {
-    return <Navigate to={"/cliente"} />;
+    if (userInfo.data.rol.descripcion == "Cliente") {
+      return <Navigate to={"/cliente"} />;
+    } else if (userInfo.data.rol.descripcion == "Administrador") {
+      return <Navigate to={"/admin"} />;
+    } else if (userInfo.data.rol.descripcion == "Asesor") {
+      return <Navigate to={"/asesor"} />;
+    }
   }
 
   return (
-    <form className="px-16 py-8" onSubmit={login}>
+    <form className="px-16 py-8" onSubmit={handleLogin}>
       <div className="space-y-6 flex justify-center flex-col items-center">
         <div className=" border-gray-900/10 text-center">
           <Link to="/" className="logo flex justify-center py-2">

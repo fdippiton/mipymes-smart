@@ -10,8 +10,10 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 export default function Header() {
   const { userInfo, setUserInfo } = useContext(UserContext);
-  const nombre = userInfo?.email_cliente;
+  const nombre = userInfo?.nombre;
   const navigate = useNavigate();
+
+  console.log(userInfo);
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -47,7 +49,7 @@ export default function Header() {
         <h6 className=" text-emerald-400 ">MiPymes Unphu Smart</h6>
       </Link>
 
-      {/* {nombre && (
+      {nombre && (
         <nav>
           <Menu as="div" className="relative inline-block text-left">
             <div>
@@ -125,7 +127,7 @@ export default function Header() {
             </MenuItems>
           </Menu>
         </nav>
-      )} */}
+      )}
 
       {/* <nav>
         {username && (

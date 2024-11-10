@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const asignacionSchema = new Schema({
+const AsignacionesSchema = new Schema({
   cliente_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Cliente",
@@ -16,6 +16,6 @@ const asignacionSchema = new Schema({
   fecha_asignacion: { type: Date, required: true },
 });
 
-const asignacionModel = model("Asignacion", asignacionSchema);
+const AsignacionesModel = model("Asignaciones", AsignacionesSchema);
 
-module.exports = asignacionModel;
+module.exports = AsignacionesModel;

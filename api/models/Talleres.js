@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const tallerSchema = new Schema({
+const TalleresSchema = new Schema({
   taller_id: { type: String, required: true, unique: true },
   titulo: { type: String, required: true },
   descripcion: { type: String, required: true },
@@ -9,6 +9,6 @@ const tallerSchema = new Schema({
   instructor: { type: String, required: true },
 });
 
-const tallerModel = model("Taller", tallerSchema);
+const TalleresModel = model("Talleres", TalleresSchema);
 
-module.exports = tallerModel;
+module.exports = TalleresModel;

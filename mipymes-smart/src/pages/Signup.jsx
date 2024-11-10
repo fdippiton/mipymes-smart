@@ -19,44 +19,110 @@ function Signup() {
     selectedOptionsIServiciosNecesarios,
     setSelectedOptionsIServiciosNecesarios,
   ] = useState([]);
+  const [customMessage, setCustomMessage] = useState("");
+  const [otroServicio, setOtroServicio] = useState(false); // State to track the checkbox
+  const [customMessageServicios, setCustomMessageServicios] = useState(""); // State for custom message
 
   const navigate = useNavigate();
 
-  const [customMessage, setCustomMessage] = useState("");
-  const [customMessageServicios, setCustomMessageServicios] = useState("");
-
   // Manejar el cambio de opción seleccionada
   const handleOptionChange = (e) => {
-    setSelectedOptionConocio_CMU(e.target.value);
-    if (e.target.value !== "Otro servicio") {
-      setCustomMessage(""); // Reiniciar el mensaje personalizado si cambia la opción
+    const selectedValue = e.target.value;
+    if (selectedValue !== "Otro medio") {
+      setSelectedOptionConocio_CMU(selectedValue);
+      setCustomMessage(""); // Reiniciar mensaje cuando no se selecciona "Otro medio"
+    } else {
+      // No establecemos selectedOptionConocio_CMU aquí, ya que queremos que se guarde el mensaje personalizado
+      setSelectedOptionConocio_CMU(""); // Limpiar el mensaje personalizado al seleccionar "Otro medio"
     }
   };
 
   // Manejar el cambio de mensaje personalizado
   const handleCustomMessageChange = (e) => {
-    setCustomMessage(e.target.value);
-  };
-
-  // Maneja el cambio de selección de cada checkbox
-  const handleOptionChangeServicios = (e) => {
-    const { value, checked } = e.target;
-
-    // Si el checkbox está seleccionado, lo agregamos al array; si no, lo quitamos
-    if (checked) {
-      setSelectedOptionsIServiciosNecesarios([
-        ...selectedOptionsIServiciosNecesarios,
-        value,
-      ]);
-    } else {
-      setSelectedOptionsIServiciosNecesarios(
-        selectedOptionsIServiciosNecesarios.filter((option) => option !== value)
-      );
+    const newMessage = e.target.value;
+    setCustomMessage(newMessage);
+    // Cuando hay un mensaje personalizado, lo guardamos en selectedOptionConocio_CMU
+    if (newMessage) {
+      setSelectedOptionConocio_CMU(newMessage);
     }
   };
 
+  const handleOptionChangeServicios = (event) => {
+    const { value, checked } = event.target;
+
+    if (value === "Otro servicio") {
+      setOtroServicio(checked); // Update state based on the "Otro servicio" checkbox
+      if (!checked) {
+        // If "Otro servicio" is unchecked, clear the custom message
+        setCustomMessageServicios("");
+        setSelectedOptionsIServiciosNecesarios(
+          (prev) => prev.filter((option) => option !== customMessageServicios) // Remove custom message if unchecked
+        );
+      }
+    } else {
+      // Update selected options for other checkboxes
+      if (checked) {
+        setSelectedOptionsIServiciosNecesarios((prev) => [...prev, value]); // Add to selected options
+      } else {
+        setSelectedOptionsIServiciosNecesarios(
+          (prev) => prev.filter((option) => option !== value) // Remove from selected options
+        );
+      }
+    }
+  };
+
+  // Function to handle custom message input change
+  const handleCustomMessageChangeServicios = (event) => {
+    const newMessage = event.target.value; // Get the new message
+    setCustomMessageServicios(newMessage); // Update the custom message state
+
+    // Update the selected options array
+    setSelectedOptionsIServiciosNecesarios((prev) => {
+      // Check if "Otro servicio" is already in the array
+      const filteredOptions = prev.filter(
+        (option) => option !== customMessageServicios
+      ); // Remove old custom message
+      return [...filteredOptions, newMessage]; // Add the new message
+    });
+  };
+
+  async function registrar(ev) {
+    ev.preventDefault();
+
+    const data = {
+      nombre,
+      email_cliente,
+      contrasena,
+      email_empresa,
+      nombre_empresa,
+      telefono,
+      rubro,
+      descripcion_servicios,
+      selectedOptionConocio_CMU,
+      selectedOptionIngresos,
+      selectedOptionsIServiciosNecesarios,
+    };
+
+    console.log(data);
+
+    const response = await fetch("http://localhost:3000/registrar", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.status === 200) {
+      alert("Registration successful.");
+      navigate("/login");
+    } else {
+      const errorData = await response.json();
+      console.error("Error:", errorData);
+      alert("Error en el registro. Inténtalo de nuevo.");
+    }
+  }
+
   return (
-    <form className="px-32 py-8 h-full">
+    <form className="px-32 py-8 h-full" onSubmit={registrar}>
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
           <h2 className="text-xl font-semibold text-gray-900">
@@ -128,7 +194,7 @@ function Signup() {
                 <div className="flex items-center gap-x-3 mb-1">
                   <input
                     id="red-social-cmu"
-                    name="red-social-cmu"
+                    name="conocio_cmu"
                     type="radio"
                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                     value="Red Social Centro MiPymes Unphu"
@@ -148,7 +214,7 @@ function Signup() {
                 <div className="flex items-center gap-x-3 mb-1">
                   <input
                     id="red-social-unphu"
-                    name="red-social-unphu"
+                    name="conocio_cmu"
                     type="radio"
                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                     value="Red Social Unphu"
@@ -165,7 +231,7 @@ function Signup() {
                 <div className="flex items-center gap-x-3 mb-1">
                   <input
                     id="red-social-micm"
-                    name="red-social-micm"
+                    name="conocio_cmu"
                     type="radio"
                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                     value="Red Social MICM"
@@ -182,7 +248,7 @@ function Signup() {
                 <div className="flex items-center gap-x-3 mb-1">
                   <input
                     id="red-social-banco-leon"
-                    name="red-social-banco-leon"
+                    name="conocio_cmu"
                     type="radio"
                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                     value="Red Social Banco Leon"
@@ -202,10 +268,13 @@ function Signup() {
                 <div className="flex items-center gap-x-3 ">
                   <input
                     id="otro-medio"
-                    name="otro-medio"
+                    name="conocio_cmu"
                     type="radio"
                     value="Otro medio"
-                    checked={selectedOptionConocio_CMU === "Otro medio"}
+                    checked={
+                      selectedOptionConocio_CMU === customMessage ||
+                      selectedOptionConocio_CMU === ""
+                    }
                     onChange={handleOptionChange}
                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                   />
@@ -215,7 +284,8 @@ function Signup() {
                   >
                     Otro
                   </label>
-                  {selectedOptionConocio_CMU === "Otro medio" && (
+                  {(selectedOptionConocio_CMU === customMessage ||
+                    selectedOptionConocio_CMU === "") && ( // Modificado
                     <div className="mt-4">
                       <input
                         id="customMessage"
@@ -470,10 +540,8 @@ function Signup() {
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                       value="Otro servicio"
-                      checked={selectedOptionsIServiciosNecesarios.includes(
-                        "Otro servicio"
-                      )}
-                      onChange={handleOptionChangeServicios}
+                      checked={otroServicio} // Use state to control checkbox
+                      onChange={handleOptionChangeServicios} // Call the handler on change
                     />
                   </div>
                   <div className="text-sm/6">
@@ -484,18 +552,13 @@ function Signup() {
                       Otro
                     </label>
                   </div>
-
-                  {selectedOptionsIServiciosNecesarios.includes(
-                    "Otro servicio"
-                  ) && (
+                  {otroServicio && (
                     <div className="mt-4">
                       <input
                         id="customMessageServicios"
                         type="text"
-                        value={customMessageServicios}
-                        onChange={(ev) =>
-                          setCustomMessageServicios(ev.target.value)
-                        }
+                        value={customMessageServicios} // Bind the custom message input to state
+                        onChange={handleCustomMessageChangeServicios}
                         placeholder="Escriba el servicio aquí"
                         className="ml-2 border placeholder:text-xs border-gray-300 rounded text-sm/6"
                       />

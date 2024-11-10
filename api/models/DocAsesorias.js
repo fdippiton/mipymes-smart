@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const docAsesoriaSchema = new Schema({
+const DocAsesoriasSchema = new Schema({
   doc_asesoria_id: { type: String, required: true, unique: true },
   asesoria_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -33,6 +33,6 @@ const docAsesoriaSchema = new Schema({
   foto: { type: String },
 });
 
-const docAsesoriaModel = model("DocAsesoria", docAsesoriaSchema);
+const DocAsesoriasModel = model("DocAsesorias", DocAsesoriasSchema);
 
-module.exports = docAsesoriaModel;
+module.exports = DocAsesoriasModel;

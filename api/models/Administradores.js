@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const administradorSchema = new Schema({
+const AdministradoresSchema = new Schema({
   administrador_id: { type: String, required: true, unique: true },
   rol: { type: mongoose.Schema.Types.ObjectId, ref: "Rol", required: true },
   nombre: { type: String, required: true },
@@ -13,6 +13,6 @@ const administradorSchema = new Schema({
   fecha_registro: { type: Date, default: Date.now },
 });
 
-const administradorModel = model("Administrador", administradorSchema);
+const AdministradoresModel = model("Administradores", AdministradoresSchema);
 
-module.exports = administradorModel;
+module.exports = AdministradoresModel;

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const asesorSchema = new Schema({
+const AsesoresSchema = new Schema({
   asesor_id: { type: String, required: true, unique: true },
   nombre: { type: String, required: true },
   contrasena: { type: String, required: true },
@@ -16,6 +16,6 @@ const asesorSchema = new Schema({
   max_clientes: { type: Number, required: true },
 });
 
-const asesorModel = model("Asesor", asesorSchema);
+const AsesoresModel = model("Asesores", AsesoresSchema);
 
-module.exports = asesorModel;
+module.exports = AsesoresModel;

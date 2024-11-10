@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import Layout from "./Layout";
 import Home from "./pages/Home";
@@ -11,6 +11,49 @@ import ClienteDashboard from "./pages/ClienteDashboard";
 import AsesorDashboard from "./pages/AsesorDashboard";
 
 function App() {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // useEffect(() => {
+  //   const checkToken = () => {
+  //     const token = Cookies.get("token");
+
+  //     if (token) {
+  //       const decoded = jwtDecode(token);
+  //       const expirationTime = decoded.exp * 1000; // Convertir la expiración a milisegundos
+  //       const currentTime = Date.now();
+
+  //       if (currentTime >= expirationTime) {
+  //         // Token expirado, realizar acciones necesarias (por ejemplo, redirigir al inicio de sesión)
+  //         alert("Tu sesión ha expirado. Inicia sesión nuevamente.");
+  //         handleLogout();
+  //         window.location.href = "/login";
+  //       } else {
+  //         // Token válido, el usuario está autenticado
+  //         setAuthenticated(true);
+  //         setUser(decoded);
+  //       }
+  //     }
+  //   };
+
+  //   checkToken();
+  // }, []);
+
+  // const handleLogin = (token) => {
+  //   Cookies.set("token", token, { expires: 1 }); // Establecer la cookie con una expiración de 1 día
+  //   const decoded = jwtDecode(token);
+  //   console.log(decoded);
+
+  //   setAuthenticated(true);
+  //   setUser(decoded);
+  // };
+
+  // const handleLogout = () => {
+  //   setAuthenticated(false);
+  //   setUser(null);
+  //   Cookies.remove("token"); // Eliminar la cookie
+  // };
+
   return (
     <UserContextProvider>
       <Routes>

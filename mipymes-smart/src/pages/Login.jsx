@@ -1,16 +1,94 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import Centro from "../assets/Centro.svg";
 import centromipymes from "../assets/centromipymes.png";
+import { UserContext } from "../UserContext";
+import { Navigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 
 function Login() {
-  const [email, setEmail] = useState("");
+  const [email_cliente, setEmail_cliente] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const [redirect, setRedirect] = useState(false);
+  const { setUserInfo } = useContext(UserContext);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  async function login(ev) {
+    ev.preventDefault();
+
+    const data = {
+      email_cliente,
+      contrasena,
+    };
+
+    try {
+      const response = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        mode: "cors",
+      });
+
+      if (response.ok) {
+        const userInfo = await response.json();
+
+        // Verificar si existe el token en las cookies
+        const token = Cookies.get("token");
+
+        if (token) {
+          console.log("Token:", token);
+          const decoded = jwtDecode(token); // Decodificar el token
+          setUserInfo(decoded);
+          setAuthenticated(true);
+          setRedirect(true); // Establecer redirección a la página de cliente
+        } else {
+          console.log("No se encontró la cookie.");
+        }
+      } else {
+        alert("Login failed. Try again.");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      alert("An error occurred during login. Please try again later.");
+    }
+  }
+
+  // Efecto para obtener la información del usuario después de login
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/profile", {
+          credentials: "include", // Incluir cookies en la solicitud
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        setUserInfo(data); // Almacenar la información del perfil en el estado
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    // Solo llamar a fetchData si el usuario está autenticado
+    if (authenticated) {
+      fetchData();
+    }
+  }, [authenticated]);
+
+  if (redirect) {
+    return <Navigate to={"/cliente"} />;
+  }
 
   return (
-    <form className="px-16 py-8">
+    <form className="px-16 py-8" onSubmit={login}>
       <div className="space-y-6 flex justify-center flex-col items-center">
         <div className=" border-gray-900/10 text-center">
           <Link to="/" className="logo flex justify-center py-2">
@@ -37,8 +115,8 @@ function Login() {
                   type="text"
                   placeholder="Correo"
                   className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
-                  value={email}
-                  onChange={(ev) => setEmail(ev.target.value)}
+                  value={email_cliente}
+                  onChange={(ev) => setEmail_cliente(ev.target.value)}
                 />
               </div>
             </div>
@@ -61,12 +139,12 @@ function Login() {
       </div>
 
       <div className="mt-2 flex justify-center gap-x-6">
-        <Link
+        <button
           type="submit"
           className="rounded-md w-96 text-center  text-sm bg-green-700 py-1.5 px-3 font-semibold text-white shadow-sm hover:bg-verdementa focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Iniciar sesión
-        </Link>
+        </button>
       </div>
       <div className="text-xs text-center mt-3">
         ¿Aún no te has registrado?

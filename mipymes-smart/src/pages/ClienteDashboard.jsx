@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Asesorias from "../components/Asesorias";
 import MiPerfil from "../components/MiPerfil";
 import Talleres from "../components/Talleres";
@@ -6,9 +6,11 @@ import { CgProfile } from "react-icons/cg";
 import { FaPersonChalkboard } from "react-icons/fa6";
 import { GiTeacher } from "react-icons/gi";
 import Centro from "../assets/Centro.svg";
+import { UserContext } from "../UserContext";
 
 function ClienteDashboard() {
   const [visibleComponent, setVisibleComponent] = useState(null);
+  const { userInfo } = useContext(UserContext);
 
   const handleToggleComponent = (component) => {
     setVisibleComponent(visibleComponent === component ? null : component);

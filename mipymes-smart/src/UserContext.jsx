@@ -2,7 +2,7 @@ import { createContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 export const UserContext = createContext({});
 import { jwtDecode } from "jwt-decode";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export function UserContextProvider({ children }) {
   const [userInfo, setUserInfo] = useState({});
@@ -71,16 +71,17 @@ export function UserContextProvider({ children }) {
   // };
 
   // /* ------------------------ Manejar cierre de sesion ------------------------ */
-  // const handleLogout = () => {
-  //   setAuthenticated(false);
-  //   setUser(null);
-  //   localStorage.removeItem("accessToken");
-  // };
+  const handleLogout = () => {
+    setAuthenticated(false);
+    setUserInfo({});
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+  };
 
   return (
     <UserContext.Provider
       value={{
         handleLogin,
+        handleLogout,
         userInfo,
         authenticated,
         setUserInfo,

@@ -27,13 +27,22 @@ const ProtectedRoute = ({
   requiredRole,
 }) => {
   const navigate = useNavigate();
-  if (!isAuthenticated) {
-    navigate("/login");
-  }
-  if (userRole !== requiredRole) {
-    navigate("/login");
-  }
-  return element;
+  useEffect(() => {
+    // Only navigate if not authenticated or if role doesn't match
+    if (!isAuthenticated || userRole !== requiredRole) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, userRole, requiredRole, navigate]); // Dependencies array ensures effect runs when these values change
+
+  // Only return the element if the user is authenticated and has the required role
+  return isAuthenticated && userRole === requiredRole ? element : null;
+  // if (!isAuthenticated) {
+  //   navigate("/login");
+  // }
+  // if (userRole !== requiredRole) {
+  //   navigate("/login");
+  // }
+  // return element;
 };
 
 function App() {

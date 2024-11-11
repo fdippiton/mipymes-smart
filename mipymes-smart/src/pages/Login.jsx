@@ -13,6 +13,8 @@ function Login() {
   const [contrasena, setContrasena] = useState("");
   const [userToken, setUserToken] = useState("");
   const [redirect, setRedirect] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(""); // Manage error state
   const navigate = useNavigate();
   const {
     handleLogin,
@@ -25,23 +27,38 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Realiza el login
-    await handleLogin(email, contrasena);
+    setLoading(true); // Set loading state to true while the login is in process
+    setError(""); // Reset error message
 
-    console.log(userInfo?.rol?.descripcion);
-    // Después de hacer login, verifica el rol y redirige al usuario según corresponda
-    if (userInfo?.rol?.descripcion === "Administrador") {
-      navigate("/admin");
-    } else if (userInfo?.rol?.descripcion === "Cliente") {
-      navigate("/cliente");
-    } else if (userInfo?.rol?.descripcion === "Asesor") {
-      navigate("/asesor");
+    try {
+      // Call the login function (awaiting the response)
+      await handleLogin(email, contrasena);
+
+      // Once login is done, set loading to false
+      setLoading(false);
+    } catch (err) {
+      setError("Login fallido. Verifica tus credenciales.");
+      setLoading(false); // Reset loading state in case of an error
     }
-    // else {
-    //   // Si no tiene un rol válido, redirige a la página de inicio
-    //   navigate("/");
-    // }
   };
+
+  // Redirect based on user role
+  useEffect(() => {
+    if (userInfo?.rol?.descripcion) {
+      const role = userInfo.rol.descripcion;
+
+      // Navigate based on the role
+      if (role === "Administrador") {
+        navigate("/admin");
+      } else if (role === "Cliente") {
+        navigate("/cliente");
+      } else if (role === "Asesor") {
+        navigate("/asesor");
+      } else {
+        navigate("/"); // Redirect to homepage if role is invalid
+      }
+    }
+  }, [userInfo, navigate]);
 
   console.log("Info recuperada", userInfo);
 

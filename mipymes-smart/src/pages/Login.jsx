@@ -36,10 +36,11 @@ function Login() {
       navigate("/cliente");
     } else if (userInfo?.rol?.descripcion === "Asesor") {
       navigate("/asesor");
-    } else {
-      // Si no tiene un rol válido, redirige a la página de inicio
-      navigate("/");
     }
+    // else {
+    //   // Si no tiene un rol válido, redirige a la página de inicio
+    //   navigate("/");
+    // }
   };
 
   console.log("Info recuperada", userInfo);

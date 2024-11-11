@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const { default: mongoose } = require("mongoose");
-const Cookies = require("js-cookie");
+// const Cookies = require("js-cookie");
 
 // Models
 const Clientes = require("./models/Clientes");
@@ -98,20 +98,36 @@ app.post("/registrar", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   // destructure request body for username and password
-  const { email_cliente, contrasena } = req.body;
+  const { email, contrasena } = req.body;
 
   // find user in database
-  const userDoc = await Clientes.findOne({
-    "contacto.email_cliente": email_cliente,
-  });
+  try {
+    let userDoc = null;
+    // Primero busca en la colección Clientes
+    userDoc = await Clientes.findOne({
+      "contacto.email_cliente": email,
+    });
 
-  // console.log(userDoc);
+    // Si no encuentra en Clientes, busca en Administradores
+    if (!userDoc) {
+      userDoc = await Administradores.findOne({
+        "contacto.email_admin": email,
+      });
+    }
 
-  // check if user exists
-  if (!userDoc) {
-    // respond with error if user doesn't exist
-    return res.status(401).json({ error: "Credenciales inválidas." });
-  } else {
+    // Si no encuentra en Administradores, busca en Asesores (si tienes esta colección)
+    if (!userDoc) {
+      userDoc = await Asesores.findOne({
+        "contacto.email": email,
+      });
+    }
+
+    // check if user exists
+    if (!userDoc) {
+      // respond with error if user doesn't exist
+      return res.status(401).json({ error: "Credenciales inválidas." });
+    }
+
     // compare password from request body with password from database
     const passwordMatch = await bcrypt.compare(contrasena, userDoc.contrasena);
 
@@ -124,24 +140,23 @@ app.post("/login", async (req, res) => {
 
       try {
         // generate and sign json web token
-        jwt.sign(
-          { email_cliente, id: userDoc._id },
-          secretKey,
-          {},
-          (err, token) => {
-            if (err) throw err;
-            // set cookie with token and send user details in response
-            res.cookie("token", token).json({
-              id: userDoc._id,
-              email_cliente,
-            });
-          }
-        );
+        jwt.sign({ email, id: userDoc._id }, secretKey, {}, (err, token) => {
+          if (err) throw err;
+          // set cookie with token and send user details in response
+          res.cookie("token", token).json({
+            id: userDoc._id,
+            email,
+          });
+        });
       } catch (error) {
         console.error(error);
       }
     }
+  } catch (error) {
+    console.error("Error buscando el email:", error);
+    throw new Error("Hubo un error al realizar la búsqueda");
   }
+  // console.log(userDoc);
 });
 
 app.get("/userInfo", async (req, res) => {
@@ -157,10 +172,22 @@ app.get("/userInfo", async (req, res) => {
     // Verificamos el token usando la clave secreta
     const decoded = jwt.verify(token, secretKey);
 
-    // Buscamos al usuario en la base de datos usando el ID del token decodificado
-    const userDoc = await Clientes.findById({ _id: decoded.id }).populate(
-      "rol"
-    );
+    let userDoc = null;
+    // Primero busca en la colección Clientes
+    userDoc = await Clientes.findById({ _id: decoded.id }).populate("rol");
+
+    // Si no encuentra en Clientes, busca en Administradores
+    if (!userDoc) {
+      userDoc = await Administradores.findById({ _id: decoded.id }).populate(
+        "rol"
+      );
+    }
+
+    // Si no encuentra en Administradores, busca en Asesores (si tienes esta colección)
+    if (!userDoc) {
+      userDoc = await Asesores.findById({ _id: decoded.id }).populate("rol");
+    }
+
     if (userDoc) {
       res.json(userDoc); // Enviamos la información del usuario
     } else {

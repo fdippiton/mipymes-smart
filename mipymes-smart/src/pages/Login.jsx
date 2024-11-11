@@ -6,87 +6,46 @@ import Centro from "../assets/Centro.svg";
 import centromipymes from "../assets/centromipymes.png";
 import { UserContext } from "../UserContext";
 import { Navigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 
 function Login() {
-  const [email_cliente, setEmail_cliente] = useState("");
+  const [email, setEmail] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const [userToken, setUserToken] = useState("");
   const [redirect, setRedirect] = useState(false);
-  const { userInfo, setUserInfo } = useContext(UserContext);
-  const [authenticated, setAuthenticated] = useState(false);
+  const navigate = useNavigate();
+  const {
+    handleLogin,
+    userInfo,
+    setUserInfo,
+    authenticated,
+    setAuthenticated,
+  } = useContext(UserContext);
 
-  async function handleLogin(ev) {
-    ev.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const data = {
-      email_cliente,
-      contrasena,
-    };
+    // Realiza el login
+    await handleLogin(email, contrasena);
 
-    try {
-      const response = await fetch("http://localhost:3000/login", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        mode: "cors",
-      });
-
-      if (response.ok) {
-        setAuthenticated(true);
-        console.log("Login successful");
-        console.log(authenticated);
-      } else {
-        alert("Login failed. Try again.");
-      }
-    } catch (error) {
-      console.error("Error during login:", error);
-      alert("An error occurred during login. Please try again later.");
+    console.log(userInfo?.rol?.descripcion);
+    // Después de hacer login, verifica el rol y redirige al usuario según corresponda
+    if (userInfo?.rol?.descripcion === "Administrador") {
+      navigate("/admin");
+    } else if (userInfo?.rol?.descripcion === "Cliente") {
+      navigate("/cliente");
+    } else if (userInfo?.rol?.descripcion === "Asesor") {
+      navigate("/asesor");
+    } else {
+      // Si no tiene un rol válido, redirige a la página de inicio
+      navigate("/");
     }
-  }
+  };
 
-  // Efecto para obtener la información del usuario después de login
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/userInfo", {
-          credentials: "include", // Incluir cookies en la solicitud
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-        console.log(data.rol);
-        // Almacenar la información del perfil en el estado
-        setUserInfo(data);
-        // Establecer redirección a la página de cliente
-        setRedirect(true);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    // Solo llamar a fetchData si el usuario está autenticado
-    if (authenticated) {
-      fetchData();
-    }
-  }, [authenticated]);
-
-  if (redirect) {
-    if (userInfo.data.rol.descripcion == "Cliente") {
-      return <Navigate to={"/cliente"} />;
-    } else if (userInfo.data.rol.descripcion == "Administrador") {
-      return <Navigate to={"/admin"} />;
-    } else if (userInfo.data.rol.descripcion == "Asesor") {
-      return <Navigate to={"/asesor"} />;
-    }
-  }
+  console.log("Info recuperada", userInfo);
 
   return (
-    <form className="px-16 py-8" onSubmit={handleLogin}>
+    <form className="px-16 py-8" onSubmit={handleSubmit}>
       <div className="space-y-6 flex justify-center flex-col items-center">
         <div className=" border-gray-900/10 text-center">
           <Link to="/" className="logo flex justify-center py-2">
@@ -113,8 +72,8 @@ function Login() {
                   type="text"
                   placeholder="Correo"
                   className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
-                  value={email_cliente}
-                  onChange={(ev) => setEmail_cliente(ev.target.value)}
+                  value={email}
+                  onChange={(ev) => setEmail(ev.target.value)}
                 />
               </div>
             </div>

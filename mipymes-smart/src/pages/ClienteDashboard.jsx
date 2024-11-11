@@ -67,9 +67,17 @@ function ClienteDashboard() {
           ></div>
         )}
         <div className="relative z-10">
-          {visibleComponent === "Mi perfil" && <MiPerfil />}
-          {visibleComponent === "Asesorias" && <Asesorias />}
-          {visibleComponent === "Talleres" && <Talleres />}
+          {/* Mostrar mensaje o componentes basados en el estado del usuario */}
+          {userInfo.estado.estado_descripcion === "En proceso de contacto" ? (
+            <div>Estás en proceso de ser aprobado</div>
+          ) : (
+            // Mostrar los componentes solo si el usuario está aprobado
+            <>
+              {visibleComponent === "Mi perfil" && <MiPerfil />}
+              {visibleComponent === "Asesorias" && <Asesorias />}
+              {visibleComponent === "Talleres" && <Talleres />}
+            </>
+          )}
         </div>
       </div>
     </div>

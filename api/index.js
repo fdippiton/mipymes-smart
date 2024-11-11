@@ -15,6 +15,7 @@ const Asesorias = require("./models/Asesorias");
 const DocAsesorias = require("./models/DocAsesorias");
 const Talleres = require("./models/Talleres");
 const Roles = require("./models/Roles");
+const Estados = require("./models/Estados");
 
 const app = express();
 const PORT = config.SERVER_PORT || 3000;
@@ -174,7 +175,9 @@ app.get("/userInfo", async (req, res) => {
 
     let userDoc = null;
     // Primero busca en la colección Clientes
-    userDoc = await Clientes.findById({ _id: decoded.id }).populate("rol");
+    userDoc = await Clientes.findById({ _id: decoded.id })
+      .populate("rol")
+      .populate("estado");
 
     // Si no encuentra en Clientes, busca en Administradores
     if (!userDoc) {
@@ -195,6 +198,52 @@ app.get("/userInfo", async (req, res) => {
     }
   } catch (error) {
     console.log(error);
+  }
+});
+
+// app.post("/logout", (req, res) => {
+//   // Remove token from cookies
+//   res.clearCookie("token").json({ message: "Logged out successfully" });
+// });
+
+app.get("/getAllClientes", async (req, res) => {
+  try {
+    const clients = await Clientes.find().populate("estado"); // Assuming Clients is a model for the clients collection
+    res.json(clients);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/allEstados", async (req, res) => {
+  try {
+    const estados = await Estados.find();
+    res.json(estados);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.put("/updateEstadoCliente/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body; // El nuevo estado debe estar en el cuerpo de la solicitud
+
+    const updatedClient = await Clientes.findByIdAndUpdate(
+      id,
+      { estado }, // Actualiza el campo estado
+      { new: true } // Devuelve el cliente actualizado
+    );
+
+    if (!updatedClient) {
+      return res.status(404).json({ error: "Cliente no encontrado" });
+    }
+    res.json(updatedClient);
+  } catch (error) {
+    console.error("Error en la actualización del estado:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 

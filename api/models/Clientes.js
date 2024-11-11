@@ -15,7 +15,11 @@ const ClientesSchema = new Schema({
   descripcion_servicios: { type: String, required: true },
   servicios_requeridos: [{ type: String, required: true }],
   conocio_CMU: [{ type: String, required: true }],
-  estado: { type: String, required: true, default: "En proceso de contacto" },
+  estado: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Estados",
+    default: "67325c856a18b7355e49e124",
+  },
   ingresos: { type: String },
   fecha_registro: { type: Date, default: Date.now },
 });

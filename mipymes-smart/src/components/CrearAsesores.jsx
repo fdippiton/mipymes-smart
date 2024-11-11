@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 function CrearAsesores() {
   const [email, setEmail] = useState("");
+  const [nombre, setNombre] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [telefono, setTelefono] = useState("");
   const [especialidades, setEspecialidades] = useState([]);
@@ -23,9 +24,44 @@ function CrearAsesores() {
     setMeta(parseInt(e.target.value, 10));
   };
 
+  async function registrarAsesor(ev) {
+    ev.preventDefault();
+
+    const data = {
+      nombre,
+      contrasena,
+      email,
+      telefono,
+      especialidades,
+      meta,
+    };
+
+    console.log(data);
+
+    const response = await fetch("http://localhost:3000/registrarAsesor", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.status === 200) {
+      alert("Registration successful.");
+      setNombre("");
+      setContrasena("");
+      setEmail("");
+      setTelefono("");
+      setEspecialidades([]);
+      setMeta("");
+    } else {
+      const errorData = await response.json();
+      console.error("Error:", errorData);
+      alert("Error en el registro. Inténtalo de nuevo.");
+    }
+  }
+
   return (
     <div>
-      <form className="">
+      <form className="" onSubmit={registrarAsesor}>
         <div className=" flex justify-start flex-col">
           <div className="border-b border-gray-300 mb-3">
             <h2 className="text-xl font-normal mb-3">Crear asesor</h2>
@@ -34,6 +70,19 @@ function CrearAsesores() {
           <div className=" border-gray-900/10 h-max">
             <div className="sm:grid-cols-6">
               <div className=" sm:col-span-2">
+                <div className="">
+                  <input
+                    id="nombre"
+                    name="nombre"
+                    type="text"
+                    placeholder="Nombre completo"
+                    className="block w-96 placeholder:text-xs rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
+                    value={nombre}
+                    onChange={(ev) => setNombre(ev.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="mt-3 sm:col-span-2">
                 <div className="">
                   <input
                     id="email"
@@ -188,12 +237,12 @@ function CrearAsesores() {
         </div>
 
         <div className="mt-3 flex justify-start gap-x-6">
-          <Link
+          <button
             type="submit"
             className="rounded-md w-50 text-center text-sm bg-green-700 py-1.5 px-3  font-normal text-white shadow-sm hover:bg-verdementa focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Crear asesor
-          </Link>
+          </button>
         </div>
       </form>
     </div>

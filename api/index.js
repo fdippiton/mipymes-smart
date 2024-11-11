@@ -247,6 +247,43 @@ app.put("/updateEstadoCliente/:id", async (req, res) => {
   }
 });
 
+app.post("/registrarAsesor", async (req, res) => {
+  const { nombre, contrasena, email, telefono, especialidades, meta } =
+    req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(contrasena, 10);
+
+    // Buscar el rol de "Cliente"
+    const roleDoc = await Roles.findOne({ descripcion: "Asesor" });
+    console.log(roleDoc);
+    if (!roleDoc) {
+      return res.status(400).json({
+        error:
+          "Rol 'Asesor' no encontrado. Asegúrate de que el rol exista en la colección 'roles'.",
+      });
+    }
+
+    // Crear el cliente con el rol asignado
+    const userDoc = await Asesores.create({
+      nombre,
+      contrasena: hashedPassword,
+      contacto: {
+        email,
+        telefono,
+      },
+      especialidades,
+      max_clientes: meta, // Inicialmente, no tiene clientes asociados
+      rol: roleDoc._id,
+    });
+
+    res.status(200).json(userDoc);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al crear el usuario asesor." });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

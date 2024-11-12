@@ -38,7 +38,7 @@ export default function Header() {
             Menu
             <ChevronDownIcon className="h-5 w-5 text-gray-400 ml-2" />
           </MenuButton>
-          <Menu.Items className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+          <Menu.Items className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
             <div>
               {userInfo?.nombre ? (
                 // Si el usuario está autenticado

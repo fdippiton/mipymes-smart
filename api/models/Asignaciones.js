@@ -4,16 +4,16 @@ const { Schema, model } = mongoose;
 const AsignacionesSchema = new Schema({
   cliente_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Cliente",
+    ref: "Clientes",
     required: true,
     unique: true,
   },
   asesor_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Asesor",
+    ref: "Asesores",
     required: true,
   },
-  fecha_asignacion: { type: Date, required: true },
+  fecha_asignacion: { type: Date, default: Date.now },
 });
 
 const AsignacionesModel = model("Asignaciones", AsignacionesSchema);

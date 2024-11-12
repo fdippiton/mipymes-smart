@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { IoMdAddCircle } from "react-icons/io";
 
 function VisualizarClientes() {
   const [expandedRow, setExpandedRow] = useState(null);
   const [dataClientes, setDataClientes] = useState([]);
   const [estados, setEstados] = useState([]);
+  const [asesores, setAsesores] = useState([]);
+  const [asignaciones, setAsignaciones] = useState([]);
+
+  const navigate = useNavigate();
 
   const handleRowClick = (rowId) => {
     setExpandedRow(expandedRow === rowId ? null : rowId);
@@ -21,7 +27,6 @@ function VisualizarClientes() {
         }
 
         const data = await response.json();
-        console.log(data);
         setDataClientes(data); // Almacenar la información del perfil en el estado
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -33,21 +38,41 @@ function VisualizarClientes() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/allEstados", {
-          credentials: "include", // Incluir cookies en la solicitud
-        });
+        // Realizar la primera solicitud para obtener los estados
+        const responseEstados = await fetch(
+          "http://localhost:3000/allEstados",
+          {
+            credentials: "include", // Incluir cookies en la solicitud
+          }
+        );
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+        if (!responseEstados.ok) {
+          throw new Error("Error al obtener los estados");
         }
 
-        const data = await response.json();
-        console.log(data);
-        setEstados(data); // Almacenar la información del perfil en el estado
+        const dataEstados = await responseEstados.json();
+        setEstados(dataEstados); // Almacenar la información de estados en el estado
+
+        // Realizar la segunda solicitud para obtener las asignaciones
+        const responseAsignaciones = await fetch(
+          "http://localhost:3000/getAllAsignaciones",
+          {
+            credentials: "include", // Incluir cookies en la solicitud
+          }
+        );
+
+        if (!responseAsignaciones.ok) {
+          throw new Error("Error al obtener las asignaciones");
+        }
+
+        const dataAsignaciones = await responseAsignaciones.json();
+        setAsignaciones(dataAsignaciones); // Almacenar la información de asignaciones en el estado
+        console.log(dataAsignaciones);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error al obtener los datos:", error);
       }
     };
+
     fetchData();
   }, []);
 
@@ -81,6 +106,121 @@ function VisualizarClientes() {
       console.error("Error updating estado:", error);
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/getAllAsesores", {
+          credentials: "include", // Incluir cookies en la solicitud
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        setAsesores(data); // Almacenar la información del perfil en el estado
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleAsignarAsesor = async (cliente) => {
+    console.log("Cliente: " + cliente);
+    // Filtrar asesores que tienen las especialidades requeridas por el cliente
+    const asesoresDisponibles = await asesores.filter((asesor) => {
+      if (
+        !cliente.servicios_requeridos ||
+        !Array.isArray(cliente.servicios_requeridos)
+      ) {
+        // Si `servicios_requeridos` no existe o no es un arreglo, devolver falso y no incluir al asesor
+        return false;
+      }
+
+      // Verificar que todas las especialidades del asesor incluyan cada servicio requerido por el cliente
+      return cliente.servicios_requeridos.every((servicio) =>
+        asesor.especialidades.includes(servicio)
+      );
+    });
+
+    console.log("Asesores disponibles", asesoresDisponibles);
+
+    // // Filtrar los asesores que aún no han alcanzado su límite de clientes
+    const asesoresElegibles = asesoresDisponibles.filter(
+      (asesor) => asesor.clientes_asignados.length < asesor.max_clientes
+    );
+
+    console.log("Asesores elegibles", asesoresDisponibles);
+
+    // Si hay asesores elegibles, elegir el que tenga menos clientes asignados
+    if (asesoresElegibles.length > 0) {
+      const asesorSeleccionado = asesoresElegibles.reduce((prev, curr) =>
+        prev.clientes_asignados.length < curr.clientes_asignados.length
+          ? prev
+          : curr
+      );
+
+      // Actualizar el cliente con el asesor seleccionado
+      //  asignarClienteAAsesor(cliente._id, asesorSeleccionado._id);
+      // console.log("Asesor seleccionado:", asesorSeleccionado._id);
+      // console.log("cliente seleccionado:", cliente._id);
+
+      const dataToUpdates = {
+        clienteId: cliente._id,
+        asesorId: asesorSeleccionado._id,
+      };
+
+      try {
+        const response = await fetch(
+          `http://localhost:3000/asignarClienteAAsesor`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(dataToUpdates),
+          }
+        );
+        if (response.ok) {
+          console.log(response.message);
+          alert("Asesor asignado correctamente");
+
+          // Actualizar las asignaciones para reflejar la nueva asignación
+          setAsignaciones((prevAsignaciones) => [
+            ...prevAsignaciones,
+            {
+              cliente_id: cliente,
+              asesor_id: asesorSeleccionado, // Guardar la asignación
+            },
+          ]);
+        } else {
+          console.error("Error updating estado:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error updating estado:", error);
+      }
+
+      // // Actualizar los datos de los asesores en el estado
+      // setAsesores((prevAsesores) =>
+      //   prevAsesores.map((asesor) =>
+      //     asesor._id === asesorSeleccionado._id
+      //       ? {
+      //           ...asesor,
+      //           clientes_asignados: [...asesor.clientes_asignados, cliente._id],
+      //         }
+      //       : asesor
+      //   )
+      // );
+    } else {
+      alert("No hay asesores disponibles que cumplan con las condiciones.");
+    }
+  };
+
+  // const handleAsignaAsesor = (e) => {
+  //   e.preventDefault();
+  //   handleAsignarAsesor(cliente);
+  // }
 
   return (
     <div>
@@ -180,7 +320,37 @@ function VisualizarClientes() {
                 onClick={() => handleRowClick(index)}
               >
                 <td className="py-2">{cliente.nombre}</td>
-                <td className="py-2">Pendiente</td>
+                <td className="py-2  ">
+                  {asignaciones.some(
+                    (asignacion) => asignacion.cliente_id._id === cliente._id
+                  ) ? (
+                    // Si el cliente está en las asignaciones, busca el asesor y muestra un mensaje
+                    <>
+                      {asignaciones
+                        .filter(
+                          (asignacion) =>
+                            asignacion.cliente_id._id === cliente._id
+                        )
+                        .map((asignacion) => (
+                          <span
+                            key={asignacion._id}
+                            className="bg-green-300 p-1 rounded-md text-gray-700 px-2"
+                          >
+                            Cliente ya asignado a {asignacion.asesor_id.nombre}{" "}
+                            {/* Aquí cambia 'asesorId' por 'asesor_id' según tu esquema */}
+                          </span>
+                        ))}
+                    </>
+                  ) : (
+                    // Si el cliente no está en las asignaciones, muestra el enlace para asignar
+                    <Link
+                      className="bg-red-400 p-5 rounded-md text-white px-5 py-2"
+                      onClick={() => handleAsignarAsesor(cliente)}
+                    >
+                      Asignar Asesor
+                    </Link>
+                  )}
+                </td>
                 <td className="py-2">Pendiente</td>
 
                 <td className="py-2">
@@ -201,23 +371,24 @@ function VisualizarClientes() {
               </tr>
               {expandedRow === index && (
                 <tr>
-                  <td colSpan="4" className="py-2 bg-gray-100">
+                  <td colSpan="4" className="py-2 bg-gray-100 text-sm">
                     <div className="p-4">
                       <h3 className="font-semibold">{cliente.nombre}</h3>
                       <p>
-                        Teléfono: {cliente.contacto.telefono} <br />
-                        Correo: {cliente.contacto.email_cliente} <br />
-                        Nombre de empresa: {cliente.nombre_empresa} <br />
-                        Correo de empresa: {cliente.contacto.email_empresa}{" "}
+                        <strong>Teléfono:</strong> {cliente.contacto.telefono}{" "}
                         <br />
-                        Servicios que ofrece: {
-                          cliente.descripcion_servicios
-                        }{" "}
-                        <br />
-                        Rubro: {cliente.rubro} <br />
-                        Ingresos generados mas de 8,000: {cliente.ingresos}{" "}
-                        <br />
-                        Servicios que necesita:{" "}
+                        <strong>Correo:</strong>{" "}
+                        {cliente.contacto.email_cliente} <br />
+                        <strong>Nombre de empresa:</strong>{" "}
+                        {cliente.nombre_empresa} <br />
+                        <strong>Correo de empresa:</strong>{" "}
+                        {cliente.contacto.email_empresa} <br />
+                        <strong>Servicios que ofrece:</strong>{" "}
+                        {cliente.descripcion_servicios} <br />
+                        <strong>Rubro:</strong> {cliente.rubro} <br />
+                        <strong>Ingresos generados mas de 8,000:</strong>{" "}
+                        {cliente.ingresos} <br />
+                        <strong>Servicios que necesita:</strong>{" "}
                         {cliente.servicios_requeridos.join(", ")}
                       </p>
                     </div>

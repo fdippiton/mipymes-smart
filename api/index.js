@@ -16,6 +16,7 @@ const DocAsesorias = require("./models/DocAsesorias");
 const Talleres = require("./models/Talleres");
 const Roles = require("./models/Roles");
 const Estados = require("./models/Estados");
+const Asignaciones = require("./models/Asignaciones");
 
 const app = express();
 const PORT = config.SERVER_PORT || 3000;
@@ -281,6 +282,112 @@ app.post("/registrarAsesor", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al crear el usuario asesor." });
+  }
+});
+
+app.get("/getAllAsesores", async (req, res) => {
+  try {
+    const asesores = await Asesores.find(); // Assuming Clients is a model for the clients collection
+    res.json(asesores);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/getAllAsignaciones", async (req, res) => {
+  try {
+    const asignaciones = await Asignaciones.find()
+      .populate("cliente_id") // Cambiado para hacer `populate` del campo `cliente_id`
+      .populate("asesor_id"); // Cambiado para hacer `populate` del campo `asesor_id`
+    res.json(asignaciones);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/asignarClienteAAsesor", async (req, res) => {
+  const { clienteId, asesorId } = req.body;
+
+  // console.log("data recieved", clienteId, asesorId);
+
+  try {
+    // Asignar el cliente al asesor
+    const asesor = await Asesores.findById(asesorId);
+    const cliente = await Clientes.findById(clienteId);
+
+    // console.log("data recieved", asesor, cliente);
+    // Verificar que el asesor y el cliente existen
+    if (!asesor || !cliente) {
+      return res.status(404).json({ error: "Asesor o cliente no encontrado" });
+    }
+
+    // Verificar si el cliente ya está asignado al asesor
+    if (asesor.clientes_asignados.includes(clienteId)) {
+      return res
+        .status(400)
+        .json({ error: "El cliente ya está asignado a este asesor" });
+    }
+
+    // Verificar si el cliente ya tiene una asignación en la colección Asignaciones
+    const asignacionExistente = await Asignaciones.findOne({
+      cliente_id: clienteId,
+    });
+
+    if (asignacionExistente) {
+      return res
+        .status(400)
+        .json({ error: "El cliente ya tiene una asignación con otro asesor." });
+    }
+
+    // Verificar si el asesor ha alcanzado su límite de clientes
+    if (asesor.clientes_asignados.length >= asesor.max_clientes) {
+      return res
+        .status(400)
+        .json({ error: "El asesor ha alcanzado su límite de clientes" });
+    }
+
+    // Asignar el cliente al asesor
+    asesor.clientes_asignados.push(clienteId);
+    asesor.max_clientes -= 1; // Reducir el límite de clientes disponibles
+    // Guardar los cambios en el asesor
+    await asesor.save();
+
+    const asignacionAsesor = await Asignaciones.create({
+      cliente_id: clienteId,
+      asesor_id: asesorId,
+    });
+
+    console.log(asignacionAsesor);
+
+    res
+      .status(200)
+      .json({ message: "Cliente asignado exitosamente al asesor." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al asignar el cliente al asesor." });
+  }
+});
+
+app.put("/updateAsesor", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { cliente, max_clientes } = req.body; // El nuevo estado debe estar en el cuerpo de la solicitud
+
+    const updatedAsesor = await Asesores.findByIdAndUpdate(
+      id,
+      { clientes_asignados }, // Actualiza el campo estado
+      { new: true } // Devuelve el cliente actualizado
+    );
+
+    if (!updatedAsesor) {
+      return res.status(404).json({ error: "Cliente no encontrado" });
+    }
+    res.json(updatedAsesor);
+  } catch (error) {
+    console.error("Error en la actualización del estado:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 

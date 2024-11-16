@@ -11,7 +11,7 @@ const AsesoresSchema = new Schema({
   },
   especialidades: [{ type: String, required: true }],
   clientes_asignados: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Cliente" },
+    { type: mongoose.Schema.Types.ObjectId, ref: "Clientes" },
   ],
   max_clientes: { type: Number, required: true },
 });

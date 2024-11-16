@@ -287,7 +287,7 @@ app.post("/registrarAsesor", async (req, res) => {
 
 app.get("/getAllAsesores", async (req, res) => {
   try {
-    const asesores = await Asesores.find(); // Assuming Clients is a model for the clients collection
+    const asesores = await Asesores.find().populate("clientes_asignados"); // Assuming Clients is a model for the clients collection
     res.json(asesores);
   } catch (error) {
     console.log(error);

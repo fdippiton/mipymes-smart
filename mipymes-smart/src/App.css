@@ -83,7 +83,7 @@ header nav {
   text-align: center;
   font-size: 12px;
   bottom: 0;
-  position: fixed;
+  /* position: fixed; */
   width: 100%;
   font-weight: bold;
   font-family: "Inter", sans-serif;

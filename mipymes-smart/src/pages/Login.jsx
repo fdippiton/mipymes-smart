@@ -63,7 +63,7 @@ function Login() {
   console.log("Info recuperada", userInfo);
 
   return (
-    <form className="px-16 py-8" onSubmit={handleSubmit}>
+    <form className="px-16 py-8 h-screen" onSubmit={handleSubmit}>
       <div className="space-y-6 flex justify-center flex-col items-center">
         <div className=" border-gray-900/10 text-center">
           <Link to="/" className="logo flex justify-center py-2">

@@ -20,7 +20,7 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <div className="flex h-screen  bg-gray-100">
+      <div className="flex min-h-screen bg-gray-100">
         {/* Sidebar */}
         <div className=" w-72 bg-gray-50 shadow-lg p-7 flex flex-col space-y-1">
           <h2 className="text-xl font-normal mb-4">
@@ -66,7 +66,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-grow relative p-6">
+        <div className="flex-grow relative p-6 ">
           {!visibleComponent && (
             <div
               className="absolute inset-0 bg-center bg-no-repeat z-0"
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
               }}
             ></div>
           )}
-          <div className="relative z-10">
+          <div className="relative z-10 flex-grow ">
             {visibleComponent === "Visualizar clientes" && (
               <VisualizarClientes />
             )}

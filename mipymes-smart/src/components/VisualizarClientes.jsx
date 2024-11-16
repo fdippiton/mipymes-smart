@@ -226,24 +226,36 @@ function VisualizarClientes() {
     <div>
       <div className=" grid grid-cols-5 gap-4">
         <div
-          className=" p-4 rounded-md shadow"
-          style={{ backgroundColor: "#e8cbf3" }}
+          className=" p-4 rounded-md shadow bg-gray-300"
+          // style={{ backgroundColor: "#e8cbf3" }}
         >
-          <h2 className="text-xl font-semibold" style={{ color: "#47097d" }}>
+          <h2
+            className="text-xl font-semibold text-gray-500"
+            // style={{ color: "#47097d" }}
+          >
             Clientes Totales
           </h2>
-          <p className="text-3xl font-bold " style={{ color: "#47097d" }}>
+          <p
+            className="text-3xl font-bold text-gray-500"
+            // style={{ color: "#47097d" }}
+          >
             {dataClientes.length}
           </p>
         </div>
         <div
-          className=" p-4 rounded-md shadow"
-          style={{ backgroundColor: "#6ba8b3" }}
+          className=" p-4 rounded-md shadow bg-emerald-400"
+          // style={{ backgroundColor: "#6ba8b3" }}
         >
-          <h2 className="text-xl font-semibold" style={{ color: "#d8e9e7" }}>
+          <h2
+            className="text-xl font-semibold text-emerald-700"
+            // style={{ color: "#d8e9e7" }}
+          >
             Activos
           </h2>
-          <p className="text-3xl font-bold " style={{ color: "#d8e9e7" }}>
+          <p
+            className="text-3xl font-bold text-emerald-700"
+            // style={{ color: "#d8e9e7" }}
+          >
             {
               dataClientes.filter(
                 (cliente) => cliente.estado.estado_descripcion === "Activo"
@@ -253,13 +265,19 @@ function VisualizarClientes() {
         </div>
 
         <div
-          className=" p-4 rounded-md shadow"
-          style={{ backgroundColor: "#fdd8b0" }}
+          className=" p-4 rounded-md shadow bg-yellow-400"
+          // style={{ backgroundColor: "#fdd8b0" }}
         >
-          <h2 className="text-xl font-semibold" style={{ color: "#827597" }}>
+          <h2
+            className="text-xl font-semibold text-yellow-600"
+            // style={{ color: "#827597" }}
+          >
             En proceso
           </h2>
-          <p className="text-3xl font-bold " style={{ color: "#827597" }}>
+          <p
+            className="text-3xl font-bold text-yellow-600"
+            // style={{ color: "#827597" }}
+          >
             {
               dataClientes.filter(
                 (cliente) =>
@@ -319,7 +337,7 @@ function VisualizarClientes() {
                 className="cursor-pointer text-sm"
                 onClick={() => handleRowClick(index)}
               >
-                <td className="py-2">{cliente.nombre}</td>
+                <td className="py-2 font-semibold">{cliente.nombre}</td>
                 <td className="py-2  ">
                   {asignaciones.some(
                     (asignacion) => asignacion.cliente_id._id === cliente._id
@@ -336,7 +354,8 @@ function VisualizarClientes() {
                             key={asignacion._id}
                             className="bg-green-300 p-1 rounded-md text-gray-700 px-2"
                           >
-                            Cliente ya asignado a {asignacion.asesor_id.nombre}{" "}
+                            Cliente asignado a{" "}
+                            <strong>{asignacion.asesor_id.nombre} </strong>
                             {/* Aquí cambia 'asesorId' por 'asesor_id' según tu esquema */}
                           </span>
                         ))}
@@ -373,7 +392,7 @@ function VisualizarClientes() {
                 <tr>
                   <td colSpan="4" className="py-2 bg-gray-100 text-sm">
                     <div className="p-4">
-                      <h3 className="font-semibold">{cliente.nombre}</h3>
+                      <h3 className="font-bold">{cliente.nombre}</h3>
                       <p>
                         <strong>Teléfono:</strong> {cliente.contacto.telefono}{" "}
                         <br />
@@ -386,10 +405,36 @@ function VisualizarClientes() {
                         <strong>Servicios que ofrece:</strong>{" "}
                         {cliente.descripcion_servicios} <br />
                         <strong>Rubro:</strong> {cliente.rubro} <br />
-                        <strong>Ingresos generados mas de 8,000:</strong>{" "}
+                        <strong>
+                          Ingresos generados son más de $8,000 pesos:
+                        </strong>{" "}
                         {cliente.ingresos} <br />
                         <strong>Servicios que necesita:</strong>{" "}
-                        {cliente.servicios_requeridos.join(", ")}
+                        {Array.isArray(cliente.servicios_requeridos)
+                          ? cliente.servicios_requeridos.map(
+                              (servicio, index) => (
+                                <span
+                                  key={index}
+                                  className="my-1 inline-block bg-emerald-100 text-emerald-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
+                                >
+                                  {servicio}
+                                </span>
+                              )
+                            )
+                          : typeof cliente.servicios_requeridos === "string"
+                          ? cliente.servicios_requeridos
+                              .trim()
+                              .split(",")
+                              .map((servicio, index) => (
+                                <span
+                                  key={index}
+                                  className="inline-block bg-emerald-100 text-emerald-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
+                                >
+                                  {servicio}
+                                </span>
+                              ))
+                          : "No especificadas"}
+                        {/* {cliente.servicios_requeridos.join(", ")} */}
                       </p>
                     </div>
                   </td>

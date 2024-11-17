@@ -222,174 +222,143 @@ function VisualizarClientes() {
   //   handleAsignarAsesor(cliente);
   // }
 
+  // const handleAsignarAsesor = async (cliente) => {
+  //   const asignadosTemporalmente = new Set();
+
+  //   const asignarAsesorEquitativo = (asesoresDisponibles) => {
+  //     if (asesoresDisponibles.length === 0) return null;
+
+  //     return asesoresDisponibles.reduce((prev, curr) => {
+  //       if (!prev) return curr;
+
+  //       const isPrevAssigned = asignadosTemporalmente.has(prev._id);
+  //       const isCurrAssigned = asignadosTemporalmente.has(curr._id);
+
+  //       if (isPrevAssigned && !isCurrAssigned) return curr;
+  //       if (!isPrevAssigned && isCurrAssigned) return prev;
+
+  //       const totalPrev =
+  //         prev.clientes_encuentros.length +
+  //         prev.clientes_asignados.length +
+  //         (isPrevAssigned ? 1 : 0);
+  //       const totalCurr =
+  //         curr.clientes_encuentros.length +
+  //         curr.clientes_asignados.length +
+  //         (isCurrAssigned ? 1 : 0);
+
+  //       return totalPrev < totalCurr ? prev : curr;
+  //     }, null);
+  //   };
+
+  //   // Filtrar asesores disponibles
+  //   const asesoresDisponiblesEmpresarial = asesores.filter(
+  //     (asesor) =>
+  //       asesor.especialidades.includes("Asesoría Empresarial") &&
+  //       asesor.clientes_encuentros.length +
+  //         (asignadosTemporalmente.has(asesor._id) ? 1 : 0) <
+  //         asesor.max_encuentros
+  //   );
+
+  //   const asesoresDisponiblesFinanciero = asesores.filter(
+  //     (asesor) =>
+  //       asesor.especialidades.includes("Asesoría Financiera") &&
+  //       asesor.clientes_encuentros.length +
+  //         (asignadosTemporalmente.has(asesor._id) ? 1 : 0) <
+  //         asesor.max_encuentros
+  //   );
+
+  //   const asesoresDisponiblesTecnologico = asesores.filter(
+  //     (asesor) =>
+  //       asesor.especialidades.includes("Asesoría Tecnologica") &&
+  //       asesor.clientes_encuentros.length +
+  //         (asignadosTemporalmente.has(asesor._id) ? 1 : 0) <
+  //         asesor.max_encuentros
+  //   );
+
+  //   // Asignar asesores para los encuentros iniciales
+  //   const asesorEmpresarial = asignarAsesorEquitativo(
+  //     asesoresDisponiblesEmpresarial
+  //   );
+  //   if (asesorEmpresarial) asignadosTemporalmente.add(asesorEmpresarial._id);
+
+  //   const asesorFinanciero = asignarAsesorEquitativo(
+  //     asesoresDisponiblesFinanciero
+  //   );
+  //   if (asesorFinanciero) asignadosTemporalmente.add(asesorFinanciero._id);
+
+  //   const asesorTecnologico = asignarAsesorEquitativo(
+  //     asesoresDisponiblesTecnologico
+  //   );
+  //   if (asesorTecnologico) asignadosTemporalmente.add(asesorTecnologico._id);
+
+  //   // Asignar asesores definitivos
+  //   const asesorDefinitivoEmpresarial = asignarAsesorEquitativo(
+  //     asesoresDisponiblesEmpresarial
+  //   );
+  //   const asesorDefinitivoFinanciero = asignarAsesorEquitativo(
+  //     asesoresDisponiblesFinanciero
+  //   );
+  //   const asesorDefinitivoTecnologico = asignarAsesorEquitativo(
+  //     asesoresDisponiblesTecnologico
+  //   );
+
+  //   const dataUpdated = {
+  //     clienteId: cliente._id,
+  //     asesorEmpresarialId: asesorEmpresarial._id,
+  //     asesorFinancieroId: asesorFinanciero._id,
+  //     asesorTecnologicoId: asesorTecnologico._id,
+  //     asesorDefinitivoEmpresarialId: asesorDefinitivoEmpresarial._id,
+  //     asesorDefinitivoFinancieroId: asesorDefinitivoFinanciero._id,
+  //     asesorDefinitivoTecnologicoId: asesorDefinitivoTecnologico._id,
+  //   };
+
+  //   console.log(dataUpdated);
+
+  //   try {
+  //     const response = await fetch(
+  //       "http://localhost:3000/asignarClienteAAsesor",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify(dataUpdated),
+  //       }
+  //     );
+
+  //     const result = await response.json();
+  //     console.log(result);
+  //   } catch (error) {
+  //     console.error("Error al asignar asesores:", error);
+  //     alert("Error al asignar asesores.");
+  //   }
+  // };
+
   const handleAsignarAsesor = async (cliente) => {
-    // console.log("Cliente: ", cliente);
-    const asignadosTemporalmente = new Set();
-
-    const asignarAsesorEquitativo = (asesoresDisponibles) => {
-      if (asesoresDisponibles.length === 0) return null;
-
-      return asesoresDisponibles.reduce((prev, curr) => {
-        if (!prev) return curr;
-
-        const isPrevAssigned = asignadosTemporalmente.has(prev._id);
-        const isCurrAssigned = asignadosTemporalmente.has(curr._id);
-
-        if (isPrevAssigned && !isCurrAssigned) return curr;
-        if (!isPrevAssigned && isCurrAssigned) return prev;
-
-        const totalPrev =
-          prev.clientes_encuentros.length +
-          prev.clientes_asignados.length +
-          (isPrevAssigned ? 1 : 0);
-        const totalCurr =
-          curr.clientes_encuentros.length +
-          curr.clientes_asignados.length +
-          (isCurrAssigned ? 1 : 0);
-
-        if (totalPrev === totalCurr) {
-          return prev.id < curr.id ? prev : curr;
+    try {
+      const response = await fetch(
+        "http://localhost:3000/asignarClienteAAsesor",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ clienteId: cliente._id }),
         }
-
-        return totalPrev < totalCurr ? prev : curr;
-      }, null);
-    };
-
-    const asesoresDisponiblesEmpresarial = asesores.filter(
-      (asesor) =>
-        asesor.especialidades.includes("Asesoría Empresarial") &&
-        asesor.clientes_encuentros.length < asesor.max_encuentros
-    );
-
-    const asesoresDisponiblesFinanciero = asesores.filter(
-      (asesor) =>
-        asesor.especialidades.includes("Asesoría Financiera") &&
-        asesor.clientes_encuentros.length < asesor.max_encuentros
-    );
-
-    const asesoresDisponiblesTecnologico = asesores.filter(
-      (asesor) =>
-        asesor.especialidades.includes("Asesoría Tecnologica") &&
-        asesor.clientes_encuentros.length < asesor.max_encuentros
-    );
-
-    let asesorEmpresarial = asignarAsesorEquitativo(
-      asesoresDisponiblesEmpresarial
-    );
-    if (asesorEmpresarial) asignadosTemporalmente.add(asesorEmpresarial._id);
-
-    let asesorFinanciero = asignarAsesorEquitativo(
-      asesoresDisponiblesFinanciero
-    );
-    if (asesorFinanciero) asignadosTemporalmente.add(asesorFinanciero._id);
-
-    let asesorTecnologico = asignarAsesorEquitativo(
-      asesoresDisponiblesTecnologico
-    );
-    if (asesorTecnologico) asignadosTemporalmente.add(asesorTecnologico._id);
-
-    console.log("Asesor empresarial " + asesorEmpresarial?.nombre);
-    console.log("Asesor financiero " + asesorFinanciero?.nombre);
-    console.log("Asesor tecnológico " + asesorTecnologico?.nombre);
-
-    const asesoresElegiblesDefinitivos = asesores.filter((asesor) => {
-      const serviciosCumplidos = cliente.servicios_requeridos.filter(
-        (servicio) => asesor.especialidades.includes(servicio)
-      ).length;
-
-      return (
-        serviciosCumplidos >=
-        Math.floor(cliente.servicios_requeridos.length / 2)
-      );
-    });
-
-    console.log(
-      "Asesores elegibles definitivos:",
-      asesoresElegiblesDefinitivos
-    );
-
-    let asesorDefinitivo = null;
-
-    if (asesoresElegiblesDefinitivos.length > 0) {
-      asesorDefinitivo = asesoresElegiblesDefinitivos.reduce((prev, curr) => {
-        const prevLoad =
-          prev.clientes_encuentros.length +
-          prev.clientes_asignados.length +
-          (asignadosTemporalmente.has(prev._id) ? 1 : 0);
-        const currLoad =
-          curr.clientes_encuentros.length +
-          curr.clientes_asignados.length +
-          (asignadosTemporalmente.has(curr._id) ? 1 : 0);
-
-        return prevLoad < currLoad ? prev : curr;
-      });
-    } else {
-      const asesoresCombinados = asesoresDisponiblesEmpresarial.concat(
-        asesoresDisponiblesFinanciero,
-        asesoresDisponiblesTecnologico
       );
 
-      asesorDefinitivo = asignarAsesorEquitativo(asesoresCombinados);
-    }
+      const result = await response.json();
 
-    if (asesorDefinitivo) {
-      asignadosTemporalmente.add(asesorDefinitivo._id);
-    }
-
-    console.log(
-      "Asesor definitivo asignado:",
-      asesorDefinitivo?.nombre || "N/A"
-    );
-
-    // Verificar si se asignaron todos los asesores
-    if (
-      asesorEmpresarial &&
-      asesorFinanciero &&
-      asesorTecnologico &&
-      asesorDefinitivo
-    ) {
-      const dataToUpdate = {
-        clienteId: cliente._id,
-        asesorEmpresarialId: asesorEmpresarial._id,
-        asesorFinancieroId: asesorFinanciero._id,
-        asesorTecnologicoId: asesorTecnologico._id,
-        asesorDefinitivoId: asesorDefinitivo._id,
-      };
-
-      try {
-        const response = await fetch(
-          `http://localhost:3000/asignarClienteAAsesor`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(dataToUpdate),
-          }
-        );
-
-        if (response.ok) {
-          console.log("Asignación exitosa", response.message);
-          alert("Asesores asignados correctamente");
-
-          // Actualizar las asignaciones para reflejar la nueva asignación
-          setAsignaciones((prevAsignaciones) => [
-            ...prevAsignaciones,
-            {
-              cliente_id: cliente._id,
-              asesor_empresarial_id: asesorEmpresarial._id,
-              asesor_financiero_id: asesorFinanciero._id,
-              asesor_tecnologico_id: asesorTecnologico._id,
-              asesor_definitivo_id: asesorDefinitivo._id,
-            },
-          ]);
-        } else {
-          console.error("Error al actualizar estado:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error al actualizar estado:", error);
+      if (response.ok) {
+        console.log("Asignación exitosa:", result);
+        alert("Asignación realizada exitosamente.");
+      } else {
+        console.error("Error del servidor:", result.error);
+        alert(`Error: ${result.error}`);
       }
-    } else {
-      alert("No hay asesores disponibles que cumplan con las condiciones.");
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      alert("Error al comunicarse con el servidor.");
     }
   };
 
@@ -492,13 +461,13 @@ function VisualizarClientes() {
       {/* Clients List */}
       <div className="bg-white p-6 rounded-lg shadow mt-8">
         <h2 className="text-xl font-semibold mb-4">Lista de Clientes</h2>
-        <table className="min-w-full bg-white">
+        <table className="min-w-full bg-white border border-gray-300">
           <thead>
             <tr>
-              <th className="text-left py-2">Nombre</th>
-              <th className="text-left py-2 ">Asesores</th>
-              <th className="text-left py-2">Asesorias completas</th>
-              <th className="text-left py-2">Estado</th>
+              <th className="text-left py-2 px-3">Nombre</th>
+              <th className="text-left py-2 px-3">Asesores</th>
+              <th className="text-left py-2 px-3">Asesorias completas</th>
+              <th className="text-left py-2 px-3">Estado</th>
             </tr>
           </thead>
 
@@ -508,7 +477,7 @@ function VisualizarClientes() {
                 className="cursor-pointer text-sm border border-gray-300 "
                 onClick={() => handleRowClick(index)}
               >
-                <td className="px-2 py-2 font-semibold">{cliente.nombre}</td>
+                <td className="px-3 py-2 font-semibold">{cliente.nombre}</td>
                 <td className="py-2  gap-2">
                   {asignaciones.some(
                     (asignacion) => asignacion.cliente_id._id === cliente._id
@@ -525,24 +494,19 @@ function VisualizarClientes() {
                             key={asignacion._id}
                             className="flex flex-col space-y-2 w-fit"
                           >
-                            <strong className=" bg-green-300 p-1 rounded-md text-gray-700 px-2">
+                            <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
                               Asesoría empresarial:{" "}
                               {asignacion.asesor_empresarial_id?.nombre ||
                                 "No asignado"}
                             </strong>
-                            <strong className=" bg-green-300 p-1 rounded-md text-gray-700 px-2">
+                            <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
                               Asesoría financiera:{" "}
                               {asignacion.asesor_financiero_id?.nombre ||
                                 "No asignado"}
                             </strong>
-                            <strong className=" bg-green-300 p-1 rounded-md text-gray-700 px-2">
+                            <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
                               Asesoría tecnológica:{" "}
                               {asignacion.asesor_tecnologico_id?.nombre ||
-                                "No asignado"}
-                            </strong>
-                            <strong className=" bg-blue-300 p-1 rounded-md text-gray-700 px-2">
-                              Asesor definitivo:{" "}
-                              {asignacion.asesor_definitivo_id?.nombre ||
                                 "No asignado"}
                             </strong>
                           </span>

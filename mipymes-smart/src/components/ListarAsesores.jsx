@@ -56,7 +56,7 @@ function ListarAsesores() {
                 ? asesor.especialidades.map((especialidad, index) => (
                     <span
                       key={index}
-                      className="my-1 inline-block bg-emerald-100 text-emerald-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
+                      className="my-1 inline-block  text-xs font-medium mr-2 bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded"
                     >
                       {especialidad}
                     </span>

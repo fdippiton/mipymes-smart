@@ -13,11 +13,8 @@ const AsesoresSchema = new Schema({
   clientes_asignados: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Clientes" },
   ],
-  clientes_encuentros: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Clientes" },
-  ],
+
   max_clientes: { type: Number, required: true },
-  max_encuentros: { type: Number, required: true },
 });
 
 const AsesoresModel = model("Asesores", AsesoresSchema);

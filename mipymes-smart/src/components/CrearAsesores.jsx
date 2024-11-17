@@ -9,7 +9,6 @@ function CrearAsesores() {
   const [telefono, setTelefono] = useState("");
   const [especialidades, setEspecialidades] = useState([]);
   const [metaClientes, setMetaClientes] = useState("");
-  const [metaEncuentros, setMetaEncuentros] = useState("");
 
   const handleOptionChangeEspecialidades = (e) => {
     const { value, checked } = e.target;
@@ -40,7 +39,6 @@ function CrearAsesores() {
       telefono,
       especialidades,
       metaClientes,
-      metaEncuentros,
     };
 
     console.log(data);
@@ -59,7 +57,6 @@ function CrearAsesores() {
       setTelefono("");
       setEspecialidades([]);
       setMetaClientes("");
-      setMetaEncuentros("");
     } else {
       const errorData = await response.json();
       console.error("Error:", errorData);
@@ -239,17 +236,6 @@ function CrearAsesores() {
                     type="number"
                     value={metaClientes}
                     onChange={handleChangeMetaClientes}
-                    min="0"
-                    className="w-20 ring-1 border-0 ring-inset ring-gray-300 rounded mt-2 ml-3 p-1"
-                  />
-                </div>
-
-                <div className="my-4">
-                  <label className="font-bold text-sm/6">Meta encuentros</label>
-                  <input
-                    type="number"
-                    value={metaEncuentros}
-                    onChange={handleChangeMetaEncuentros}
                     min="0"
                     className="w-20 ring-1 border-0 ring-inset ring-gray-300 rounded mt-2 ml-3 p-1"
                   />

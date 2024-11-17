@@ -249,15 +249,8 @@ app.put("/updateEstadoCliente/:id", async (req, res) => {
 });
 
 app.post("/registrarAsesor", async (req, res) => {
-  const {
-    nombre,
-    contrasena,
-    email,
-    telefono,
-    especialidades,
-    metaClientes,
-    metaEncuentros,
-  } = req.body;
+  const { nombre, contrasena, email, telefono, especialidades, metaClientes } =
+    req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(contrasena, 10);
@@ -282,7 +275,6 @@ app.post("/registrarAsesor", async (req, res) => {
       },
       especialidades,
       max_clientes: metaClientes, // Inicialmente, no tiene clientes asociados
-      max_encuentros: metaEncuentros, // Inicialmente, no tiene
       rol: roleDoc._id,
     });
 
@@ -309,8 +301,10 @@ app.get("/getAllAsignaciones", async (req, res) => {
       .populate("cliente_id")
       .populate("asesor_empresarial_id")
       .populate("asesor_financiero_id")
-      .populate("asesor_tecnologico_id")
-      .populate("asesor_definitivo_id");
+      .populate("asesor_tecnologico_id");
+    // .populate("encuentro_asesor_empresarial_id")
+    // .populate("encuentro_asesor_financiero_id")
+    // .populate("encuentro_asesor_tecnologico_id");
 
     res.json(asignaciones);
   } catch (error) {
@@ -320,99 +314,693 @@ app.get("/getAllAsignaciones", async (req, res) => {
 });
 
 app.post("/asignarClienteAAsesor", async (req, res) => {
-  const {
-    clienteId,
-    asesorEmpresarialId,
-    asesorFinancieroId,
-    asesorTecnologicoId,
-    asesorDefinitivoId,
-  } = req.body;
+  const { clienteId } = req.body;
 
   try {
-    // Obtener los asesores y el cliente
-    const asesorEmpresarial = await Asesores.findById(asesorEmpresarialId);
-    const asesorFinanciero = await Asesores.findById(asesorFinancieroId);
-    const asesorTecnologico = await Asesores.findById(asesorTecnologicoId);
-    const asesorDefinitivo = await Asesores.findById(asesorDefinitivoId);
+    // Verificar si el cliente existe
     const cliente = await Clientes.findById(clienteId);
-
-    // Verificar que el cliente y los asesores existen
-    if (
-      !asesorEmpresarial ||
-      !asesorFinanciero ||
-      !asesorTecnologico ||
-      !asesorDefinitivo ||
-      !cliente
-    ) {
-      return res.status(404).json({ error: "Asesor o cliente no encontrado" });
+    if (!cliente) {
+      return res.status(404).json({ error: "Cliente no encontrado" });
     }
 
-    // Verificar si el cliente ya tiene una asignación en la colección Asignaciones
+    // Verificar si ya tiene una asignación
     const asignacionExistente = await Asignaciones.findOne({
       cliente_id: clienteId,
     });
-
     if (asignacionExistente) {
-      return res
-        .status(400)
-        .json({ error: "El cliente ya tiene una asignación con otro asesor." });
-    }
-
-    // Verificar si los asesores han alcanzado su límite de clientes
-    if (
-      asesorEmpresarial.clientes_asignados.length >=
-        asesorEmpresarial.max_clientes ||
-      asesorFinanciero.clientes_asignados.length >=
-        asesorFinanciero.max_clientes ||
-      asesorTecnologico.clientes_asignados.length >=
-        asesorTecnologico.max_clientes ||
-      asesorDefinitivo.clientes_asignados.length >=
-        asesorDefinitivo.max_clientes
-    ) {
       return res.status(400).json({
-        error: "Uno o más asesores han alcanzado su límite de clientes",
+        error: "El cliente ya tiene una asignación registrada",
       });
     }
 
-    // Asignar el cliente a cada uno de los asesores
-    asesorEmpresarial.clientes_encuentros.push(clienteId);
-    asesorFinanciero.clientes_encuentros.push(clienteId);
-    asesorTecnologico.clientes_encuentros.push(clienteId);
-    asesorDefinitivo.clientes_asignados.push(clienteId);
+    // Obtener asesores y calcular cargas
+    const asesores = await Asesores.find();
+    const asesoresDisponibles = asesores.map((asesor) => ({
+      ...asesor.toObject(),
+      carga:
+        // (asesor.clientes_encuentros?.length || 0) +
+        asesor.clientes_asignados?.length || 0,
+    }));
 
-    // Reducir el límite de clientes disponibles para cada asesor
-    asesorEmpresarial.max_encuentros -= 1;
-    asesorFinanciero.max_encuentros -= 1;
-    asesorTecnologico.max_encuentros -= 1;
-    asesorDefinitivo.max_clientes -= 1;
+    // Función de asignación equitativa
+    const asignarAsesorEquitativo = (
+      especialidad,
+      tipo,
+      preseleccionados = []
+    ) => {
+      // Filtrar asesores según la especialidad y disponibilidad solo para "definitivos"
+      const filtrados = asesoresDisponibles.filter((asesor) => {
+        const cumpleEspecialidad = asesor.especialidades.includes(especialidad);
 
-    // Guardar los cambios en los asesores
-    await asesorEmpresarial.save();
-    await asesorFinanciero.save();
-    await asesorTecnologico.save();
-    await asesorDefinitivo.save();
+        // Solo considerar "clientes_asignados" para la asignación definitiva
+        const dentroDeLimites =
+          tipo === "definitivos"
+            ? (asesor.clientes_asignados?.length || 0) <
+              (asesor.max_clientes || Infinity)
+            : false;
 
-    // Crear la asignación en la base de datos
-    const asignacionAsesor = await Asignaciones.create({
+        return cumpleEspecialidad && dentroDeLimites;
+      });
+
+      // Si no hay asesores disponibles, agregar los preseleccionados
+      if (filtrados.length === 0 && preseleccionados.length > 0) {
+        preseleccionados.forEach((preseleccionado) => {
+          const preseleccionadoConCarga = asesoresDisponibles.find(
+            (asesor) => asesor._id.toString() === preseleccionado._id.toString()
+          );
+          if (preseleccionadoConCarga) {
+            filtrados.push(preseleccionadoConCarga);
+          }
+        });
+      }
+
+      // Si todos los asesores tienen la misma carga (cero), asignar de forma cíclica o aleatoria
+      if (filtrados.every((asesor) => asesor.carga === 0)) {
+        // Asignación cíclica aleatoria si todos tienen la misma carga
+        return filtrados[Math.floor(Math.random() * filtrados.length)];
+      }
+
+      // Si no todos tienen la misma carga, asignar al que menos carga tiene
+      // Mejoramos la lógica para repartir de forma equitativa:
+      // Se calcula la carga de cada asesor (clientes asignados)
+      // y se asigna el asesor con menos carga total.
+      const asesorMenosCargado = filtrados.reduce((prev, curr) => {
+        // Calcular carga total del asesor
+        const cargaPrev = prev.clientes_asignados?.length || 0;
+        const cargaCurr = curr.clientes_asignados?.length || 0;
+
+        // Comparar las cargas
+        return cargaPrev < cargaCurr ? prev : curr;
+      });
+
+      return asesorMenosCargado;
+    };
+
+    // Asignar asesores para encuentros iniciales
+    // const asesorEncuentroEmpresarial = asignarAsesorEquitativo(
+    //   "Asesoría Empresarial",
+    //   "encuentros"
+    // );
+    // const asesorEncuentroFinanciero = asignarAsesorEquitativo(
+    //   "Asesoría Financiera",
+    //   "encuentros"
+    // );
+    // const asesorEncuentroTecnologico = asignarAsesorEquitativo(
+    //   "Asesoría Tecnologica",
+    //   "encuentros"
+    // );
+
+    // console.log("Asesoría Empresarial encuentros", asesorEncuentroEmpresarial);
+    // console.log("Asesoría Financiera encuentros", asesorEncuentroFinanciero);
+    // console.log("Asesoría Tecnologica encuentros", asesorEncuentroTecnologico);
+
+    // if (
+    //   !asesorEncuentroEmpresarial ||
+    //   !asesorEncuentroFinanciero ||
+    //   !asesorEncuentroTecnologico
+    // ) {
+    //   return res.status(400).json({
+    //     error: "No hay asesores disponibles para encuentros.",
+    //   });
+    // }
+
+    // Actualizar datos de asesores de encuentros
+    // await Promise.all([
+    //   Asesores.updateOne(
+    //     { _id: asesorEncuentroEmpresarial._id },
+    //     {
+    //       $push: { clientes_encuentros: clienteId },
+    //       $inc: { max_encuentros: -1 },
+    //     }
+    //   ),
+    //   Asesores.updateOne(
+    //     { _id: asesorEncuentroFinanciero._id },
+    //     {
+    //       $push: { clientes_encuentros: clienteId },
+    //       $inc: { max_encuentros: -1 },
+    //     }
+    //   ),
+    //   Asesores.updateOne(
+    //     { _id: asesorEncuentroTecnologico._id },
+    //     {
+    //       $push: { clientes_encuentros: clienteId },
+    //       $inc: { max_encuentros: -1 },
+    //     }
+    //   ),
+    // ]);
+
+    // Asignar asesores definitivos
+    const asesorDefinitivoEmpresarial = asignarAsesorEquitativo(
+      "Asesoría Empresarial",
+      "definitivos"
+    );
+    const asesorDefinitivoFinanciero = asignarAsesorEquitativo(
+      "Asesoría Financiera",
+      "definitivos"
+    );
+    const asesorDefinitivoTecnologico = asignarAsesorEquitativo(
+      "Asesoría Tecnologica",
+      "definitivos"
+    );
+
+    // console.log("Asesoría Empresarial", asesorDefinitivoEmpresarial);
+    // console.log("Asesoría Financiera", asesorDefinitivoFinanciero);
+    // console.log("Asesoría Tecnologica", asesorDefinitivoTecnologico);
+
+    if (
+      !asesorDefinitivoEmpresarial ||
+      !asesorDefinitivoFinanciero ||
+      !asesorDefinitivoTecnologico
+    ) {
+      return res.status(400).json({
+        error: "No hay asesores disponibles para definitivos.",
+      });
+    }
+
+    // Actualizar datos de asesores definitivos
+    await Promise.all([
+      Asesores.updateOne(
+        { _id: asesorDefinitivoEmpresarial._id },
+        { $push: { clientes_asignados: clienteId }, $inc: { max_clientes: -1 } }
+      ),
+      Asesores.updateOne(
+        { _id: asesorDefinitivoFinanciero._id },
+        { $push: { clientes_asignados: clienteId }, $inc: { max_clientes: -1 } }
+      ),
+      Asesores.updateOne(
+        { _id: asesorDefinitivoTecnologico._id },
+        { $push: { clientes_asignados: clienteId }, $inc: { max_clientes: -1 } }
+      ),
+    ]);
+
+    // Crear la asignación
+    const nuevaAsignacion = await Asignaciones.create({
       cliente_id: clienteId,
-      asesor_empresarial_id: asesorEmpresarial._id,
-      asesor_financiero_id: asesorFinanciero._id,
-      asesor_tecnologico_id: asesorTecnologico._id,
-      asesor_definitivo_id: asesorDefinitivo._id,
+      // encuentro_asesor_empresarial_id: asesorEncuentroEmpresarial._id,
+      // encuentro_asesor_financiero_id: asesorEncuentroFinanciero._id,
+      // encuentro_asesor_tecnologico_id: asesorEncuentroTecnologico._id,
+      asesor_empresarial_id: asesorDefinitivoEmpresarial._id,
+      asesor_financiero_id: asesorDefinitivoFinanciero._id,
+      asesor_tecnologico_id: asesorDefinitivoTecnologico._id,
     });
 
-    console.log(asignacionAsesor);
-
-    res
-      .status(200)
-      .json({ message: "Cliente asignado exitosamente a los asesores." });
+    res.status(200).json({
+      message: "Asignación realizada exitosamente",
+      nuevaAsignacion,
+    });
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ error: "Error al asignar el cliente a los asesores." });
+    console.error("Error al asignar cliente:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+
+// app.post("/asignarClienteAAsesor", async (req, res) => {
+//   const { clienteId } = req.body;
+
+//   try {
+//     // Verificar si el cliente existe
+//     const cliente = await Clientes.findById(clienteId);
+//     if (!cliente) {
+//       return res.status(404).json({ error: "Cliente no encontrado" });
+//     }
+
+//     // Verificar si ya tiene una asignación
+//     const asignacionExistente = await Asignaciones.findOne({
+//       cliente_id: clienteId,
+//     });
+//     if (asignacionExistente) {
+//       return res.status(400).json({
+//         error: "El cliente ya tiene una asignación registrada",
+//       });
+//     }
+
+//     // Obtener asesores y calcular cargas
+//     const asesores = await Asesores.find();
+//     const asesoresDisponibles = asesores.map((asesor) => ({
+//       ...asesor.toObject(),
+//       carga:
+//         (asesor.clientes_encuentros?.length || 0) +
+//         (asesor.clientes_asignados?.length || 0),
+//     }));
+
+//     // Función de asignación equitativa
+//     const asignarAsesorEquitativo = (
+//       especialidad,
+//       tipo,
+//       preseleccionados = []
+//     ) => {
+//       // Filtrar asesores según la especialidad y disponibilidad
+//       const filtrados = asesoresDisponibles.filter((asesor) => {
+//         const cumpleEspecialidad = asesor.especialidades.includes(especialidad);
+//         const dentroDeLimites =
+//           tipo === "encuentros"
+//             ? (asesor.clientes_encuentros?.length || 0) < asesor.max_encuentros
+//             : (asesor.clientes_asignados?.length || 0) < asesor.max_clientes;
+
+//         return cumpleEspecialidad && dentroDeLimites;
+//       });
+
+//       // Si no hay asesores disponibles, agregar los preseleccionados
+//       if (filtrados.length === 0 && preseleccionados.length > 0) {
+//         preseleccionados.forEach((preseleccionado) => {
+//           const preseleccionadoConCarga = asesoresDisponibles.find(
+//             (asesor) => asesor._id.toString() === preseleccionado._id.toString()
+//           );
+//           if (preseleccionadoConCarga) {
+//             filtrados.push(preseleccionadoConCarga);
+//           }
+//         });
+//       }
+
+//       // Si todos los asesores tienen la misma carga (cero), asignar de forma cíclica
+//       if (filtrados.every((asesor) => asesor.carga === 0)) {
+//         // Encontrar el índice del asesor anterior en la lista de asesores disponibles
+//         let ultimoIndice = asesoresDisponibles.findIndex((asesor) =>
+//           preseleccionados.includes(asesor._id.toString())
+//         );
+//         // Asignar al siguiente asesor en la lista
+//         let siguienteIndice = (ultimoIndice + 1) % asesoresDisponibles.length;
+//         return asesoresDisponibles[siguienteIndice];
+//       }
+
+//       // Si no todos tienen la misma carga, asignar al que menos carga tiene
+//       return filtrados.sort((a, b) => a.carga - b.carga)[0];
+//     };
+
+//     // Asignar asesores para encuentros iniciales
+//     const preseleccionadosEncuentros = [];
+
+//     const asesorEncuentroEmpresarial = asignarAsesorEquitativo(
+//       "Asesoría Empresarial",
+//       "encuentros",
+//       preseleccionadosEncuentros
+//     );
+//     const asesorEncuentroFinanciero = asignarAsesorEquitativo(
+//       "Asesoría Financiera",
+//       "encuentros",
+//       preseleccionadosEncuentros
+//     );
+//     const asesorEncuentroTecnologico = asignarAsesorEquitativo(
+//       "Asesoría Tecnologica",
+//       "encuentros",
+//       preseleccionadosEncuentros
+//     );
+
+//     if (
+//       !asesorEncuentroEmpresarial ||
+//       !asesorEncuentroFinanciero ||
+//       !asesorEncuentroTecnologico
+//     ) {
+//       return res.status(400).json({
+//         error: "No hay asesores disponibles para encuentros.",
+//       });
+//     }
+
+//     // Actualizar datos de asesores de encuentros
+//     await Promise.all([
+//       Asesores.updateOne(
+//         { _id: asesorEncuentroEmpresarial._id },
+//         {
+//           $push: { clientes_encuentros: clienteId },
+//           $inc: { max_encuentros: -1 },
+//         }
+//       ),
+//       Asesores.updateOne(
+//         { _id: asesorEncuentroFinanciero._id },
+//         {
+//           $push: { clientes_encuentros: clienteId },
+//           $inc: { max_encuentros: -1 },
+//         }
+//       ),
+//       Asesores.updateOne(
+//         { _id: asesorEncuentroTecnologico._id },
+//         {
+//           $push: { clientes_encuentros: clienteId },
+//           $inc: { max_encuentros: -1 },
+//         }
+//       ),
+//     ]);
+
+//     // Asignar asesores definitivos
+//     const preseleccionadosDefinitivos = [];
+
+//     const asesorDefinitivoEmpresarial = asignarAsesorEquitativo(
+//       "Asesoría Empresarial",
+//       "definitivos",
+//       preseleccionadosDefinitivos
+//     );
+//     const asesorDefinitivoFinanciero = asignarAsesorEquitativo(
+//       "Asesoría Financiera",
+//       "definitivos",
+//       preseleccionadosDefinitivos
+//     );
+//     const asesorDefinitivoTecnologico = asignarAsesorEquitativo(
+//       "Asesoría Tecnologica",
+//       "definitivos",
+//       preseleccionadosDefinitivos
+//     );
+
+//     if (
+//       !asesorDefinitivoEmpresarial ||
+//       !asesorDefinitivoFinanciero ||
+//       !asesorDefinitivoTecnologico
+//     ) {
+//       return res.status(400).json({
+//         error: "No hay asesores disponibles para definitivos.",
+//       });
+//     }
+
+//     // Actualizar datos de asesores definitivos
+//     await Promise.all([
+//       Asesores.updateOne(
+//         { _id: asesorDefinitivoEmpresarial._id },
+//         { $push: { clientes_asignados: clienteId }, $inc: { max_clientes: -1 } }
+//       ),
+//       Asesores.updateOne(
+//         { _id: asesorDefinitivoFinanciero._id },
+//         { $push: { clientes_asignados: clienteId }, $inc: { max_clientes: -1 } }
+//       ),
+//       Asesores.updateOne(
+//         { _id: asesorDefinitivoTecnologico._id },
+//         { $push: { clientes_asignados: clienteId }, $inc: { max_clientes: -1 } }
+//       ),
+//     ]);
+
+//     // Crear la asignación
+//     const nuevaAsignacion = await Asignaciones.create({
+//       cliente_id: clienteId,
+//       encuentro_asesor_empresarial_id: asesorEncuentroEmpresarial._id,
+//       encuentro_asesor_financiero_id: asesorEncuentroFinanciero._id,
+//       encuentro_asesor_tecnologico_id: asesorEncuentroTecnologico._id,
+//       asesor_empresarial_id: asesorDefinitivoEmpresarial._id,
+//       asesor_financiero_id: asesorDefinitivoFinanciero._id,
+//       asesor_tecnologico_id: asesorDefinitivoTecnologico._id,
+//     });
+
+//     res.status(200).json({
+//       message: "Asignación realizada exitosamente",
+//       nuevaAsignacion,
+//     });
+//   } catch (error) {
+//     console.error("Error al asignar cliente:", error);
+//     res.status(500).json({ error: "Error interno del servidor" });
+//   }
+// });
+
+// app.post("/asignarClienteAAsesor", async (req, res) => {
+//   const { clienteId } = req.body;
+
+//   try {
+//     // Verificar si el cliente existe
+//     const cliente = await Clientes.findById(clienteId);
+//     if (!cliente) {
+//       return res.status(404).json({ error: "Cliente no encontrado" });
+//     }
+
+//     // Verificar si ya tiene una asignación
+//     const asignacionExistente = await Asignaciones.findOne({
+//       cliente_id: clienteId,
+//     });
+//     if (asignacionExistente) {
+//       return res
+//         .status(400)
+//         .json({ error: "El cliente ya tiene una asignación registrada" });
+//     }
+
+//     // Obtener asesores y calcular cargas
+//     const asesores = await Asesores.find();
+//     const asesoresDisponibles = asesores.map((asesor) => ({
+//       ...asesor.toObject(),
+//       carga:
+//         (asesor.clientes_encuentros?.length || 0) +
+//         (asesor.clientes_asignados?.length || 0), // Manejar valores vacíos
+//     }));
+
+//     const asignarAsesorEquitativo = (especialidad, tipo) => {
+//       const filtrados = asesoresDisponibles.filter((asesor) => {
+//         const cumpleEspecialidad = asesor.especialidades.includes(especialidad);
+//         const dentroDeLimites =
+//           tipo === "encuentros"
+//             ? (asesor.clientes_encuentros?.length || 0) < asesor.max_encuentros
+//             : (asesor.clientes_asignados?.length || 0) < asesor.max_clientes;
+
+//         return cumpleEspecialidad && dentroDeLimites;
+//       });
+
+//       return filtrados.sort((a, b) => a.carga - b.carga)[0]; // Asignar al menos cargado
+//     };
+
+//     // Asignar asesores para encuentros iniciales
+//     const asesorEncuentroEmpresarial = asignarAsesorEquitativo(
+//       "Asesoría Empresarial",
+//       "encuentros"
+//     );
+//     const asesorEncuentroFinanciero = asignarAsesorEquitativo(
+//       "Asesoría Financiera",
+//       "encuentros"
+//     );
+//     const asesorEncuentroTecnologico = asignarAsesorEquitativo(
+//       "Asesoría Tecnologica",
+//       "encuentros"
+//     );
+
+//     console.log("Asesoría Empresarial", asesorEncuentroEmpresarial);
+//     console.log("Asesoría Financiera", asesorEncuentroFinanciero);
+//     console.log("Asesoría Tecnológica", asesorEncuentroTecnologico);
+
+//     if (
+//       !asesorEncuentroEmpresarial ||
+//       !asesorEncuentroFinanciero ||
+//       !asesorEncuentroTecnologico
+//     ) {
+//       return res
+//         .status(400)
+//         .json({ error: "No hay asesores disponibles para encuentros." });
+//     }
+
+//     // Actualizar datos de asesores de encuentros
+//     await Promise.all([
+//       Asesores.updateOne(
+//         { _id: asesorEncuentroEmpresarial._id },
+//         {
+//           $push: { clientes_encuentros: clienteId },
+//           $inc: { max_encuentros: -1 },
+//         }
+//       ),
+//       Asesores.updateOne(
+//         { _id: asesorEncuentroFinanciero._id },
+//         {
+//           $push: { clientes_encuentros: clienteId },
+//           $inc: { max_encuentros: -1 },
+//         }
+//       ),
+//       Asesores.updateOne(
+//         { _id: asesorEncuentroTecnologico._id },
+//         {
+//           $push: { clientes_encuentros: clienteId },
+//           $inc: { max_encuentros: -1 },
+//         }
+//       ),
+//     ]);
+
+//     // Asignar asesores definitivos
+//     const asesorDefinitivoEmpresarial = asignarAsesorEquitativo(
+//       "Asesoría Empresarial",
+//       "definitivos"
+//     );
+//     const asesorDefinitivoFinanciero = asignarAsesorEquitativo(
+//       "Asesoría Financiera",
+//       "definitivos"
+//     );
+//     const asesorDefinitivoTecnologico = asignarAsesorEquitativo(
+//       "Asesoría Tecnologica",
+//       "definitivos"
+//     );
+
+//     if (
+//       !asesorDefinitivoEmpresarial ||
+//       !asesorDefinitivoFinanciero ||
+//       !asesorDefinitivoTecnologico
+//     ) {
+//       return res
+//         .status(400)
+//         .json({ error: "No hay asesores disponibles para definitivos." });
+//     }
+
+//     // Actualizar datos de asesores definitivos
+//     await Promise.all([
+//       Asesores.updateOne(
+//         { _id: asesorDefinitivoEmpresarial._id },
+//         { $push: { clientes_asignados: clienteId }, $inc: { max_clientes: -1 } }
+//       ),
+//       Asesores.updateOne(
+//         { _id: asesorDefinitivoFinanciero._id },
+//         { $push: { clientes_asignados: clienteId }, $inc: { max_clientes: -1 } }
+//       ),
+//       Asesores.updateOne(
+//         { _id: asesorDefinitivoTecnologico._id },
+//         { $push: { clientes_asignados: clienteId }, $inc: { max_clientes: -1 } }
+//       ),
+//     ]);
+
+//     // Crear la asignación
+//     const nuevaAsignacion = await Asignaciones.create({
+//       cliente_id: clienteId,
+//       encuentro_asesor_empresarial_id: asesorEncuentroEmpresarial._id,
+//       encuentro_asesor_financiero_id: asesorEncuentroFinanciero._id,
+//       encuentro_asesor_tecnologico_id: asesorEncuentroTecnologico._id,
+//       asesor_empresarial_id: asesorDefinitivoEmpresarial._id,
+//       asesor_financiero_id: asesorDefinitivoFinanciero._id,
+//       asesor_tecnologico_id: asesorDefinitivoTecnologico._id,
+//     });
+
+//     res
+//       .status(200)
+//       .json({ message: "Asignación realizada exitosamente", nuevaAsignacion });
+//   } catch (error) {
+//     console.error("Error al asignar cliente:", error);
+//     res.status(500).json({ error: "Error interno del servidor" });
+//   }
+// });
+
+// app.post("/asignarClienteAAsesor", async (req, res) => {
+//   const {
+//     clienteId,
+//     asesorEmpresarialId,
+//     asesorFinancieroId,
+//     asesorTecnologicoId,
+//     asesorDefinitivoEmpresarialId,
+//     asesorDefinitivoFinancieroId,
+//     asesorDefinitivoTecnologicoId,
+//   } = req.body;
+
+//   try {
+//     // Filtrar asesores disponibles
+//     const asesores = await Asesores.find({
+//       _id: {
+//         $in: [
+//           asesorEmpresarialId,
+//           asesorFinancieroId,
+//           asesorTecnologicoId,
+//           asesorDefinitivoEmpresarialId,
+//           asesorDefinitivoFinancieroId,
+//           asesorDefinitivoTecnologicoId,
+//         ],
+//       },
+//     });
+
+//     console.log(asesores);
+
+//     // if (asesores.length !== 6) {
+//     //   return res
+//     //     .status(404)
+//     //     .json({ error: "Uno o más asesores no encontrados" });
+//     // }
+
+//     // Verificar si el cliente existe
+//     const cliente = await Clientes.findById(clienteId);
+//     if (!cliente) {
+//       return res.status(404).json({ error: "Cliente no encontrado" });
+//     }
+
+//     // Verificar si ya tiene una asignación
+//     const asignacionExistente = await Asignaciones.findOne({
+//       cliente_id: clienteId,
+//     });
+//     if (asignacionExistente) {
+//       return res
+//         .status(400)
+//         .json({ error: "El cliente ya tiene una asignación registrada" });
+//     }
+
+//     // Asignar asesores para los encuentros iniciales
+//     const asesoresDisponibles = asesores.map((asesor) => ({
+//       ...asesor.toObject(),
+//       carga:
+//         asesor.clientes_encuentros.length + asesor.clientes_asignados.length,
+//     }));
+
+//     const asignarAsesorEquitativo = (asesoresDisponibles, especialidad) => {
+//       return asesoresDisponibles
+//         .filter((asesor) => asesor.especialidades.includes(especialidad))
+//         .sort((a, b) => a.carga - b.carga)[0]; // Asignar al menos cargado
+//     };
+
+//     const asesorEmpresarial = asignarAsesorEquitativo(
+//       asesoresDisponibles,
+//       "Asesoría Empresarial"
+//     );
+//     const asesorFinanciero = asignarAsesorEquitativo(
+//       asesoresDisponibles,
+//       "Asesoría Financiera"
+//     );
+//     const asesorTecnologico = asignarAsesorEquitativo(
+//       asesoresDisponibles,
+//       "Asesoría Tecnológica"
+//     );
+
+//     // Actualizar los asesores con las asignaciones temporales
+//     const updateAsesor = async (asesorId, clienteId) => {
+//       try {
+//         await Asesores.updateOne(
+//           { _id: asesorId },
+//           {
+//             $push: { clientes_encuentros: clienteId },
+//             $inc: { max_encuentros: -1 },
+//           }
+//         );
+//       } catch (error) {
+//         console.error(`Error al actualizar asesor con ID ${asesorId}:`, error);
+//       }
+//     };
+
+//     await Promise.all([
+//       updateAsesor(asesorEmpresarialId, clienteId),
+//       updateAsesor(asesorFinancieroId, clienteId),
+//       updateAsesor(asesorTecnologicoId, clienteId),
+//     ]);
+
+//     // Asignar asesores definitivos
+
+//     const updateAsesorDefinitivo = async (asesorId, clienteId) => {
+//       try {
+//         await Asesores.updateOne(
+//           { _id: asesorId },
+//           {
+//             $push: { clientes_asignados: clienteId },
+//             $inc: { max_clientes: -1 },
+//           }
+//         );
+//       } catch (error) {
+//         console.error(`Error al actualizar asesor con ID ${asesorId}:`, error);
+//       }
+//     };
+
+//     await Promise.all([
+//       updateAsesorDefinitivo(asesorDefinitivoEmpresarialId, clienteId),
+//       updateAsesorDefinitivo(asesorDefinitivoFinancieroId, clienteId),
+//       updateAsesorDefinitivo(asesorDefinitivoTecnologicoId, clienteId),
+//     ]);
+
+//     // Crear la asignación
+//     const nuevaAsignacion = await Asignaciones.create({
+//       cliente_id: clienteId,
+//       asesor_empresarial_id: asesorDefinitivoEmpresarialId,
+//       asesor_financiero_id: asesorDefinitivoFinancieroId,
+//       asesor_tecnologico_id: asesorDefinitivoTecnologicoId,
+//       encuentro_asesor_empresarial_id: asesorEmpresarialId,
+//       encuentro_asesor_financiero_id: asesorFinancieroId,
+//       encuentro_asesor_tecnologico_id: asesorTecnologicoId,
+//     });
+
+//     res
+//       .status(200)
+//       .json({ message: "Asignación realizada exitosamente", nuevaAsignacion });
+//   } catch (error) {
+//     console.log("Error al asignar cliente:", error);
+//     res.status(500).json({ error: "Error interno del servidor" });
+//   }
+// });
 
 // app.post("/asignarClienteAAsesor", async (req, res) => {
 //   const { clienteId, asesorId } = req.body;

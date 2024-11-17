@@ -249,8 +249,15 @@ app.put("/updateEstadoCliente/:id", async (req, res) => {
 });
 
 app.post("/registrarAsesor", async (req, res) => {
-  const { nombre, contrasena, email, telefono, especialidades, meta } =
-    req.body;
+  const {
+    nombre,
+    contrasena,
+    email,
+    telefono,
+    especialidades,
+    metaClientes,
+    metaEncuentros,
+  } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(contrasena, 10);
@@ -274,7 +281,8 @@ app.post("/registrarAsesor", async (req, res) => {
         telefono,
       },
       especialidades,
-      max_clientes: meta, // Inicialmente, no tiene clientes asociados
+      max_clientes: metaClientes, // Inicialmente, no tiene clientes asociados
+      max_encuentros: metaEncuentros, // Inicialmente, no tiene
       rol: roleDoc._id,
     });
 
@@ -298,8 +306,12 @@ app.get("/getAllAsesores", async (req, res) => {
 app.get("/getAllAsignaciones", async (req, res) => {
   try {
     const asignaciones = await Asignaciones.find()
-      .populate("cliente_id") // Cambiado para hacer `populate` del campo `cliente_id`
-      .populate("asesor_id"); // Cambiado para hacer `populate` del campo `asesor_id`
+      .populate("cliente_id")
+      .populate("asesor_empresarial_id")
+      .populate("asesor_financiero_id")
+      .populate("asesor_tecnologico_id")
+      .populate("asesor_definitivo_id");
+
     res.json(asignaciones);
   } catch (error) {
     console.log(error);
@@ -308,26 +320,31 @@ app.get("/getAllAsignaciones", async (req, res) => {
 });
 
 app.post("/asignarClienteAAsesor", async (req, res) => {
-  const { clienteId, asesorId } = req.body;
-
-  // console.log("data recieved", clienteId, asesorId);
+  const {
+    clienteId,
+    asesorEmpresarialId,
+    asesorFinancieroId,
+    asesorTecnologicoId,
+    asesorDefinitivoId,
+  } = req.body;
 
   try {
-    // Asignar el cliente al asesor
-    const asesor = await Asesores.findById(asesorId);
+    // Obtener los asesores y el cliente
+    const asesorEmpresarial = await Asesores.findById(asesorEmpresarialId);
+    const asesorFinanciero = await Asesores.findById(asesorFinancieroId);
+    const asesorTecnologico = await Asesores.findById(asesorTecnologicoId);
+    const asesorDefinitivo = await Asesores.findById(asesorDefinitivoId);
     const cliente = await Clientes.findById(clienteId);
 
-    // console.log("data recieved", asesor, cliente);
-    // Verificar que el asesor y el cliente existen
-    if (!asesor || !cliente) {
+    // Verificar que el cliente y los asesores existen
+    if (
+      !asesorEmpresarial ||
+      !asesorFinanciero ||
+      !asesorTecnologico ||
+      !asesorDefinitivo ||
+      !cliente
+    ) {
       return res.status(404).json({ error: "Asesor o cliente no encontrado" });
-    }
-
-    // Verificar si el cliente ya está asignado al asesor
-    if (asesor.clientes_asignados.includes(clienteId)) {
-      return res
-        .status(400)
-        .json({ error: "El cliente ya está asignado a este asesor" });
     }
 
     // Verificar si el cliente ya tiene una asignación en la colección Asignaciones
@@ -341,34 +358,124 @@ app.post("/asignarClienteAAsesor", async (req, res) => {
         .json({ error: "El cliente ya tiene una asignación con otro asesor." });
     }
 
-    // Verificar si el asesor ha alcanzado su límite de clientes
-    if (asesor.clientes_asignados.length >= asesor.max_clientes) {
-      return res
-        .status(400)
-        .json({ error: "El asesor ha alcanzado su límite de clientes" });
+    // Verificar si los asesores han alcanzado su límite de clientes
+    if (
+      asesorEmpresarial.clientes_asignados.length >=
+        asesorEmpresarial.max_clientes ||
+      asesorFinanciero.clientes_asignados.length >=
+        asesorFinanciero.max_clientes ||
+      asesorTecnologico.clientes_asignados.length >=
+        asesorTecnologico.max_clientes ||
+      asesorDefinitivo.clientes_asignados.length >=
+        asesorDefinitivo.max_clientes
+    ) {
+      return res.status(400).json({
+        error: "Uno o más asesores han alcanzado su límite de clientes",
+      });
     }
 
-    // Asignar el cliente al asesor
-    asesor.clientes_asignados.push(clienteId);
-    asesor.max_clientes -= 1; // Reducir el límite de clientes disponibles
-    // Guardar los cambios en el asesor
-    await asesor.save();
+    // Asignar el cliente a cada uno de los asesores
+    asesorEmpresarial.clientes_encuentros.push(clienteId);
+    asesorFinanciero.clientes_encuentros.push(clienteId);
+    asesorTecnologico.clientes_encuentros.push(clienteId);
+    asesorDefinitivo.clientes_asignados.push(clienteId);
 
+    // Reducir el límite de clientes disponibles para cada asesor
+    asesorEmpresarial.max_encuentros -= 1;
+    asesorFinanciero.max_encuentros -= 1;
+    asesorTecnologico.max_encuentros -= 1;
+    asesorDefinitivo.max_clientes -= 1;
+
+    // Guardar los cambios en los asesores
+    await asesorEmpresarial.save();
+    await asesorFinanciero.save();
+    await asesorTecnologico.save();
+    await asesorDefinitivo.save();
+
+    // Crear la asignación en la base de datos
     const asignacionAsesor = await Asignaciones.create({
       cliente_id: clienteId,
-      asesor_id: asesorId,
+      asesor_empresarial_id: asesorEmpresarial._id,
+      asesor_financiero_id: asesorFinanciero._id,
+      asesor_tecnologico_id: asesorTecnologico._id,
+      asesor_definitivo_id: asesorDefinitivo._id,
     });
 
     console.log(asignacionAsesor);
 
     res
       .status(200)
-      .json({ message: "Cliente asignado exitosamente al asesor." });
+      .json({ message: "Cliente asignado exitosamente a los asesores." });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error al asignar el cliente al asesor." });
+    res
+      .status(500)
+      .json({ error: "Error al asignar el cliente a los asesores." });
   }
 });
+
+// app.post("/asignarClienteAAsesor", async (req, res) => {
+//   const { clienteId, asesorId } = req.body;
+
+//   // console.log("data recieved", clienteId, asesorId);
+
+//   try {
+//     // Asignar el cliente al asesor
+//     const asesor = await Asesores.findById(asesorId);
+//     const cliente = await Clientes.findById(clienteId);
+
+//     // console.log("data recieved", asesor, cliente);
+//     // Verificar que el asesor y el cliente existen
+//     if (!asesor || !cliente) {
+//       return res.status(404).json({ error: "Asesor o cliente no encontrado" });
+//     }
+
+//     // Verificar si el cliente ya está asignado al asesor
+//     if (asesor.clientes_asignados.includes(clienteId)) {
+//       return res
+//         .status(400)
+//         .json({ error: "El cliente ya está asignado a este asesor" });
+//     }
+
+//     // Verificar si el cliente ya tiene una asignación en la colección Asignaciones
+//     const asignacionExistente = await Asignaciones.findOne({
+//       cliente_id: clienteId,
+//     });
+
+//     if (asignacionExistente) {
+//       return res
+//         .status(400)
+//         .json({ error: "El cliente ya tiene una asignación con otro asesor." });
+//     }
+
+//     // Verificar si el asesor ha alcanzado su límite de clientes
+//     if (asesor.clientes_asignados.length >= asesor.max_clientes) {
+//       return res
+//         .status(400)
+//         .json({ error: "El asesor ha alcanzado su límite de clientes" });
+//     }
+
+//     // Asignar el cliente al asesor
+//     asesor.clientes_asignados.push(clienteId);
+//     asesor.max_clientes -= 1; // Reducir el límite de clientes disponibles
+//     // Guardar los cambios en el asesor
+//     await asesor.save();
+
+//     const asignacionAsesor = await Asignaciones.create({
+//       cliente_id: clienteId,
+//       asesor_id: asesorId,
+//     });
+
+//     console.log(asignacionAsesor);
+
+//     res
+//       .status(200)
+//       .json({ message: "Cliente asignado exitosamente al asesor." });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Error al asignar el cliente al asesor." });
+//   }
+// });
 
 app.put("/updateAsesor", async (req, res) => {
   try {

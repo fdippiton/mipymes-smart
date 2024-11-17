@@ -83,9 +83,9 @@ function App() {
   if (loading) {
     return <div>Cargando...</div>; // Espera a que `userInfo` esté definido
   }
-  console.log("Roles", userRol);
-  console.log("AU", authenticated);
-  console.log("userRol === 'Administrador'", userRol === "Administrador");
+  // console.log("Roles", userRol);
+  // console.log("AU", authenticated);
+  // console.log("userRol === 'Administrador'", userRol === "Administrador");
 
   return (
     <Routes>

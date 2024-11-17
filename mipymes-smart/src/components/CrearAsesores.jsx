@@ -8,7 +8,8 @@ function CrearAsesores() {
   const [contrasena, setContrasena] = useState("");
   const [telefono, setTelefono] = useState("");
   const [especialidades, setEspecialidades] = useState([]);
-  const [meta, setMeta] = useState("");
+  const [metaClientes, setMetaClientes] = useState("");
+  const [metaEncuentros, setMetaEncuentros] = useState("");
 
   const handleOptionChangeEspecialidades = (e) => {
     const { value, checked } = e.target;
@@ -21,8 +22,12 @@ function CrearAsesores() {
     }
   };
 
-  const handleChangeMeta = (e) => {
-    setMeta(parseInt(e.target.value, 10));
+  const handleChangeMetaClientes = (e) => {
+    setMetaClientes(parseInt(e.target.value, 10));
+  };
+
+  const handleChangeMetaEncuentros = (e) => {
+    setMetaEncuentros(parseInt(e.target.value, 10));
   };
 
   async function registrarAsesor(ev) {
@@ -34,7 +39,8 @@ function CrearAsesores() {
       email,
       telefono,
       especialidades,
-      meta,
+      metaClientes,
+      metaEncuentros,
     };
 
     console.log(data);
@@ -52,7 +58,8 @@ function CrearAsesores() {
       setEmail("");
       setTelefono("");
       setEspecialidades([]);
-      setMeta("");
+      setMetaClientes("");
+      setMetaEncuentros("");
     } else {
       const errorData = await response.json();
       console.error("Error:", errorData);
@@ -227,11 +234,22 @@ function CrearAsesores() {
                 </fieldset>
 
                 <div className="my-4">
-                  <label className="font-bold text-sm/6">Meta</label>
+                  <label className="font-bold text-sm/6">Meta clientes</label>
                   <input
                     type="number"
-                    value={meta}
-                    onChange={handleChangeMeta}
+                    value={metaClientes}
+                    onChange={handleChangeMetaClientes}
+                    min="0"
+                    className="w-20 ring-1 border-0 ring-inset ring-gray-300 rounded mt-2 ml-3 p-1"
+                  />
+                </div>
+
+                <div className="my-4">
+                  <label className="font-bold text-sm/6">Meta encuentros</label>
+                  <input
+                    type="number"
+                    value={metaEncuentros}
+                    onChange={handleChangeMetaEncuentros}
                     min="0"
                     className="w-20 ring-1 border-0 ring-inset ring-gray-300 rounded mt-2 ml-3 p-1"
                   />

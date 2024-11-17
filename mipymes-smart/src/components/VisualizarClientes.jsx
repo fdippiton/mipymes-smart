@@ -127,49 +127,233 @@ function VisualizarClientes() {
     fetchData();
   }, []);
 
-  const handleAsignarAsesor = async (cliente) => {
-    console.log("Cliente: " + cliente);
-    // Filtrar asesores que tienen las especialidades requeridas por el cliente
-    const asesoresDisponibles = await asesores.filter((asesor) => {
-      if (
-        !cliente.servicios_requeridos ||
-        !Array.isArray(cliente.servicios_requeridos)
-      ) {
-        // Si `servicios_requeridos` no existe o no es un arreglo, devolver falso y no incluir al asesor
-        return false;
-      }
+  // const handleAsignarAsesor = async (cliente) => {
+  //   console.log("Cliente: " + cliente);
+  //   // Filtrar asesores que tienen las especialidades requeridas por el cliente
+  //   const asesoresDisponibles = await asesores.filter((asesor) => {
+  //     if (
+  //       !cliente.servicios_requeridos ||
+  //       !Array.isArray(cliente.servicios_requeridos)
+  //     ) {
+  //       // Si `servicios_requeridos` no existe o no es un arreglo, devolver falso y no incluir al asesor
+  //       return false;
+  //     }
 
-      // Verificar que todas las especialidades del asesor incluyan cada servicio requerido por el cliente
-      return cliente.servicios_requeridos.every((servicio) =>
-        asesor.especialidades.includes(servicio)
+  //     // Verificar que todas las especialidades del asesor incluyan cada servicio requerido por el cliente
+  //     return cliente.servicios_requeridos.every((servicio) =>
+  //       asesor.especialidades.includes(servicio)
+  //     );
+  //   });
+
+  //   console.log("Asesores disponibles", asesoresDisponibles);
+
+  //   // // Filtrar los asesores que aún no han alcanzado su límite de clientes
+  //   const asesoresElegibles = asesoresDisponibles.filter(
+  //     (asesor) => asesor.clientes_asignados.length < asesor.max_clientes
+  //   );
+
+  //   console.log("Asesores elegibles", asesoresDisponibles);
+
+  //   // Si hay asesores elegibles, elegir el que tenga menos clientes asignados
+  //   if (asesoresElegibles.length > 0) {
+  //     const asesorSeleccionado = asesoresElegibles.reduce((prev, curr) =>
+  //       prev.clientes_asignados.length < curr.clientes_asignados.length
+  //         ? prev
+  //         : curr
+  //     );
+
+  //     // Actualizar el cliente con el asesor seleccionado
+  //     //  asignarClienteAAsesor(cliente._id, asesorSeleccionado._id);
+  //     // console.log("Asesor seleccionado:", asesorSeleccionado._id);
+  //     // console.log("cliente seleccionado:", cliente._id);
+
+  //     const dataToUpdates = {
+  //       clienteId: cliente._id,
+  //       asesorId: asesorSeleccionado._id,
+  //     };
+
+  //     try {
+  //       const response = await fetch(
+  //         `http://localhost:3000/asignarClienteAAsesor`,
+  //         {
+  //           method: "POST",
+  //           headers: { "Content-Type": "application/json" },
+  //           credentials: "include",
+  //           body: JSON.stringify(dataToUpdates),
+  //         }
+  //       );
+  //       if (response.ok) {
+  //         console.log(response.message);
+  //         alert("Asesor asignado correctamente");
+
+  //         // Actualizar las asignaciones para reflejar la nueva asignación
+  //         setAsignaciones((prevAsignaciones) => [
+  //           ...prevAsignaciones,
+  //           {
+  //             cliente_id: cliente,
+  //             asesor_id: asesorSeleccionado, // Guardar la asignación
+  //           },
+  //         ]);
+  //       } else {
+  //         console.error("Error updating estado:", response.statusText);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error updating estado:", error);
+  //     }
+
+  //     // // Actualizar los datos de los asesores en el estado
+  //     // setAsesores((prevAsesores) =>
+  //     //   prevAsesores.map((asesor) =>
+  //     //     asesor._id === asesorSeleccionado._id
+  //     //       ? {
+  //     //           ...asesor,
+  //     //           clientes_asignados: [...asesor.clientes_asignados, cliente._id],
+  //     //         }
+  //     //       : asesor
+  //     //   )
+  //     // );
+  //   } else {
+  //     alert("No hay asesores disponibles que cumplan con las condiciones.");
+  //   }
+  // };
+
+  // const handleAsignaAsesor = (e) => {
+  //   e.preventDefault();
+  //   handleAsignarAsesor(cliente);
+  // }
+
+  const handleAsignarAsesor = async (cliente) => {
+    // console.log("Cliente: ", cliente);
+    const asignadosTemporalmente = new Set();
+
+    const asignarAsesorEquitativo = (asesoresDisponibles) => {
+      if (asesoresDisponibles.length === 0) return null;
+
+      return asesoresDisponibles.reduce((prev, curr) => {
+        if (!prev) return curr;
+
+        const isPrevAssigned = asignadosTemporalmente.has(prev._id);
+        const isCurrAssigned = asignadosTemporalmente.has(curr._id);
+
+        if (isPrevAssigned && !isCurrAssigned) return curr;
+        if (!isPrevAssigned && isCurrAssigned) return prev;
+
+        const totalPrev =
+          prev.clientes_encuentros.length +
+          prev.clientes_asignados.length +
+          (isPrevAssigned ? 1 : 0);
+        const totalCurr =
+          curr.clientes_encuentros.length +
+          curr.clientes_asignados.length +
+          (isCurrAssigned ? 1 : 0);
+
+        if (totalPrev === totalCurr) {
+          return prev.id < curr.id ? prev : curr;
+        }
+
+        return totalPrev < totalCurr ? prev : curr;
+      }, null);
+    };
+
+    const asesoresDisponiblesEmpresarial = asesores.filter(
+      (asesor) =>
+        asesor.especialidades.includes("Asesoría Empresarial") &&
+        asesor.clientes_encuentros.length < asesor.max_encuentros
+    );
+
+    const asesoresDisponiblesFinanciero = asesores.filter(
+      (asesor) =>
+        asesor.especialidades.includes("Asesoría Financiera") &&
+        asesor.clientes_encuentros.length < asesor.max_encuentros
+    );
+
+    const asesoresDisponiblesTecnologico = asesores.filter(
+      (asesor) =>
+        asesor.especialidades.includes("Asesoría Tecnologica") &&
+        asesor.clientes_encuentros.length < asesor.max_encuentros
+    );
+
+    let asesorEmpresarial = asignarAsesorEquitativo(
+      asesoresDisponiblesEmpresarial
+    );
+    if (asesorEmpresarial) asignadosTemporalmente.add(asesorEmpresarial._id);
+
+    let asesorFinanciero = asignarAsesorEquitativo(
+      asesoresDisponiblesFinanciero
+    );
+    if (asesorFinanciero) asignadosTemporalmente.add(asesorFinanciero._id);
+
+    let asesorTecnologico = asignarAsesorEquitativo(
+      asesoresDisponiblesTecnologico
+    );
+    if (asesorTecnologico) asignadosTemporalmente.add(asesorTecnologico._id);
+
+    console.log("Asesor empresarial " + asesorEmpresarial?.nombre);
+    console.log("Asesor financiero " + asesorFinanciero?.nombre);
+    console.log("Asesor tecnológico " + asesorTecnologico?.nombre);
+
+    const asesoresElegiblesDefinitivos = asesores.filter((asesor) => {
+      const serviciosCumplidos = cliente.servicios_requeridos.filter(
+        (servicio) => asesor.especialidades.includes(servicio)
+      ).length;
+
+      return (
+        serviciosCumplidos >=
+        Math.floor(cliente.servicios_requeridos.length / 2)
       );
     });
 
-    console.log("Asesores disponibles", asesoresDisponibles);
-
-    // // Filtrar los asesores que aún no han alcanzado su límite de clientes
-    const asesoresElegibles = asesoresDisponibles.filter(
-      (asesor) => asesor.clientes_asignados.length < asesor.max_clientes
+    console.log(
+      "Asesores elegibles definitivos:",
+      asesoresElegiblesDefinitivos
     );
 
-    console.log("Asesores elegibles", asesoresDisponibles);
+    let asesorDefinitivo = null;
 
-    // Si hay asesores elegibles, elegir el que tenga menos clientes asignados
-    if (asesoresElegibles.length > 0) {
-      const asesorSeleccionado = asesoresElegibles.reduce((prev, curr) =>
-        prev.clientes_asignados.length < curr.clientes_asignados.length
-          ? prev
-          : curr
+    if (asesoresElegiblesDefinitivos.length > 0) {
+      asesorDefinitivo = asesoresElegiblesDefinitivos.reduce((prev, curr) => {
+        const prevLoad =
+          prev.clientes_encuentros.length +
+          prev.clientes_asignados.length +
+          (asignadosTemporalmente.has(prev._id) ? 1 : 0);
+        const currLoad =
+          curr.clientes_encuentros.length +
+          curr.clientes_asignados.length +
+          (asignadosTemporalmente.has(curr._id) ? 1 : 0);
+
+        return prevLoad < currLoad ? prev : curr;
+      });
+    } else {
+      const asesoresCombinados = asesoresDisponiblesEmpresarial.concat(
+        asesoresDisponiblesFinanciero,
+        asesoresDisponiblesTecnologico
       );
 
-      // Actualizar el cliente con el asesor seleccionado
-      //  asignarClienteAAsesor(cliente._id, asesorSeleccionado._id);
-      // console.log("Asesor seleccionado:", asesorSeleccionado._id);
-      // console.log("cliente seleccionado:", cliente._id);
+      asesorDefinitivo = asignarAsesorEquitativo(asesoresCombinados);
+    }
 
-      const dataToUpdates = {
+    if (asesorDefinitivo) {
+      asignadosTemporalmente.add(asesorDefinitivo._id);
+    }
+
+    console.log(
+      "Asesor definitivo asignado:",
+      asesorDefinitivo?.nombre || "N/A"
+    );
+
+    // Verificar si se asignaron todos los asesores
+    if (
+      asesorEmpresarial &&
+      asesorFinanciero &&
+      asesorTecnologico &&
+      asesorDefinitivo
+    ) {
+      const dataToUpdate = {
         clienteId: cliente._id,
-        asesorId: asesorSeleccionado._id,
+        asesorEmpresarialId: asesorEmpresarial._id,
+        asesorFinancieroId: asesorFinanciero._id,
+        asesorTecnologicoId: asesorTecnologico._id,
+        asesorDefinitivoId: asesorDefinitivo._id,
       };
 
       try {
@@ -179,48 +363,35 @@ function VisualizarClientes() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify(dataToUpdates),
+            body: JSON.stringify(dataToUpdate),
           }
         );
+
         if (response.ok) {
-          console.log(response.message);
-          alert("Asesor asignado correctamente");
+          console.log("Asignación exitosa", response.message);
+          alert("Asesores asignados correctamente");
 
           // Actualizar las asignaciones para reflejar la nueva asignación
           setAsignaciones((prevAsignaciones) => [
             ...prevAsignaciones,
             {
-              cliente_id: cliente,
-              asesor_id: asesorSeleccionado, // Guardar la asignación
+              cliente_id: cliente._id,
+              asesor_empresarial_id: asesorEmpresarial._id,
+              asesor_financiero_id: asesorFinanciero._id,
+              asesor_tecnologico_id: asesorTecnologico._id,
+              asesor_definitivo_id: asesorDefinitivo._id,
             },
           ]);
         } else {
-          console.error("Error updating estado:", response.statusText);
+          console.error("Error al actualizar estado:", response.statusText);
         }
       } catch (error) {
-        console.error("Error updating estado:", error);
+        console.error("Error al actualizar estado:", error);
       }
-
-      // // Actualizar los datos de los asesores en el estado
-      // setAsesores((prevAsesores) =>
-      //   prevAsesores.map((asesor) =>
-      //     asesor._id === asesorSeleccionado._id
-      //       ? {
-      //           ...asesor,
-      //           clientes_asignados: [...asesor.clientes_asignados, cliente._id],
-      //         }
-      //       : asesor
-      //   )
-      // );
     } else {
       alert("No hay asesores disponibles que cumplan con las condiciones.");
     }
   };
-
-  // const handleAsignaAsesor = (e) => {
-  //   e.preventDefault();
-  //   handleAsignarAsesor(cliente);
-  // }
 
   return (
     <div>
@@ -325,7 +496,7 @@ function VisualizarClientes() {
           <thead>
             <tr>
               <th className="text-left py-2">Nombre</th>
-              <th className="text-left py-2">Asesor</th>
+              <th className="text-left py-2 ">Asesores</th>
               <th className="text-left py-2">Asesorias completas</th>
               <th className="text-left py-2">Estado</th>
             </tr>
@@ -334,11 +505,11 @@ function VisualizarClientes() {
           {dataClientes.map((cliente, index) => (
             <tbody key={index}>
               <tr
-                className="cursor-pointer text-sm"
+                className="cursor-pointer text-sm border border-gray-300 "
                 onClick={() => handleRowClick(index)}
               >
-                <td className="py-2 font-semibold">{cliente.nombre}</td>
-                <td className="py-2  ">
+                <td className="px-2 py-2 font-semibold">{cliente.nombre}</td>
+                <td className="py-2  gap-2">
                   {asignaciones.some(
                     (asignacion) => asignacion.cliente_id._id === cliente._id
                   ) ? (
@@ -352,18 +523,35 @@ function VisualizarClientes() {
                         .map((asignacion) => (
                           <span
                             key={asignacion._id}
-                            className="bg-green-300 p-1 rounded-md text-gray-700 px-2"
+                            className="flex flex-col space-y-2 w-fit"
                           >
-                            Cliente asignado a{" "}
-                            <strong>{asignacion.asesor_id.nombre} </strong>
-                            {/* Aquí cambia 'asesorId' por 'asesor_id' según tu esquema */}
+                            <strong className=" bg-green-300 p-1 rounded-md text-gray-700 px-2">
+                              Asesoría empresarial:{" "}
+                              {asignacion.asesor_empresarial_id?.nombre ||
+                                "No asignado"}
+                            </strong>
+                            <strong className=" bg-green-300 p-1 rounded-md text-gray-700 px-2">
+                              Asesoría financiera:{" "}
+                              {asignacion.asesor_financiero_id?.nombre ||
+                                "No asignado"}
+                            </strong>
+                            <strong className=" bg-green-300 p-1 rounded-md text-gray-700 px-2">
+                              Asesoría tecnológica:{" "}
+                              {asignacion.asesor_tecnologico_id?.nombre ||
+                                "No asignado"}
+                            </strong>
+                            <strong className=" bg-blue-300 p-1 rounded-md text-gray-700 px-2">
+                              Asesor definitivo:{" "}
+                              {asignacion.asesor_definitivo_id?.nombre ||
+                                "No asignado"}
+                            </strong>
                           </span>
                         ))}
                     </>
                   ) : (
                     // Si el cliente no está en las asignaciones, muestra el enlace para asignar
                     <Link
-                      className="bg-red-400 p-5 rounded-md text-white px-5 py-2"
+                      className="bg-gray-300 p-5 rounded-md text-black px-5 py-2"
                       onClick={() => handleAsignarAsesor(cliente)}
                     >
                       Asignar Asesor
@@ -390,7 +578,10 @@ function VisualizarClientes() {
               </tr>
               {expandedRow === index && (
                 <tr>
-                  <td colSpan="4" className="py-2 bg-gray-100 text-sm">
+                  <td
+                    colSpan="4"
+                    className="py-2 bg-gray-100 text-sm border border-gray-300"
+                  >
                     <div className="p-4">
                       <h3 className="font-bold">{cliente.nombre}</h3>
                       <p>

@@ -79,13 +79,31 @@ function ListarAsesores() {
               <div className="mt-4 space-y-2">
                 <div className="bg-gray-100 p-2 rounded">
                   <span className="font-semibold text-gray-700 text-sm">
-                    Disponibilidad:
+                    Disponibilidad clientes:
                   </span>{" "}
                   <h2 className="text-sm">{asesor.max_clientes} clientes</h2>
                 </div>
                 <div className="bg-gray-100 p-2 rounded">
                   <span className="font-semibold text-gray-700 text-sm">
+                    Disponibilidad encuentros:
+                  </span>{" "}
+                  <h2 className="text-sm">{asesor.max_encuentros} clientes</h2>
+                </div>
+                <div className="bg-gray-100 p-2 rounded">
+                  <span className="font-semibold text-gray-700 text-sm">
                     Clientes asignados:
+                  </span>
+                  <ul className="list-disc pl-5">
+                    {asesor.clientes_asignados.map((cliente) => (
+                      <li key={cliente._id} className="text-sm text-gray-600">
+                        {cliente.nombre}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-gray-100 p-2 rounded">
+                  <span className="font-semibold text-gray-700 text-sm">
+                    Clientes para encuentros asignados:
                   </span>
                   <ul className="list-disc pl-5">
                     {asesor.clientes_asignados.map((cliente) => (

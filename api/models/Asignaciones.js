@@ -8,7 +8,32 @@ const AsignacionesSchema = new Schema({
     required: true,
     unique: true,
   },
-  asesor_id: {
+  asesor_empresarial_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Asesores",
+    required: true,
+  },
+  asesor_financiero_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Asesores",
+    required: true,
+  },
+  asesor_tecnologico_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Asesores",
+    required: true,
+  },
+  encuentro_asesor_empresarial_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Asesores",
+    required: true,
+  },
+  encuentro_asesor_financiero_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Asesores",
+    required: true,
+  },
+  encuentro_asesor_tecnologico_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Asesores",
     required: true,

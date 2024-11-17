@@ -2,20 +2,19 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const DocAsesoriasSchema = new Schema({
-  doc_asesoria_id: { type: String, required: true, unique: true },
   asesoria_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Asesoria",
+    ref: "Asesorias",
     required: true,
   },
   cliente_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Cliente",
+    ref: "Clientes",
     required: true,
   },
   asesor_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Asesor",
+    ref: "Asesores",
     required: true,
   },
   fecha: { type: Date, required: true },
@@ -26,7 +25,7 @@ const DocAsesoriasSchema = new Schema({
   temas_tratados: [{ type: String, required: true }],
   objetivos_acordados: { type: String, required: true },
   talleres_recomendados: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Taller" },
+    { type: mongoose.Schema.Types.ObjectId, ref: "Talleres" },
   ],
   observaciones_adicionales: { type: String },
   estado: { type: String, required: true },

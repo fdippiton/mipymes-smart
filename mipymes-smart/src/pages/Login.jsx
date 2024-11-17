@@ -60,7 +60,7 @@ function Login() {
     }
   }, [userInfo, navigate]);
 
-  console.log("Info recuperada", userInfo);
+  // console.log("Info recuperada", userInfo);
 
   return (
     <form className="px-16 py-8 h-screen" onSubmit={handleSubmit}>

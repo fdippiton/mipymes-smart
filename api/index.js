@@ -268,6 +268,16 @@ app.get("/allEstados", async (req, res) => {
   }
 });
 
+app.get("/getAllAsesorias", async (req, res) => {
+  try {
+    const asesorias = await Asesorias.find();
+    res.json(asesorias);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.put("/updateEstadoCliente/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -326,6 +336,50 @@ app.post("/registrarAsesor", async (req, res) => {
   }
 });
 
+app.post("/registrarDocAsesoria", async (req, res) => {
+  const {
+    asesoria_id,
+    cliente_id,
+    asesor_id,
+    fecha,
+    hora,
+    duracion_sesion,
+    tema_principal,
+    documentos_compartidos,
+    temas_tratados,
+    objetivos_acordados,
+    talleres_recomendados,
+    observaciones_adicionales,
+    estado,
+    foto,
+  } = req.body;
+
+  try {
+    // Crear el cliente con el rol asignado
+    const asesoriaDoc = await DocAsesorias.create({
+      asesoria_id,
+      cliente_id,
+      asesor_id,
+      fecha,
+      hora,
+      duracion_sesion,
+      tema_principal,
+      documentos_compartidos: [],
+      temas_tratados: [],
+      objetivos_acordados: null,
+      talleres_recomendados: [],
+      observaciones_adicionales: null,
+      estado,
+      foto: null,
+    });
+
+    res.status(200).json(asesoriaDoc);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al crear el documento de asesoria." });
+  }
+});
+
 app.get("/getAllAsesores", async (req, res) => {
   try {
     const asesores = await Asesores.find().populate("clientes_asignados"); // Assuming Clients is a model for the clients collection
@@ -348,6 +402,19 @@ app.get("/getAllAsignaciones", async (req, res) => {
     // .populate("encuentro_asesor_tecnologico_id");
 
     res.json(asignaciones);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/getAllDocAsesorias", async (req, res) => {
+  try {
+    const docAsesorias = await DocAsesorias.find()
+      .populate("cliente_id")
+      .populate("asesoria_id");
+
+    res.json(docAsesorias);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });

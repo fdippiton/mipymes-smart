@@ -10,6 +10,64 @@ function ClientesAsignados() {
   const [expandedRowAsesoria, setExpandedRowAsesoria] = useState(null);
   const [expandedRowNewAsesoria, setExpandedRowNewAsesoria] = useState(null);
   const [asesorId, setAsesorId] = useState(null);
+  const [asesorias, setAsesorias] = useState([]);
+  const [docAsesorias, setDocAsesorias] = useState({});
+
+  const [formData, setFormData] = useState({
+    asesoria_id: "",
+    cliente_id: "",
+    asesor_id: "",
+    fecha: "",
+    hora: "",
+    duracion_sesion: "",
+    tema_principal: "",
+    documentos_compartidos: "",
+    temas_tratados: "",
+    objetivos_acordados: "",
+    talleres_recomendados: "",
+    observaciones_adicionales: "",
+    estado: "",
+    foto: null,
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const resetForm = () => {
+    const clearedFormData = Object.keys(formData).reduce((acc, key) => {
+      acc[key] = key === "foto" ? null : ""; // Si es 'foto', asigna null; de lo contrario, cadena vacía
+      return acc;
+    }, {});
+
+    setFormData(clearedFormData);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Formulario enviado:", formData);
+
+    const response = await fetch("http://localhost:3000/registrarDocAsesoria", {
+      method: "POST",
+      body: JSON.stringify(formData),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.status === 200) {
+      alert("Asesoria creada exitosamente.");
+      resetForm();
+      setExpandedRowNewAsesoria(null);
+    } else {
+      const errorData = await response.json();
+      console.error("Error:", errorData);
+      alert("Error en el registro. Inténtalo de nuevo.");
+    }
+    // Aquí puedes hacer la lógica de envío de datos (fetch o axios)
+  };
 
   const handleRowClick = (rowId) => {
     setExpandedRow(expandedRow === rowId ? null : rowId);
@@ -19,9 +77,211 @@ function ClientesAsignados() {
     setExpandedRowAsesoria(expandedRowAsesoria === rowId ? null : rowId);
   };
 
-  const handleNewAsesoriaClick = (rowId) => {
-    setExpandedRowNewAsesoria(expandedRowNewAsesoria === rowId ? null : rowId);
+  const handleNewAsesoriaClick = (rowId, tipoAsesoria) => {
+    const key = `${rowId}-${tipoAsesoria}`;
+    setExpandedRowNewAsesoria(expandedRowNewAsesoria === key ? null : key);
   };
+
+  const renderForm = (asesoria, clienteId, asesorId) => (
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg space-y-6"
+    >
+      <h2 className="text-base font-semibold text-gray-700">
+        Nueva sesión de Asesoría
+      </h2>
+
+      {/* Fecha */}
+      <div className="flex flex-col">
+        <label htmlFor="fecha" className="font-medium text-sm">
+          Fecha
+        </label>
+        <input
+          type="date"
+          id="fecha"
+          name="fecha"
+          value={formData.fecha}
+          onChange={handleInputChange}
+          className="border text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
+          required
+        />
+      </div>
+
+      {/* Hora */}
+      <div className="flex flex-col">
+        <label htmlFor="hora" className="font-medium text-sm">
+          Hora
+        </label>
+        <input
+          type="time"
+          id="hora"
+          name="hora"
+          value={formData.hora}
+          onChange={handleInputChange}
+          className="border text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
+          required
+        />
+      </div>
+
+      {/* Duración */}
+      <div className="flex flex-col">
+        <label htmlFor="duracion_sesion" className="font-medium text-sm">
+          Duración de la sesión
+        </label>
+        <input
+          type="text"
+          id="duracion_sesion"
+          name="duracion_sesion"
+          value={formData.duracion_sesion}
+          onChange={handleInputChange}
+          className="border text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
+        />
+      </div>
+
+      {/* Tema Principal */}
+      <div className="flex flex-col">
+        <label htmlFor="tema_principal" className="font-medium text-sm">
+          Tema Principal
+        </label>
+        <input
+          type="text"
+          id="tema_principal"
+          name="tema_principal"
+          value={formData.tema_principal}
+          onChange={handleInputChange}
+          className="border text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
+        />
+      </div>
+
+      {/* Estado */}
+      <div className="flex flex-col">
+        <label htmlFor="estado" className="font-medium text-sm">
+          Estado
+        </label>
+        <select
+          id="estado"
+          name="estado"
+          value={formData.estado}
+          onChange={handleInputChange}
+          className="border text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
+          required
+        >
+          <option value="" className="text-sm">
+            Selecciona un estado
+          </option>
+          <option value="Pendiente" className="text-sm">
+            Pendiente
+          </option>
+          <option value="Completado" className="text-sm">
+            Completado
+          </option>
+        </select>
+      </div>
+
+      {/* Observaciones */}
+      {/* <div className="flex flex-col">
+        <label
+          htmlFor="observaciones_adicionales"
+          className="font-medium text-gray-600"
+        >
+          Observaciones Adicionales
+        </label>
+        <textarea
+          id="observaciones_adicionales"
+          name="observaciones_adicionales"
+          value={formData.observaciones_adicionales}
+          onChange={handleInputChange}
+          className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
+          rows="4"
+        ></textarea>
+      </div> */}
+
+      {/* Foto */}
+      {/* <div className="flex flex-col">
+        <label htmlFor="foto" className="font-medium text-gray-600">
+          Foto
+        </label>
+        <input
+          type="file"
+          id="foto"
+          name="foto"
+          onChange={handleInputChange}
+          className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
+        />
+      </div> */}
+
+      {/* Botón de envío */}
+      <button
+        type="submit"
+        className="border  bg-emerald-100 rounded-md hover:bg-emerald-200 p-3"
+      >
+        Guardar Asesoría
+      </button>
+
+      {/* Asesoria ID */}
+      <div className="flex flex-col">
+        <label
+          htmlFor="asesoria_id"
+          className="font-medium text-gray-600"
+          style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+        >
+          Asesoría
+        </label>
+        <input
+          type="text"
+          id="asesoria_id"
+          name="asesoria_id"
+          value={(formData.asesoria_id = asesoria)}
+          onChange={handleInputChange}
+          className="border text-sm border-gray-300 bg-gray-100 rounded-md p-0"
+          required
+          style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+        />
+      </div>
+
+      {/* Cliente ID */}
+      <div className="flex flex-col">
+        <label
+          htmlFor="cliente_id"
+          style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+          className="font-medium text-gray-600"
+        >
+          ID del Cliente
+        </label>
+        <input
+          type="text"
+          id="cliente_id"
+          name="cliente_id"
+          value={(formData.cliente_id = clienteId)}
+          onChange={handleInputChange}
+          className="border border-gray-300 rounded-md p-0 focus:outline-none focus:ring focus:ring-emerald-300"
+          required
+          style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+        />
+      </div>
+
+      {/* Asesor ID */}
+      <div className="flex flex-col">
+        <label
+          htmlFor="asesor_id"
+          style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+          className="font-medium text-gray-600"
+        >
+          ID del Asesor
+        </label>
+        <input
+          type="text"
+          id="asesor_id"
+          name="asesor_id"
+          value={(formData.asesor_id = asesorId)}
+          onChange={handleInputChange}
+          className="border border-gray-300 rounded-md p-0 focus:outline-none focus:ring focus:ring-emerald-300"
+          required
+          style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+        />
+      </div>
+    </form>
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,7 +303,37 @@ function ClientesAsignados() {
 
         const data = await response.json();
         setDataClientes(data); // Almacenar la información del perfil en el estado
-        console.log(dataClientes);
+        // console.log(dataClientes);
+
+        const responseAsesorias = await fetch(
+          "http://localhost:3000/getAllAsesorias",
+          {
+            credentials: "include", // Incluir cookies en la solicitud
+          }
+        );
+
+        if (!responseAsesorias.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const dataAsesorias = await responseAsesorias.json();
+        // console.log(dataAsesorias);
+        setAsesorias(dataAsesorias);
+
+        const responseDocAsesorias = await fetch(
+          "http://localhost:3000/getAllDocAsesorias",
+          {
+            credentials: "include", // Incluir cookies en la solicitud
+          }
+        );
+
+        if (!responseDocAsesorias.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const dataDocAsesorias = await responseDocAsesorias.json();
+        console.log(dataDocAsesorias);
+        setDocAsesorias(dataDocAsesorias);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -56,11 +346,11 @@ function ClientesAsignados() {
       {" "}
       {/* Clients List */}
       <div className="bg-white p-6 rounded-lg shadow mt-8">
-        <h2 className="text-xl font-semibold mb-4">Lista de Clientes</h2>
+        <h2 className="text-xl font-semibold mb-4">Mis clientes</h2>
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
             <tr>
-              <th className="text-left py-2 px-3">Nombre</th>
+              <th className="text-left py-2 px-3">Cliente</th>
               <th className="text-left py-2 px-3">Asesorias</th>
             </tr>
           </thead>
@@ -69,7 +359,7 @@ function ClientesAsignados() {
             <tbody key={index}>
               <tr className="cursor-pointer text-sm border border-gray-300 h-14">
                 <td
-                  className="px-3 py-2 font-semibold"
+                  className="px-3 py-2 font-normal"
                   onClick={() => handleRowClick(index)}
                 >
                   {cliente.cliente_id.nombre}
@@ -143,18 +433,17 @@ function ClientesAsignados() {
                 <tr>
                   <td
                     colSpan="4"
-                    className="py-2 bg-gray-100 text-sm border border-gray-300"
+                    className=" bg-gray-100 text-sm border border-gray-300"
                   >
-                    <div className="p-4">
-                      <h3 className="font-bold text-xl mb-5">
+                    <div className="">
+                      <h3 className="pl-4  pt-4 font-normal text-base mb-5">
                         Asesorías del cliente
                       </h3>
-                      <div className="space-y-5 h-fit">
+                      <div className="space-y-2 h-fit">
                         {" "}
                         {/* Contenedor con espacio vertical entre las asesorías */}
                         {dataClientes
                           .filter((asesoria) => {
-                            // Filtrar solo las asesorías relacionadas con este asesor
                             return (
                               (asesoria.asesor_empresarial_id === asesorId &&
                                 asesoria.cliente_id === cliente.cliente_id) ||
@@ -167,64 +456,317 @@ function ClientesAsignados() {
                           .map((asesoria) => (
                             <div
                               key={asesoria._id}
-                              className="p-4 border rounded-md shadow-md bg-gray-50"
+                              className="px-4 border shadow-md bg-gray-50"
                             >
-                              <div className="mt-3 py-3 h-fit">
+                              <div className="mt-3 py-1 h-fit">
                                 {asesoria.asesor_empresarial_id === asesorId &&
                                   asesoria.cliente_id ===
                                     cliente.cliente_id && (
                                     <div className="mb-6">
-                                      <strong className="bg-gray-200 p-2 rounded-md mb-0.5 block">
+                                      <strong className="text-sm   rounded-md mb-0.5 block">
                                         Empresarial
                                       </strong>
-                                      <br />
                                       <button
                                         onClick={() =>
-                                          handleNewAsesoriaClick(index)
+                                          handleNewAsesoriaClick(
+                                            index,
+                                            "empresarial"
+                                          )
                                         }
-                                        className="flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-emerald-100"
+                                        className="mt-2 flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-emerald-100"
                                       >
                                         <IoIosAddCircle className="text-xl" />
                                         Nueva sesión de asesoría
                                       </button>
+                                      {expandedRowNewAsesoria ===
+                                        `${index}-empresarial` && (
+                                        <div className="mt-4">
+                                          {renderForm(
+                                            asesorias
+                                              .filter(
+                                                (asesoria) =>
+                                                  asesoria.nombre_asesoria ===
+                                                  "Asesoria Empresarial"
+                                              )
+                                              .map(
+                                                (asesoria) => asesoria._id
+                                              )[0], // Selecciona el primer _id de la asesoría que cumpla la condición
+                                            cliente.cliente_id._id,
+                                            asesorId
+                                          )}
+                                        </div>
+                                      )}
+                                      {/* {docAsesorias.map(
+                                        (docAsesoria, index) => (
+                                          <div key={index} className="mb-6">
+                                            <p>
+                                              Cliente en docAsesoria:{" "}
+                                              {docAsesoria.cliente_id._id}
+                                            </p>
+                                            <p>
+                                              Cliente esperado:{" "}
+                                              {cliente.cliente_id._id}
+                                            </p>
+                                            <p>
+                                              Asesor en docAsesoria:{" "}
+                                              {docAsesoria.asesor_id}
+                                            </p>
+                                            <p>Asesor esperado: {asesorId}</p>
+                                            <p>
+                                              Nombre asesoría:{" "}
+                                              {
+                                                docAsesoria.asesoria_id
+                                                  ?.nombre_asesoria
+                                              }
+                                            </p>
+                                          </div>
+                                        )
+                                      )} */}
+                                      <div className="flex">
+                                        {docAsesorias
+                                          .filter((docAsesoria) => {
+                                            // Validar propiedades anidadas
+                                            return (
+                                              docAsesoria &&
+                                              docAsesoria.cliente_id._id ===
+                                                cliente.cliente_id._id &&
+                                              docAsesoria.asesor_id ==
+                                                asesorId &&
+                                              docAsesoria.asesoria_id
+                                                ?.nombre_asesoria ==
+                                                "Asesoria Empresarial"
+                                            );
+                                          })
+                                          .map((doc, index) => (
+                                            <div
+                                              key={index}
+                                              className=" mt-3 max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-6"
+                                              style={{
+                                                backgroundColor:
+                                                  doc.estado === "Pendiente"
+                                                    ? "#FADBD8"
+                                                    : "#B2F7EF",
+                                              }}
+                                            >
+                                              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                {doc.asesoria_id
+                                                  ?.nombre_asesoria || "N/A"}
+                                              </h3>
+                                              <p className="text-sm text-gray-500 mb-1">
+                                                <span className="font-medium text-gray-600">
+                                                  Tema:
+                                                </span>{" "}
+                                                {doc.tema_principal ||
+                                                  "No especificado"}
+                                              </p>
+                                              <p className="text-sm text-gray-500 mb-1">
+                                                <span className="font-medium text-gray-600">
+                                                  Fecha:
+                                                </span>{" "}
+                                                {doc.fecha || "No especificada"}
+                                              </p>
+                                              <p className="text-sm text-gray-500 mb-1">
+                                                <span className="font-medium text-gray-600">
+                                                  Hora:
+                                                </span>{" "}
+                                                {doc.hora || "No especificada"}
+                                              </p>
+                                              <p className="text-sm text-gray-500">
+                                                <span className="font-medium text-gray-600">
+                                                  Estado:
+                                                </span>{" "}
+                                                {doc.estado ||
+                                                  "No especificado"}
+                                              </p>
+                                            </div>
+                                          ))}
+                                      </div>
                                     </div>
                                   )}
                                 {asesoria.asesor_financiero_id === asesorId &&
                                   asesoria.cliente_id ===
                                     cliente.cliente_id && (
                                     <div className="mb-6">
-                                      <strong className="bg-gray-200 p-2 rounded-md mb-0.5 block">
+                                      <strong className="text-sm   rounded-md mb-0.5 block">
                                         Financiera
                                       </strong>
-                                      <br />
                                       <button
                                         onClick={() =>
-                                          handleNewAsesoriaClick(index)
+                                          handleNewAsesoriaClick(
+                                            index,
+                                            "financiera"
+                                          )
                                         }
-                                        className="flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-emerald-100"
+                                        className="mt-2 flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-emerald-100"
                                       >
                                         <IoIosAddCircle className="text-xl" />
                                         Nueva sesión de asesoría
                                       </button>
+                                      {expandedRowNewAsesoria ===
+                                        `${index}-financiera` && (
+                                        <div className="mt-4">
+                                          {renderForm(
+                                            asesorias
+                                              .filter(
+                                                (asesoria) =>
+                                                  asesoria.nombre_asesoria ===
+                                                  "Asesoría Financiera"
+                                              )
+                                              .map(
+                                                (asesoria) => asesoria._id
+                                              )[0], // Selecciona el primer _id de la asesoría que cumpla la condición,
+                                            cliente.cliente_id._id,
+                                            asesorId
+                                          )}
+                                        </div>
+                                      )}
+
+                                      <div className="flex">
+                                        {docAsesorias
+                                          .filter((docAsesoria) => {
+                                            // Validar propiedades anidadas
+                                            return (
+                                              docAsesoria &&
+                                              docAsesoria.cliente_id._id ===
+                                                cliente.cliente_id._id &&
+                                              docAsesoria.asesor_id ==
+                                                asesorId &&
+                                              docAsesoria.asesoria_id
+                                                ?.nombre_asesoria ==
+                                                "Asesoría Financiera"
+                                            );
+                                          })
+                                          .map((doc, index) => (
+                                            <div
+                                              key={index}
+                                              className=" mt-3 max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-6"
+                                            >
+                                              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                {doc.asesoria_id
+                                                  ?.nombre_asesoria || "N/A"}
+                                              </h3>
+                                              <p className="text-sm text-gray-500 mb-1">
+                                                <span className="font-medium text-gray-600">
+                                                  Tema:
+                                                </span>{" "}
+                                                {doc.tema_principal ||
+                                                  "No especificado"}
+                                              </p>
+                                              <p className="text-sm text-gray-500 mb-1">
+                                                <span className="font-medium text-gray-600">
+                                                  Fecha:
+                                                </span>{" "}
+                                                {doc.fecha || "No especificada"}
+                                              </p>
+                                              <p className="text-sm text-gray-500 mb-1">
+                                                <span className="font-medium text-gray-600">
+                                                  Hora:
+                                                </span>{" "}
+                                                {doc.hora || "No especificada"}
+                                              </p>
+                                              <p className="text-sm text-gray-500">
+                                                <span className="font-medium text-gray-600">
+                                                  Estado:
+                                                </span>{" "}
+                                                {doc.estado ||
+                                                  "No especificado"}
+                                              </p>
+                                            </div>
+                                          ))}
+                                      </div>
                                     </div>
                                   )}
                                 {asesoria.asesor_tecnologico_id === asesorId &&
                                   asesoria.cliente_id ===
                                     cliente.cliente_id && (
                                     <div className="">
-                                      <strong className="bg-gray-200 p-1 rounded-md mb-0.5 block">
+                                      <strong className="text-sm   rounded-md mb-0.5 block">
                                         Tecnológica
                                       </strong>
-                                      <br />
                                       <button
                                         onClick={() =>
-                                          handleNewAsesoriaClick(index)
+                                          handleNewAsesoriaClick(
+                                            index,
+                                            "tecnologica"
+                                          )
                                         }
-                                        className="flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-emerald-100"
+                                        className="mt-2 flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-emerald-100"
                                       >
                                         <IoIosAddCircle className="text-xl" />
                                         Nueva sesión de asesoría
                                       </button>
+                                      {expandedRowNewAsesoria ===
+                                        `${index}-tecnologica` && (
+                                        <div className="mt-4">
+                                          {renderForm(
+                                            asesorias
+                                              .filter(
+                                                (asesoria) =>
+                                                  asesoria.nombre_asesoria ===
+                                                  "Asesoria Tecnológica"
+                                              )
+                                              .map(
+                                                (asesoria) => asesoria._id
+                                              )[0], // Selecciona el primer _id de la asesoría que cumpla la condición
+                                            cliente.cliente_id,
+                                            asesorId
+                                          )}
+                                        </div>
+                                      )}
+
+                                      <div className="flex">
+                                        {docAsesorias
+                                          .filter((docAsesoria) => {
+                                            // Validar propiedades anidadas
+                                            return (
+                                              docAsesoria &&
+                                              docAsesoria.cliente_id._id ===
+                                                cliente.cliente_id._id &&
+                                              docAsesoria.asesor_id ==
+                                                asesorId &&
+                                              docAsesoria.asesoria_id
+                                                ?.nombre_asesoria ==
+                                                "Asesoria Tecnológica"
+                                            );
+                                          })
+                                          .map((doc, index) => (
+                                            <div
+                                              key={index}
+                                              className=" mt-3 max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-6"
+                                            >
+                                              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                {doc.asesoria_id
+                                                  ?.nombre_asesoria || "N/A"}
+                                              </h3>
+                                              <p className="text-sm text-gray-500 mb-1">
+                                                <span className="font-medium text-gray-600">
+                                                  Tema:
+                                                </span>{" "}
+                                                {doc.tema_principal ||
+                                                  "No especificado"}
+                                              </p>
+                                              <p className="text-sm text-gray-500 mb-1">
+                                                <span className="font-medium text-gray-600">
+                                                  Fecha:
+                                                </span>{" "}
+                                                {doc.fecha || "No especificada"}
+                                              </p>
+                                              <p className="text-sm text-gray-500 mb-1">
+                                                <span className="font-medium text-gray-600">
+                                                  Hora:
+                                                </span>{" "}
+                                                {doc.hora || "No especificada"}
+                                              </p>
+                                              <p className="text-sm text-gray-500">
+                                                <span className="font-medium text-gray-600">
+                                                  Estado:
+                                                </span>{" "}
+                                                {doc.estado ||
+                                                  "No especificado"}
+                                              </p>
+                                            </div>
+                                          ))}
+                                      </div>
                                     </div>
                                   )}
                               </div>
@@ -232,17 +774,6 @@ function ClientesAsignados() {
                           ))}
                       </div>
                     </div>
-                  </td>
-                </tr>
-              )}
-
-              {expandedRowNewAsesoria === index && (
-                <tr>
-                  <td
-                    colSpan="4"
-                    className="py-2 bg-gray-100 text-sm border border-gray-300"
-                  >
-                    <div className="p-4">Hello</div>
                   </td>
                 </tr>
               )}

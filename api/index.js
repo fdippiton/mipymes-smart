@@ -217,6 +217,47 @@ app.get("/getAllClientes", async (req, res) => {
   }
 });
 
+app.get("/getAllAsesorClientes", async (req, res) => {
+  const token = req.cookies.token; // Accede al token desde las cookies
+
+  try {
+    if (!token) {
+      return res.status(401).json({ error: "No se proporcionó token." });
+    }
+
+    // Decodificar el token para obtener el ID del asesor
+    const decoded = jwt.verify(token, secretKey);
+
+    // Buscar al asesor por ID
+    const asesor = await Asesores.findById(decoded.id); // Cambiado a findById para buscar un único documento por ID
+
+    if (!asesor) {
+      return res.status(404).json({ message: "No se encontró este asesor." });
+    }
+
+    // Buscar asignaciones donde este asesor esté asignado en cualquiera de los roles
+    const asignaciones = await Asignaciones.find({
+      $or: [
+        { asesor_empresarial_id: decoded.id },
+        { asesor_financiero_id: decoded.id },
+        { asesor_tecnologico_id: decoded.id },
+      ],
+    }).populate("cliente_id"); // Poblar la información del cliente
+
+    if (asignaciones.length === 0) {
+      return res.status(404).json({
+        message: "No se encontraron clientes asignados para este asesor.",
+      });
+    }
+
+    // Enviar las asignaciones encontradas como respuesta
+    res.json(asignaciones);
+  } catch (error) {
+    console.error("Error al procesar la solicitud:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
 app.get("/allEstados", async (req, res) => {
   try {
     const estados = await Estados.find();

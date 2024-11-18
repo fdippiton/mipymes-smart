@@ -22,8 +22,8 @@ const DocAsesoriasSchema = new Schema({
   duracion_sesion: { type: String },
   tema_principal: { type: String },
   documentos_compartidos: [{ type: String }],
-  temas_tratados: [{ type: String, required: true }],
-  objetivos_acordados: { type: String, required: true },
+  temas_tratados: [{ type: String }],
+  objetivos_acordados: { type: String },
   talleres_recomendados: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Talleres" },
   ],

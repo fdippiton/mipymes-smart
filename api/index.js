@@ -1195,9 +1195,9 @@ app.put("/updateAsesor", async (req, res) => {
 });
 
 // Endpoint para desasignar cliente
-app.delete("/deshacerAsignacion", async (req, res) => {
+app.delete("/deshacerAsignacion/:clienteId", async (req, res) => {
   try {
-    const { clienteId } = req.body;
+    const { clienteId } = req.params;
 
     // Buscar la asignación del cliente
     const asignacion = await Asignaciones.findOne({
@@ -1215,25 +1215,19 @@ app.delete("/deshacerAsignacion", async (req, res) => {
       asignacion.asesor_empresarial_id,
       asignacion.asesor_financiero_id,
       asignacion.asesor_tecnologico_id,
-    ].filter(Boolean); // Elimina IDs nulos
+    ].filter(Boolean); // Filtrar IDs válidos
 
-    // Actualizar cada asesor
+    // Actualizar asesores en la base de datos
     await Promise.all(
       asesoresIds.map(async (asesorId) => {
-        const asesor = await Asesores.findById(asesorId);
-
-        if (asesor) {
-          // Eliminar cliente de la lista de asignados
-          asesor.clientes_asignados = asesor.clientes_asignados.filter(
-            (id) => id.toString() !== clienteId
-          );
-
-          // Incrementar el límite de clientes
-          asesor.max_clientes += 1;
-
-          // Guardar cambios
-          await asesor.save();
-        }
+        await Asesores.findByIdAndUpdate(
+          asesorId,
+          {
+            $pull: { clientes_asignados: clienteId }, // Remover cliente
+            $inc: { max_clientes: 1 }, // Incrementar max_clientes
+          },
+          { new: true } // Opcional, para devolver el documento actualizado
+        );
       })
     );
 
@@ -1249,18 +1243,18 @@ app.delete("/deshacerAsignacion", async (req, res) => {
   }
 });
 
-app.delete("/deshacerAsignacion", async (req, res) => {
-  const { clienteId } = req.body;
+// app.delete("/deshacerAsignacion", async (req, res) => {
+//   const { clienteId } = req.body;
 
-  try {
-    // Eliminar asignación según tu modelo de datos
-    await Asignacion.deleteOne({ cliente_id: clienteId });
-    res.status(200).json({ message: "Asignación eliminada exitosamente" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error al eliminar la asignación" });
-  }
-});
+//   try {
+//     // Eliminar asignación según tu modelo de datos
+//     await Asignacion.deleteOne({ cliente_id: clienteId });
+//     res.status(200).json({ message: "Asignación eliminada exitosamente" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Error al eliminar la asignación" });
+//   }
+// });
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

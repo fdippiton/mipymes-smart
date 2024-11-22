@@ -5,12 +5,17 @@ import { IoMdAddCircle } from "react-icons/io";
 function VisualizarClientes() {
   const [expandedRow, setExpandedRow] = useState(null);
   const [dataClientes, setDataClientes] = useState([]);
+  const [dataClientesParametros, setDataClientesParametros] = useState([]);
   const [estados, setEstados] = useState([]);
   const [asesores, setAsesores] = useState([]);
   const [asignaciones, setAsignaciones] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); // Texto de búsqueda ingresado por el usuario
   const [clientesFiltrados, setClientesFiltrados] = useState([]); // Resultados filtrados
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null); // Cliente seleccionado
+  const [clientesEnProceso, setClientesEnProceso] = useState([]);
+  const [clientesActivos, setClientesActivos] = useState([]);
+  const [clientesInactivos, setClientesInactivos] = useState([]);
+  const [clientesCerrados, setClientesCerrados] = useState([]);
 
   const navigate = useNavigate();
 
@@ -31,12 +36,24 @@ function VisualizarClientes() {
 
         const data = await response.json();
         setDataClientes(data); // Almacenar la información del perfil en el estado
+        setDataClientesParametros(data); //
+        console.log("estado", clientesActivos);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
     fetchData();
   }, []);
+
+  const handleClienteEstado = (estadoCliente) => {
+    // Filtrar clientes según el estado proporcionado
+    const clientesEstado = dataClientes.filter(
+      (cliente) => cliente.estado.estado_descripcion === estadoCliente
+    );
+
+    // Actualizar el estado con los clientes filtrados
+    setDataClientes(clientesEstado);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,7 +109,7 @@ function VisualizarClientes() {
       );
       if (response.ok) {
         // Actualiza el estado del cliente en el frontend
-        setDataClientes((prevClientes) =>
+        setDataClientesParametros((prevClientes) =>
           prevClientes.map((cliente) =>
             cliente._id === clienteId
               ? {
@@ -358,6 +375,20 @@ function VisualizarClientes() {
   // };
 
   const handleAsignarAsesor = async (cliente) => {
+    const fetchAsignaciones = async () => {
+      try {
+        const responseAsignaciones = await fetch(
+          "http://localhost:3000/getAllAsignaciones",
+          {
+            credentials: "include", // Incluir cookies en la solicitud
+          }
+        );
+        const data = await responseAsignaciones.json();
+        setAsignaciones(data);
+      } catch (error) {
+        console.error("Error al obtener asignaciones:", error);
+      }
+    };
     try {
       const response = await fetch(
         "http://localhost:3000/asignarClienteAAsesor",
@@ -371,10 +402,13 @@ function VisualizarClientes() {
       );
 
       const result = await response.json();
+      console.log("asignaciones", asignaciones);
 
       if (response.ok) {
-        console.log("Asignación exitosa:", result);
+        // console.log("Asignación exitosa:", result);
         alert("Asignación realizada exitosamente.");
+        // Reflejar la asignación en la lista
+        fetchAsignaciones();
       } else {
         console.error("Error del servidor:", result.error);
         alert(`Error: ${result.error}`);
@@ -387,13 +421,12 @@ function VisualizarClientes() {
 
   const handleDeshacerAsignacion = async (clienteId) => {
     try {
-      const response = await fetch(`http://localhost:3000/deshacerAsignacion`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ clienteId }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/deshacerAsignacion/${clienteId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -421,7 +454,7 @@ function VisualizarClientes() {
     <div>
       <div className=" grid grid-cols-5 gap-4">
         <div
-          className="rounded-md shadow "
+          className="rounded-md shadow cursor-pointer"
           // style={{ backgroundColor: "#e8cbf3" }}
         >
           <h2
@@ -431,14 +464,15 @@ function VisualizarClientes() {
             Clientes Totales
           </h2>
           <p
-            className="text-3xl font-bold text-gray-500 text-center py-2"
+            className="text-3xl font-bold text-center py-2"
             // style={{ color: "#47097d" }}
           >
-            {dataClientes.length}
+            {dataClientesParametros.length}
           </p>
         </div>
         <div
-          className="rounded-md shadow "
+          onClick={() => handleClienteEstado("Activo")}
+          className="rounded-md shadow cursor-pointer"
           // style={{ backgroundColor: "#6ba8b3" }}
         >
           <h2
@@ -448,11 +482,11 @@ function VisualizarClientes() {
             Activos
           </h2>
           <p
-            className="text-3xl font-bold text-emerald-700  text-center py-2"
+            className="text-3xl font-bold   text-center py-2"
             // style={{ color: "#d8e9e7" }}
           >
             {
-              dataClientes.filter(
+              dataClientesParametros.filter(
                 (cliente) => cliente.estado.estado_descripcion === "Activo"
               ).length
             }
@@ -460,7 +494,8 @@ function VisualizarClientes() {
         </div>
 
         <div
-          className="rounded-md shadow "
+          className="rounded-md shadow cursor-pointer"
+          onClick={() => handleClienteEstado("En proceso de contacto")}
           // style={{ backgroundColor: "#fdd8b0" }}
         >
           <h2
@@ -470,48 +505,48 @@ function VisualizarClientes() {
             En proceso
           </h2>
           <p
-            className="text-3xl font-bold text-yellow-600 text-center py-2"
+            className="text-3xl font-bold  text-center py-2"
             // style={{ color: "#827597" }}
           >
             {
-              dataClientes.filter(
+              dataClientesParametros.filter(
                 (cliente) =>
                   cliente.estado.estado_descripcion === "En proceso de contacto"
               ).length
             }
           </p>
         </div>
-        <div className=" rounded-md shadow">
+        <div
+          className=" rounded-md shadow cursor-pointer"
+          onClick={() => handleClienteEstado("Cerrado")}
+        >
           <h2
             className="rounded-md text-xl font-semibold p-4 h-28"
             style={{ color: "#15315d", backgroundColor: "#7b94de" }}
           >
             Cerrados
           </h2>
-          <p
-            className="text-3xl font-bold text-center py-2"
-            style={{ color: "#15315d" }}
-          >
+          <p className="text-3xl font-bold text-center py-2">
             {
-              dataClientes.filter(
+              dataClientesParametros.filter(
                 (cliente) => cliente.estado.estado_descripcion === "Cerrado"
               ).length
             }
           </p>
         </div>
-        <div className=" rounded-md shadow">
+        <div
+          className=" rounded-md shadow cursor-pointer"
+          onClick={() => handleClienteEstado("Inactivo")}
+        >
           <h2
             className="rounded-md text-xl font-semibold p-4 h-28"
             style={{ color: "#e0bdcb", backgroundColor: "#9c1323" }}
           >
             Inactivos
           </h2>
-          <p
-            className="text-3xl font-bold text-center py-2"
-            style={{ color: "#e0bdcb" }}
-          >
+          <p className="text-3xl font-bold text-center py-2">
             {
-              dataClientes.filter(
+              dataClientesParametros.filter(
                 (cliente) => cliente.estado.estado_descripcion === "Inactivo"
               ).length
             }

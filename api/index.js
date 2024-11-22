@@ -1194,6 +1194,74 @@ app.put("/updateAsesor", async (req, res) => {
   }
 });
 
+// Endpoint para desasignar cliente
+app.delete("/deshacerAsignacion", async (req, res) => {
+  try {
+    const { clienteId } = req.body;
+
+    // Buscar la asignación del cliente
+    const asignacion = await Asignaciones.findOne({
+      cliente_id: clienteId,
+    });
+
+    if (!asignacion) {
+      return res
+        .status(404)
+        .json({ error: "No se encontró asignación para este cliente." });
+    }
+
+    // Lista de asesores relacionados con el cliente
+    const asesoresIds = [
+      asignacion.asesor_empresarial_id,
+      asignacion.asesor_financiero_id,
+      asignacion.asesor_tecnologico_id,
+    ].filter(Boolean); // Elimina IDs nulos
+
+    // Actualizar cada asesor
+    await Promise.all(
+      asesoresIds.map(async (asesorId) => {
+        const asesor = await Asesores.findById(asesorId);
+
+        if (asesor) {
+          // Eliminar cliente de la lista de asignados
+          asesor.clientes_asignados = asesor.clientes_asignados.filter(
+            (id) => id.toString() !== clienteId
+          );
+
+          // Incrementar el límite de clientes
+          asesor.max_clientes += 1;
+
+          // Guardar cambios
+          await asesor.save();
+        }
+      })
+    );
+
+    // Eliminar la asignación del cliente
+    await asignacion.deleteOne();
+
+    res.status(200).json({ message: "Cliente desasignado exitosamente." });
+  } catch (error) {
+    console.error("Error al desasignar cliente:", error);
+    res
+      .status(500)
+      .json({ error: "Ocurrió un error al desasignar el cliente." });
+  }
+});
+
+app.delete("/deshacerAsignacion", async (req, res) => {
+  const { clienteId } = req.body;
+
+  try {
+    // Eliminar asignación según tu modelo de datos
+    await Asignacion.deleteOne({ cliente_id: clienteId });
+    res.status(200).json({ message: "Asignación eliminada exitosamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al eliminar la asignación" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

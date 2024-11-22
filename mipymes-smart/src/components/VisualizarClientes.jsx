@@ -385,6 +385,38 @@ function VisualizarClientes() {
     }
   };
 
+  const handleDeshacerAsignacion = async (clienteId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/deshacerAsignacion`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ clienteId }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Asignación eliminada:", result);
+
+        // Actualizar el estado para reflejar la eliminación
+        setAsignaciones((prevAsignaciones) =>
+          prevAsignaciones.filter(
+            (asignacion) => asignacion.cliente_id._id !== clienteId
+          )
+        );
+        alert("Asignación eliminada exitosamente.");
+      } else {
+        const error = await response.json();
+        console.error("Error del servidor:", error.message);
+        alert(`Error: ${error.message}`);
+      }
+    } catch (error) {
+      console.error("Error al comunicarse con el servidor:", error);
+      alert("Error al eliminar la asignación.");
+    }
+  };
+
   return (
     <div>
       <div className=" grid grid-cols-5 gap-4">
@@ -518,21 +550,104 @@ function VisualizarClientes() {
         <div className="mt-4 p-4 border border-gray-300 rounded-md shadow-md">
           <div className="p-4">
             <h3 className="font-bold">{clienteSeleccionado.nombre}</h3>
+            <div className="flex justify-between">
+              <div className="py-2  gap-2">
+                <h6 className="text-sm font-bold mb-2">Asesores</h6>
+                {asignaciones.some(
+                  (asignacion) =>
+                    asignacion.cliente_id._id === clienteSeleccionado._id
+                ) ? (
+                  // Si el cliente está en las asignaciones, busca el asesor y muestra un mensaje
+                  <>
+                    {asignaciones
+                      .filter(
+                        (asignacion) =>
+                          asignacion.cliente_id._id === clienteSeleccionado._id
+                      )
+                      .map((asignacion) => (
+                        <div>
+                          <span
+                            key={asignacion._id}
+                            className="flex flex-col space-y-2 w-fit text-xs"
+                          >
+                            <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
+                              Asesoría empresarial:{" "}
+                              {asignacion.asesor_empresarial_id?.nombre ||
+                                "No asignado"}
+                            </strong>
+                            <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
+                              Asesoría financiera:{" "}
+                              {asignacion.asesor_financiero_id?.nombre ||
+                                "No asignado"}
+                            </strong>
+                            <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
+                              Asesoría tecnológica:{" "}
+                              {asignacion.asesor_tecnologico_id?.nombre ||
+                                "No asignado"}
+                            </strong>
+                          </span>
+                          <button
+                            onClick={() =>
+                              handleDeshacerAsignacion(clienteSeleccionado._id)
+                            }
+                            className="bg-red-400 p-5 rounded-md text-white px-5 py-2 mt-3 text-xs"
+                          >
+                            Deshacer Asignación
+                          </button>
+                        </div>
+                      ))}
+                  </>
+                ) : (
+                  // Si el cliente no está en las asignaciones, muestra el enlace para asignar
+                  <Link
+                    className="bg-gray-300 p-5 rounded-md text-black px-5 py-2 text-xs"
+                    onClick={() => handleAsignarAsesor(clienteSeleccionado)}
+                  >
+                    Asignar Asesor
+                  </Link>
+                )}
+              </div>
+
+              <div className="py-2">
+                <h6 className="text-sm font-bold mb-2">Estado</h6>
+
+                <select
+                  value={clienteSeleccionado.estado?._id} // Asegurarse de que el valor sea el id del estado
+                  onChange={(e) =>
+                    handleEstadoChange(clienteSeleccionado._id, e.target.value)
+                  }
+                  className="bg-white border border-gray-300 text-sm rounded p-1.5 pr-10 px-4"
+                >
+                  {estados.map((estado) => (
+                    <option key={estado._id} value={estado._id}>
+                      {estado.estado_descripcion}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <p>
-              <strong>Teléfono:</strong> {clienteSeleccionado.contacto.telefono}{" "}
-              <br />
-              <strong>Correo:</strong>{" "}
-              {clienteSeleccionado.contacto.email_cliente} <br />
-              <strong>Nombre de empresa:</strong>{" "}
-              {clienteSeleccionado.nombre_empresa} <br />
-              <strong>Correo de empresa:</strong>{" "}
-              {clienteSeleccionado.contacto.email_empresa} <br />
-              <strong>Servicios que ofrece:</strong>{" "}
-              {clienteSeleccionado.descripcion_servicios} <br />
-              <strong>Rubro:</strong> {clienteSeleccionado.rubro} <br />
-              <strong>Ingresos generados son más de $8,000 pesos:</strong>{" "}
-              {clienteSeleccionado.ingresos} <br />
-              <strong>Servicios que necesita:</strong>{" "}
+              <h6 className="text-sm font-bold mb-2 mt-4">
+                Informacion del cliente
+              </h6>
+              <div className="text-sm">
+                <strong>Teléfono:</strong>{" "}
+                {clienteSeleccionado.contacto.telefono} <br />
+                <strong>Correo:</strong>{" "}
+                {clienteSeleccionado.contacto.email_cliente} <br />
+                <strong>Nombre de empresa:</strong>{" "}
+                {clienteSeleccionado.nombre_empresa} <br />
+                <strong>Correo de empresa:</strong>{" "}
+                {clienteSeleccionado.contacto.email_empresa} <br />
+                <strong>Servicios que ofrece:</strong>{" "}
+                {clienteSeleccionado.descripcion_servicios} <br />
+                <strong>Rubro:</strong> {clienteSeleccionado.rubro} <br />
+                <strong>
+                  Ingresos generados son más de $8,000 pesos:
+                </strong>{" "}
+                {clienteSeleccionado.ingresos} <br />
+                <strong>Servicios que necesita:</strong>{" "}
+              </div>
               {Array.isArray(clienteSeleccionado.servicios_requeridos)
                 ? clienteSeleccionado.servicios_requeridos.map(
                     (servicio, index) => (
@@ -579,12 +694,14 @@ function VisualizarClientes() {
 
           {dataClientes.map((cliente, index) => (
             <tbody key={index}>
-              <tr
-                className="cursor-pointer text-sm border border-gray-300 "
-                onClick={() => handleRowClick(index)}
-              >
-                <td className="px-3 py-2 font-semibold">{cliente.nombre}</td>
-                <td className="py-2  gap-2">
+              <tr className="cursor-pointer text-sm border border-gray-300 ">
+                <td
+                  className="px-3 py-2 font-semibold"
+                  onClick={() => handleRowClick(index)}
+                >
+                  {cliente.nombre}
+                </td>
+                <td className="py-2  gap-2 ">
                   {asignaciones.some(
                     (asignacion) => asignacion.cliente_id._id === cliente._id
                   ) ? (
@@ -596,32 +713,42 @@ function VisualizarClientes() {
                             asignacion.cliente_id._id === cliente._id
                         )
                         .map((asignacion) => (
-                          <span
-                            key={asignacion._id}
-                            className="flex flex-col space-y-2 w-fit"
-                          >
-                            <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
-                              Asesoría empresarial:{" "}
-                              {asignacion.asesor_empresarial_id?.nombre ||
-                                "No asignado"}
-                            </strong>
-                            <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
-                              Asesoría financiera:{" "}
-                              {asignacion.asesor_financiero_id?.nombre ||
-                                "No asignado"}
-                            </strong>
-                            <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
-                              Asesoría tecnológica:{" "}
-                              {asignacion.asesor_tecnologico_id?.nombre ||
-                                "No asignado"}
-                            </strong>
-                          </span>
+                          <div>
+                            <span
+                              key={asignacion._id}
+                              className="flex flex-col space-y-2 w-fit"
+                            >
+                              <strong className="text-xs bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
+                                Asesoría empresarial:{" "}
+                                {asignacion.asesor_empresarial_id?.nombre ||
+                                  "No asignado"}
+                              </strong>
+                              <strong className="text-xs bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
+                                Asesoría financiera:{" "}
+                                {asignacion.asesor_financiero_id?.nombre ||
+                                  "No asignado"}
+                              </strong>
+                              <strong className="text-xs bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
+                                Asesoría tecnológica:{" "}
+                                {asignacion.asesor_tecnologico_id?.nombre ||
+                                  "No asignado"}
+                              </strong>
+                            </span>
+                            <button
+                              onClick={() =>
+                                handleDeshacerAsignacion(cliente._id)
+                              }
+                              className="bg-red-400 p-5 rounded-md text-white px-5 py-2 mt-3 text-xs"
+                            >
+                              Deshacer Asignación
+                            </button>
+                          </div>
                         ))}
                     </>
                   ) : (
                     // Si el cliente no está en las asignaciones, muestra el enlace para asignar
                     <Link
-                      className="bg-gray-300 p-5 rounded-md text-black px-5 py-2"
+                      className="bg-gray-300 p-5 rounded-md text-black px-5 py-2 text-xs"
                       onClick={() => handleAsignarAsesor(cliente)}
                     >
                       Asignar Asesor

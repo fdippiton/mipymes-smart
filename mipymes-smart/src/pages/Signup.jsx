@@ -22,6 +22,7 @@ function Signup() {
   const [customMessage, setCustomMessage] = useState("");
   const [otroServicio, setOtroServicio] = useState(false); // State to track the checkbox
   const [customMessageServicios, setCustomMessageServicios] = useState(""); // State for custom message
+  const [errores, setErrores] = useState({});
 
   const navigate = useNavigate();
 
@@ -86,6 +87,33 @@ function Signup() {
     });
   };
 
+  const validarFormulario = () => {
+    const nuevosErrores = {};
+
+    if (!nombre.trim()) nuevosErrores.nombre = "El nombre es obligatorio.";
+    if (
+      !email_cliente.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email_cliente)
+    )
+      nuevosErrores.email_cliente = "Ingrese un correo válido.";
+    if (contrasena.length < 3)
+      nuevosErrores.contrasena =
+        "La contraseña debe tener al menos 6 caracteres.";
+    if (!telefono.trim() || !/^\d{3}-\d{3}-\d{4}$/.test(telefono))
+      nuevosErrores.telefono =
+        "Ingrese un teléfono válido (formato: 809-XXX-XXXX).";
+    if (!nombre_empresa.trim())
+      nuevosErrores.nombre_empresa = "El nombre de la empresa es obligatorio.";
+    if (
+      !email_empresa.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email_empresa)
+    )
+      nuevosErrores.email_empresa = "Ingrese un correo válido para la empresa.";
+
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
+  };
+
   async function registrar(ev) {
     ev.preventDefault();
 
@@ -105,19 +133,25 @@ function Signup() {
 
     console.log(data);
 
-    const response = await fetch("http://localhost:3000/registrar", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" },
-    });
+    if (validarFormulario()) {
+      alert("Formulario enviado con éxito.");
+      // Aquí puedes manejar la lógica de envío de datos
+      const response = await fetch("http://localhost:3000/registrar", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+      });
 
-    if (response.status === 200) {
-      alert("Registration successful.");
-      navigate("/login");
+      if (response.status === 200) {
+        alert("Registration successful.");
+        navigate("/login");
+      } else {
+        const errorData = await response.json();
+        console.error("Error:", errorData);
+        alert("Error en el registro. Inténtalo de nuevo.");
+      }
     } else {
-      const errorData = await response.json();
-      console.error("Error:", errorData);
-      alert("Error en el registro. Inténtalo de nuevo.");
+      alert("Por favor, corrija los errores en el formulario.");
     }
   }
 
@@ -145,34 +179,46 @@ function Signup() {
           <div className="mt-10 gap-y-8 sm:grid-cols-6">
             <div className="sm:col-span-3">
               <div className="mt-2">
+                <label className="text-sm font-bold">Nombre del cliente</label>
                 <input
                   id="nombre-cliente"
                   name="nombre-cliente"
                   type="text"
-                  placeholder="Nombre del cliente"
+                  placeholder="John Doe"
                   className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={nombre}
                   onChange={(ev) => setNombre(ev.target.value)}
                 />
+                {errores.nombre && (
+                  <p className="text-red-500 text-sm">{errores.nombre}</p>
+                )}
               </div>
             </div>
 
             <div className=" sm:col-span-3">
               <div className="mt-2">
+                <label className="text-sm font-bold">Correo</label>
                 <input
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="Correo del cliente"
+                  placeholder="johndoe@gmail.com"
                   className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={email_cliente}
                   onChange={(ev) => setEmail_cliente(ev.target.value)}
                 />
+                {errores.email_cliente && (
+                  <p className="text-red-500 text-sm">
+                    {errores.email_cliente}
+                  </p>
+                )}
               </div>
             </div>
 
             <div className="sm:col-span-3">
               <div className="mb-4 mt-2">
+                <label className="text-sm font-bold">Contraseña</label>
+
                 <input
                   id="password"
                   name="password"
@@ -182,6 +228,9 @@ function Signup() {
                   value={contrasena}
                   onChange={(ev) => setContrasena(ev.target.value)}
                 />
+                {errores.contrasena && (
+                  <p className="text-red-500 text-sm">{errores.contrasena}</p>
+                )}
               </div>
             </div>
 
@@ -317,15 +366,20 @@ function Signup() {
 
           <div className="sm:col-span-3">
             <div className="mt-2">
+              <label className="text-sm font-bold">Telefono</label>
+
               <input
                 id="telefono-empresa"
                 name="telefono-empresa"
                 type="text"
-                placeholder="Teléfono del cliente"
+                placeholder="809-XXX-XXXX"
                 className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                 value={telefono}
                 onChange={(ev) => setTelefono(ev.target.value)}
               />
+              {errores.telefono && (
+                <p className="text-red-500 text-sm">{errores.telefono}</p>
+              )}
             </div>
           </div>
 
@@ -335,39 +389,59 @@ function Signup() {
           <div className="mt-2 gap-y-8 sm:grid-cols-6">
             <div className="sm:col-span-3">
               <div className="mt-2">
+                <label className="text-sm font-bold">
+                  Nombre de la empresa
+                </label>
+
                 <input
                   id="nombre-empresa"
                   name="nombre-empresa"
                   type="text"
-                  placeholder="Nombre de empresa"
+                  placeholder="John Doe SRL"
                   className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={nombre_empresa}
                   onChange={(ev) => setNombre_empresa(ev.target.value)}
                 />
+                {errores.nombre_empresa && (
+                  <p className="text-red-500 text-sm">
+                    {errores.nombre_empresa}
+                  </p>
+                )}
               </div>
             </div>
 
             <div className="sm:col-span-3">
               <div className="mt-2">
+                <label className="text-sm font-bold">Correo de empresa</label>
+
                 <input
                   id="correo-empresa"
                   name="correo-empresa"
                   type="email"
-                  placeholder="Correo de empresa"
+                  placeholder="johndoesrl@example.com"
                   className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={email_empresa}
                   onChange={(ev) => setEmail_empresa(ev.target.value)}
                 />
+                {errores.email_empresa && (
+                  <p className="text-red-500 text-sm">
+                    {errores.email_empresa}
+                  </p>
+                )}
               </div>
             </div>
 
             <div className=" sm:col-span-3">
               <div className="mt-2">
+                <label className="text-sm font-bold">
+                  Descripcion de los servicios o productos que ofrece
+                </label>
+
                 <textarea
                   id="descripcion-servicios"
                   name="descripcion-servicios"
                   rows={3}
-                  placeholder="Breve descripción de los servicios o productos que ofrece"
+                  placeholder="Servicio mecanicos"
                   className="block w-96 placeholder:text-xs rounded-md border-0 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={descripcion_servicios}
                   onChange={(ev) => setDescripcion_servicios(ev.target.value)}
@@ -377,11 +451,15 @@ function Signup() {
 
             <div className="sm:col-span-3">
               <div className="mt-2 mb-4">
+                <label className="text-sm font-bold">
+                  Rubro/sector de empresa
+                </label>
+
                 <input
                   id="rubro-empresa"
                   name="rubro-empresa"
                   type="text"
-                  placeholder="Rubro/Sector de empresa"
+                  placeholder="Automotriz"
                   className="block w-96 placeholder:text-xs rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   value={rubro}
                   onChange={(ev) => setRubro(ev.target.value)}

@@ -8,6 +8,9 @@ function VisualizarClientes() {
   const [estados, setEstados] = useState([]);
   const [asesores, setAsesores] = useState([]);
   const [asignaciones, setAsignaciones] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(""); // Texto de búsqueda ingresado por el usuario
+  const [clientesFiltrados, setClientesFiltrados] = useState([]); // Resultados filtrados
+  const [clienteSeleccionado, setClienteSeleccionado] = useState(null); // Cliente seleccionado
 
   const navigate = useNavigate();
 
@@ -126,6 +129,26 @@ function VisualizarClientes() {
     };
     fetchData();
   }, []);
+
+  // Actualizar los resultados filtrados cuando cambia el texto de búsqueda
+  useEffect(() => {
+    const query = searchQuery.trim().toLowerCase();
+    const filtrados = dataClientes.filter(
+      (cliente) => cliente.nombre.toLowerCase().startsWith(query) // Coincidencia exacta desde el inicio
+    );
+    setClientesFiltrados(filtrados);
+  }, [searchQuery, dataClientes]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value); // Actualiza el texto de búsqueda
+    setClienteSeleccionado(null); // Limpiar cliente seleccionado al buscar
+  };
+
+  const handleClienteSeleccionado = (cliente) => {
+    setClienteSeleccionado(cliente); // Guarda el cliente seleccionado
+    setSearchQuery(""); // Limpia la barra de búsqueda
+    setClientesFiltrados([]); // Limpia los resultados
+  };
 
   // const handleAsignarAsesor = async (cliente) => {
   //   console.log("Cliente: " + cliente);
@@ -366,34 +389,34 @@ function VisualizarClientes() {
     <div>
       <div className=" grid grid-cols-5 gap-4">
         <div
-          className=" p-4 rounded-md shadow bg-gray-300"
+          className="rounded-md shadow "
           // style={{ backgroundColor: "#e8cbf3" }}
         >
           <h2
-            className="text-xl font-semibold text-gray-500"
+            className="rounded-md text-xl font-semibold p-4 h-28 bg-gray-300 text-gray-500"
             // style={{ color: "#47097d" }}
           >
             Clientes Totales
           </h2>
           <p
-            className="text-3xl font-bold text-gray-500"
+            className="text-3xl font-bold text-gray-500 text-center py-2"
             // style={{ color: "#47097d" }}
           >
             {dataClientes.length}
           </p>
         </div>
         <div
-          className=" p-4 rounded-md shadow bg-emerald-400"
+          className="rounded-md shadow "
           // style={{ backgroundColor: "#6ba8b3" }}
         >
           <h2
-            className="text-xl font-semibold text-emerald-700"
+            className="rounded-md text-xl font-semibold p-4 h-28 bg-emerald-400 text-emerald-700"
             // style={{ color: "#d8e9e7" }}
           >
             Activos
           </h2>
           <p
-            className="text-3xl font-bold text-emerald-700"
+            className="text-3xl font-bold text-emerald-700  text-center py-2"
             // style={{ color: "#d8e9e7" }}
           >
             {
@@ -405,17 +428,17 @@ function VisualizarClientes() {
         </div>
 
         <div
-          className=" p-4 rounded-md shadow bg-yellow-400"
+          className="rounded-md shadow "
           // style={{ backgroundColor: "#fdd8b0" }}
         >
           <h2
-            className="text-xl font-semibold text-yellow-600"
+            className="rounded-md text-xl font-semibold  p-4 h-28 bg-yellow-400 text-yellow-600"
             // style={{ color: "#827597" }}
           >
             En proceso
           </h2>
           <p
-            className="text-3xl font-bold text-yellow-600"
+            className="text-3xl font-bold text-yellow-600 text-center py-2"
             // style={{ color: "#827597" }}
           >
             {
@@ -426,14 +449,17 @@ function VisualizarClientes() {
             }
           </p>
         </div>
-        <div
-          className=" p-4 rounded-md shadow"
-          style={{ backgroundColor: "#7b94de" }}
-        >
-          <h2 className="text-xl font-semibold" style={{ color: "#15315d" }}>
+        <div className=" rounded-md shadow">
+          <h2
+            className="rounded-md text-xl font-semibold p-4 h-28"
+            style={{ color: "#15315d", backgroundColor: "#7b94de" }}
+          >
             Cerrados
           </h2>
-          <p className="text-3xl font-bold" style={{ color: "#15315d" }}>
+          <p
+            className="text-3xl font-bold text-center py-2"
+            style={{ color: "#15315d" }}
+          >
             {
               dataClientes.filter(
                 (cliente) => cliente.estado.estado_descripcion === "Cerrado"
@@ -441,14 +467,17 @@ function VisualizarClientes() {
             }
           </p>
         </div>
-        <div
-          className=" p-4 rounded-md shadow"
-          style={{ backgroundColor: "#9c1323" }}
-        >
-          <h2 className="text-xl font-semibold" style={{ color: "#e0bdcb" }}>
+        <div className=" rounded-md shadow">
+          <h2
+            className="rounded-md text-xl font-semibold p-4 h-28"
+            style={{ color: "#e0bdcb", backgroundColor: "#9c1323" }}
+          >
             Inactivos
           </h2>
-          <p className="text-3xl font-bold" style={{ color: "#e0bdcb" }}>
+          <p
+            className="text-3xl font-bold text-center py-2"
+            style={{ color: "#e0bdcb" }}
+          >
             {
               dataClientes.filter(
                 (cliente) => cliente.estado.estado_descripcion === "Inactivo"
@@ -458,6 +487,84 @@ function VisualizarClientes() {
         </div>
       </div>
 
+      {/* Barra de búsqueda */}
+      <input
+        type="text"
+        placeholder="Buscar cliente..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+        className="w-full p-2 border text-sm border-gray-300 rounded-md mb-4 mt-8"
+      />
+
+      {/* Lista dinámica de clientes */}
+      {searchQuery && clientesFiltrados.length > 0 ? (
+        <ul className="border border-gray-300 rounded-md shadow-md">
+          {clientesFiltrados.map((cliente) => (
+            <li
+              key={cliente._id} // Asegúrate de que `_id` exista en tus datos
+              onClick={() => handleClienteSeleccionado(cliente)} // Seleccionar cliente
+              className="p-2 cursor-pointer hover:bg-gray-100 border-b"
+            >
+              {cliente.nombre}
+            </li>
+          ))}
+        </ul>
+      ) : searchQuery ? (
+        <p className="text-gray-500">No se encontraron coincidencias</p>
+      ) : null}
+
+      {/* Mostrar información del cliente seleccionado */}
+      {clienteSeleccionado && (
+        <div className="mt-4 p-4 border border-gray-300 rounded-md shadow-md">
+          <div className="p-4">
+            <h3 className="font-bold">{clienteSeleccionado.nombre}</h3>
+            <p>
+              <strong>Teléfono:</strong> {clienteSeleccionado.contacto.telefono}{" "}
+              <br />
+              <strong>Correo:</strong>{" "}
+              {clienteSeleccionado.contacto.email_cliente} <br />
+              <strong>Nombre de empresa:</strong>{" "}
+              {clienteSeleccionado.nombre_empresa} <br />
+              <strong>Correo de empresa:</strong>{" "}
+              {clienteSeleccionado.contacto.email_empresa} <br />
+              <strong>Servicios que ofrece:</strong>{" "}
+              {clienteSeleccionado.descripcion_servicios} <br />
+              <strong>Rubro:</strong> {clienteSeleccionado.rubro} <br />
+              <strong>Ingresos generados son más de $8,000 pesos:</strong>{" "}
+              {clienteSeleccionado.ingresos} <br />
+              <strong>Servicios que necesita:</strong>{" "}
+              {Array.isArray(clienteSeleccionado.servicios_requeridos)
+                ? clienteSeleccionado.servicios_requeridos.map(
+                    (servicio, index) => (
+                      <span
+                        key={index}
+                        className="my-1 inline-block bg-emerald-100 text-emerald-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
+                      >
+                        {servicio}
+                      </span>
+                    )
+                  )
+                : typeof clienteSeleccionado.servicios_requeridos === "string"
+                ? clienteSeleccionado.servicios_requeridos
+                    .trim()
+                    .split(",")
+                    .map((servicio, index) => (
+                      <span
+                        key={index}
+                        className="inline-block bg-emerald-100 text-emerald-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
+                      >
+                        {servicio}
+                      </span>
+                    ))
+                : "No especificadas"}
+              {/* {cliente.servicios_requeridos.join(", ")} */}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Detalles del cliente seleccionado */}
+
       {/* Clients List */}
       <div className="bg-white p-6 rounded-lg shadow mt-8">
         <h2 className="text-xl font-semibold mb-4">Lista de Clientes</h2>
@@ -466,7 +573,6 @@ function VisualizarClientes() {
             <tr>
               <th className="text-left py-2 px-3">Nombre</th>
               <th className="text-left py-2 px-3">Asesores</th>
-              <th className="text-left py-2 px-3">Asesorias completas</th>
               <th className="text-left py-2 px-3">Estado</th>
             </tr>
           </thead>
@@ -522,7 +628,6 @@ function VisualizarClientes() {
                     </Link>
                   )}
                 </td>
-                <td className="py-2">Pendiente</td>
 
                 <td className="py-2">
                   <select

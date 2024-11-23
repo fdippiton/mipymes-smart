@@ -1243,6 +1243,156 @@ app.delete("/deshacerAsignacion/:clienteId", async (req, res) => {
   }
 });
 
+// Ejemplo en Node.js con Express
+app.get("/estadisticas", async (req, res) => {
+  try {
+    // 1. Total de clientes por estado
+    const clientesPorEstado = await Clientes.aggregate([
+      {
+        $lookup: {
+          from: "estados",
+          localField: "estado",
+          foreignField: "_id",
+          as: "estado",
+        },
+      },
+      { $unwind: "$estado" },
+      {
+        $group: {
+          _id: "$estado.estado_descripcion",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // 2. Total de clientes por rubro
+    const clientesPorRubro = await Clientes.aggregate([
+      {
+        $group: {
+          _id: "$rubro",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // 3. Promedio de clientes asignados por asesor
+    const totalClientesAsignados = await Asignaciones.countDocuments();
+    const totalAsesores = await Asesores.countDocuments();
+    const promedioClientesPorAsesor =
+      totalAsesores > 0 ? totalClientesAsignados / totalAsesores : 0;
+
+    // 4. Clientes por tipo de asesor asignado
+    const clientesPorTipoAsesor = await Asignaciones.aggregate([
+      {
+        $facet: {
+          empresarial: [
+            { $group: { _id: "$asesor_empresarial_id", count: { $sum: 1 } } },
+          ],
+          financiero: [
+            { $group: { _id: "$asesor_financiero_id", count: { $sum: 1 } } },
+          ],
+          tecnologico: [
+            { $group: { _id: "$asesor_tecnologico_id", count: { $sum: 1 } } },
+          ],
+        },
+      },
+    ]);
+
+    // 5. Servicios más requeridos por los clientes
+    const serviciosRequeridos = await Clientes.aggregate([
+      { $unwind: "$servicios_requeridos" },
+      {
+        $group: {
+          _id: "$servicios_requeridos",
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { count: -1 } },
+    ]);
+
+    res.json({
+      clientesPorEstado,
+      clientesPorRubro,
+      promedioClientesPorAsesor,
+      clientesPorTipoAsesor: clientesPorTipoAsesor[0],
+      serviciosRequeridos,
+    });
+  } catch (error) {
+    console.error("Error al generar estadísticas:", error);
+    res.status(500).json({ message: "Error al generar estadísticas" });
+  }
+});
+
+app.get("/estadisticas/asesores", async (req, res) => {
+  try {
+    const estadisticasPorAsesor = await Asignaciones.aggregate([
+      {
+        $group: {
+          _id: "$asesor_empresarial_id",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    res.json({ estadisticasPorAsesor });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Error al generar estadísticas por asesor" });
+  }
+});
+
+app.get("/estadisticas/registroClientes", async (req, res) => {
+  try {
+    const today = new Date();
+    const last30Days = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - 30
+    );
+    const last60Days = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - 60
+    );
+    const last90Days = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - 90
+    );
+
+    const registroClientes = await Clientes.aggregate([
+      {
+        $match: {
+          fecha_registro: { $gte: last30Days },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $cond: [
+              { $gte: ["$fecha_registro", last60Days] },
+              "Últimos 60 días",
+              "Últimos 30 días",
+            ],
+          },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    res.json({ registroClientes });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({
+        message: "Error al generar estadísticas de registro de clientes",
+      });
+  }
+});
+
 // app.delete("/deshacerAsignacion", async (req, res) => {
 //   const { clienteId } = req.body;
 

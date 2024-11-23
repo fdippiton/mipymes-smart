@@ -7,9 +7,11 @@ import { FaPeopleGroup } from "react-icons/fa6";
 import VisualizarClientes from "../components/VisualizarClientes";
 import Metas from "../components/Metas";
 import GenerarReportes from "../components/GenerarReportes";
+
 import CrearAsesores from "../components/CrearAsesores";
 import Centro from "../assets/Centro.svg";
 import centromipymes from "../assets/centromipymes.png";
+import Estadisticas from "../components/Estadisticas";
 
 const AdminDashboard = () => {
   const [visibleComponent, setVisibleComponent] = useState(null);
@@ -82,7 +84,7 @@ const AdminDashboard = () => {
               <VisualizarClientes />
             )}
             {visibleComponent === "Metas" && <Metas />}
-            {visibleComponent === "Generar reportes" && <GenerarReportes />}
+            {visibleComponent === "Generar reportes" && <Estadisticas />}
             {visibleComponent === "Crear asesores" && <CrearAsesores />}
           </div>
         </div>

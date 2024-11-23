@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoMdAddCircle } from "react-icons/io";
+import { FaUndoAlt } from "react-icons/fa";
 
 function VisualizarClientes() {
   const [expandedRow, setExpandedRow] = useState(null);
@@ -11,6 +12,7 @@ function VisualizarClientes() {
   const [asignaciones, setAsignaciones] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); // Texto de búsqueda ingresado por el usuario
   const [clientesFiltrados, setClientesFiltrados] = useState([]); // Resultados filtrados
+  const [clientesFiltradosEstados, setClientesFiltradosEstados] = useState([]); // Resultados filtrados
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null); // Cliente seleccionado
   const [clientesEnProceso, setClientesEnProceso] = useState([]);
   const [clientesActivos, setClientesActivos] = useState([]);
@@ -52,7 +54,11 @@ function VisualizarClientes() {
     );
 
     // Actualizar el estado con los clientes filtrados
-    setDataClientes(clientesEstado);
+    setClientesFiltradosEstados(clientesEstado);
+  };
+
+  const resetClientesFiltradosEstados = () => {
+    setClientesFiltradosEstados(dataClientes);
   };
 
   useEffect(() => {
@@ -109,7 +115,18 @@ function VisualizarClientes() {
       );
       if (response.ok) {
         // Actualiza el estado del cliente en el frontend
-        setDataClientesParametros((prevClientes) =>
+        setClientesFiltradosEstados((prevClientes) =>
+          prevClientes.map((cliente) =>
+            cliente._id === clienteId
+              ? {
+                  ...cliente,
+                  estado: estados.find((e) => e._id === nuevoEstadoId), // Actualizar el estado
+                }
+              : cliente
+          )
+        );
+
+        setDataClientes((prevClientes) =>
           prevClientes.map((cliente) =>
             cliente._id === clienteId
               ? {
@@ -452,64 +469,43 @@ function VisualizarClientes() {
 
   return (
     <div>
-      <div className=" grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-5 gap-4">
         <div
           className="rounded-md shadow cursor-pointer"
-          // style={{ backgroundColor: "#e8cbf3" }}
+          onClick={resetClientesFiltradosEstados}
         >
-          <h2
-            className="rounded-md text-xl font-semibold p-4 h-28 bg-gray-300 text-gray-500"
-            // style={{ color: "#47097d" }}
-          >
+          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-gray-300 text-gray-500">
             Clientes Totales
           </h2>
-          <p
-            className="text-3xl font-bold text-center py-2"
-            // style={{ color: "#47097d" }}
-          >
-            {dataClientesParametros.length}
+          <p className="text-3xl font-bold text-center py-2">
+            {dataClientes.length}
           </p>
         </div>
         <div
           onClick={() => handleClienteEstado("Activo")}
           className="rounded-md shadow cursor-pointer"
-          // style={{ backgroundColor: "#6ba8b3" }}
         >
-          <h2
-            className="rounded-md text-xl font-semibold p-4 h-28 bg-emerald-400 text-emerald-700"
-            // style={{ color: "#d8e9e7" }}
-          >
+          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-emerald-400 text-emerald-700">
             Activos
           </h2>
-          <p
-            className="text-3xl font-bold   text-center py-2"
-            // style={{ color: "#d8e9e7" }}
-          >
+          <p className="text-3xl font-bold text-center py-2">
             {
-              dataClientesParametros.filter(
+              dataClientes.filter(
                 (cliente) => cliente.estado.estado_descripcion === "Activo"
               ).length
             }
           </p>
         </div>
-
         <div
-          className="rounded-md shadow cursor-pointer"
           onClick={() => handleClienteEstado("En proceso de contacto")}
-          // style={{ backgroundColor: "#fdd8b0" }}
+          className="rounded-md shadow cursor-pointer"
         >
-          <h2
-            className="rounded-md text-xl font-semibold  p-4 h-28 bg-yellow-400 text-yellow-600"
-            // style={{ color: "#827597" }}
-          >
+          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-yellow-400 text-yellow-600">
             En proceso
           </h2>
-          <p
-            className="text-3xl font-bold  text-center py-2"
-            // style={{ color: "#827597" }}
-          >
+          <p className="text-3xl font-bold text-center py-2">
             {
-              dataClientesParametros.filter(
+              dataClientes.filter(
                 (cliente) =>
                   cliente.estado.estado_descripcion === "En proceso de contacto"
               ).length
@@ -517,8 +513,8 @@ function VisualizarClientes() {
           </p>
         </div>
         <div
-          className=" rounded-md shadow cursor-pointer"
           onClick={() => handleClienteEstado("Cerrado")}
+          className="rounded-md shadow cursor-pointer"
         >
           <h2
             className="rounded-md text-xl font-semibold p-4 h-28"
@@ -528,15 +524,15 @@ function VisualizarClientes() {
           </h2>
           <p className="text-3xl font-bold text-center py-2">
             {
-              dataClientesParametros.filter(
+              dataClientes.filter(
                 (cliente) => cliente.estado.estado_descripcion === "Cerrado"
               ).length
             }
           </p>
         </div>
         <div
-          className=" rounded-md shadow cursor-pointer"
           onClick={() => handleClienteEstado("Inactivo")}
+          className="rounded-md shadow cursor-pointer"
         >
           <h2
             className="rounded-md text-xl font-semibold p-4 h-28"
@@ -546,7 +542,7 @@ function VisualizarClientes() {
           </h2>
           <p className="text-3xl font-bold text-center py-2">
             {
-              dataClientesParametros.filter(
+              dataClientes.filter(
                 (cliente) => cliente.estado.estado_descripcion === "Inactivo"
               ).length
             }
@@ -625,8 +621,9 @@ function VisualizarClientes() {
                             onClick={() =>
                               handleDeshacerAsignacion(clienteSeleccionado._id)
                             }
-                            className="bg-red-400 p-5 rounded-md text-white px-5 py-2 mt-3 text-xs"
+                            className="flex items-center bg-red-400 p-5 rounded-md text-white px-5 py-2 mt-3 text-xs"
                           >
+                            <FaUndoAlt className="mr-2" />
                             Deshacer Asignación
                           </button>
                         </div>
@@ -648,9 +645,20 @@ function VisualizarClientes() {
 
                 <select
                   value={clienteSeleccionado.estado?._id} // Asegurarse de que el valor sea el id del estado
-                  onChange={(e) =>
-                    handleEstadoChange(clienteSeleccionado._id, e.target.value)
-                  }
+                  onChange={(e) => {
+                    const nuevoEstadoId = e.target.value;
+
+                    // Actualiza el estado del cliente en la base de datos
+                    handleEstadoChange(clienteSeleccionado._id, nuevoEstadoId);
+
+                    // Actualiza el cliente seleccionado localmente
+                    setClienteSeleccionado((prevCliente) => ({
+                      ...prevCliente,
+                      estado: estados.find(
+                        (estado) => estado._id === nuevoEstadoId
+                      ), // Actualiza el estado
+                    }));
+                  }}
                   className="bg-white border border-gray-300 text-sm rounded p-1.5 pr-10 px-4"
                 >
                   {estados.map((estado) => (
@@ -727,7 +735,7 @@ function VisualizarClientes() {
             </tr>
           </thead>
 
-          {dataClientes.map((cliente, index) => (
+          {clientesFiltradosEstados.map((cliente, index) => (
             <tbody key={index}>
               <tr className="cursor-pointer text-sm border border-gray-300 ">
                 <td
@@ -773,8 +781,10 @@ function VisualizarClientes() {
                               onClick={() =>
                                 handleDeshacerAsignacion(cliente._id)
                               }
-                              className="bg-red-400 p-5 rounded-md text-white px-5 py-2 mt-3 text-xs"
+                              className=" flex items-center bg-red-400 p-5 rounded-md text-white px-5 py-2 mt-3 text-xs"
                             >
+                              {" "}
+                              <FaUndoAlt className="mr-2" />
                               Deshacer Asignación
                             </button>
                           </div>

@@ -3,15 +3,41 @@ import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { IoIosAddCircle } from "react-icons/io";
+import { MdOutlineCancelPresentation } from "react-icons/md";
+import { FaRegEdit } from "react-icons/fa";
 
 function ClientesAsignados() {
   const [dataClientes, setDataClientes] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
   const [expandedRowAsesoria, setExpandedRowAsesoria] = useState(null);
+  const [expandedRowDocAsesoria, setExpandedDocRowAsesoria] = useState(null);
+  const [expandedRowDocAsesoriaUpdate, setExpandedDocRowAsesoriaUpdate] =
+    useState(null);
   const [expandedRowNewAsesoria, setExpandedRowNewAsesoria] = useState(null);
   const [asesorId, setAsesorId] = useState(null);
   const [asesorias, setAsesorias] = useState([]);
   const [docAsesorias, setDocAsesorias] = useState({});
+  const [loading, setLoading] = useState(true); // Estado de carga
+  const [reload, setReload] = useState(false);
+  const [hideForm, sethideForm] = useState(false);
+  const [currentDocAsesoria, setcurrentDocAsesoria] = useState(null);
+
+  const [cliente_id, setCliente_id] = useState("");
+  const [asesoria_id, setAsesoria_id] = useState("");
+  const [asesor_id, setAsesor_id] = useState("");
+  const [fecha, setFecha] = useState("");
+  const [hora, setHora] = useState("");
+  const [duracion_sesion, setDuracion_sesion] = useState("");
+  const [tema_principal, setTema_principal] = useState("");
+  const [tema_secundario, setTema_secundario] = useState("");
+  const [documentos_compartidos, setDocumentos_compartidos] = useState("");
+  const [temas_tratados, setTemas_tratados] = useState("");
+  const [objetivos_acordados, setObjetivos_acordados] = useState("");
+  const [talleres_recomendados, setTalleres_recomendados] = useState("");
+  const [observaciones_adicionales, setObservaciones_adicionales] =
+    useState("");
+  const [estado, setEstado] = useState("");
+  const [foto, setFoto] = useState(null);
 
   const [formData, setFormData] = useState({
     asesoria_id: "",
@@ -58,7 +84,12 @@ function ClientesAsignados() {
     });
 
     if (response.status === 200) {
-      alert("Asesoria creada exitosamente.");
+      const newDoc = await response.json(); // Obtén el nuevo documento devuelto por el servidor
+      alert("Asesoría creada exitosamente.");
+
+      // Actualiza el estado con el nuevo documento
+      setDocAsesorias((prevDocs) => [...prevDocs, newDoc]);
+      setReload((prev) => !prev); // Cambia el estado para forzar la recarga
       resetForm();
       setExpandedRowNewAsesoria(null);
     } else {
@@ -151,31 +182,6 @@ function ClientesAsignados() {
           onChange={handleInputChange}
           className="border text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
         />
-      </div>
-
-      {/* Estado */}
-      <div className="flex flex-col">
-        <label htmlFor="estado" className="font-medium text-sm">
-          Estado
-        </label>
-        <select
-          id="estado"
-          name="estado"
-          value={formData.estado}
-          onChange={handleInputChange}
-          className="border text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
-          required
-        >
-          <option value="" className="text-sm">
-            Selecciona un estado
-          </option>
-          <option value="Pendiente" className="text-sm">
-            Pendiente
-          </option>
-          <option value="Completado" className="text-sm">
-            Completado
-          </option>
-        </select>
       </div>
 
       {/* Observaciones */}
@@ -280,8 +286,122 @@ function ClientesAsignados() {
           style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
         />
       </div>
+
+      {/* Estado */}
+      <div className="flex flex-col">
+        <label
+          htmlFor="estado"
+          className="font-medium text-sm"
+          style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+        >
+          Estado
+        </label>
+        <select
+          id="estado"
+          name="estado"
+          style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+          value={(formData.estado = "Pendiente")}
+          onChange={handleInputChange}
+          className="border text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
+          required
+        >
+          <option value="" className="text-sm">
+            Selecciona un estado
+          </option>
+          <option value="Pendiente" className="text-sm">
+            Pendiente
+          </option>
+          <option value="Completado" className="text-sm">
+            Completado
+          </option>
+        </select>
+      </div>
     </form>
   );
+
+  const eliminarDoc = async (docAsesoriaId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/eliminarDocAsesoria/${docAsesoriaId}`,
+        {
+          method: "DELETE",
+          credentials: "include", // Incluir cookies en la solicitud
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error del servidor:", error);
+      } else {
+        console.log("Documento eliminado exitosamente");
+        setDocAsesorias((prevDocs) =>
+          prevDocs.filter((doc) => doc._id !== docAsesoriaId)
+        );
+      }
+    } catch (error) {
+      console.error("Error al eliminar el documento de la asesoría:", error);
+    }
+  };
+
+  const mostrarDetallesAsesoria = (asesoriaId) => {
+    // Alternar expansión: si el ID ya está seleccionado, se cierra, sino se abre
+    setExpandedDocRowAsesoria((prevState) =>
+      prevState === asesoriaId ? null : asesoriaId
+    );
+    // Asegurarse de que el formulario de actualización esté oculto al ver los detalles
+    setExpandedDocRowAsesoriaUpdate(null);
+    sethideForm(false);
+  };
+
+  // Manejar la actualización de la asesoría
+  const handleSubmitUpdate = async (e, asesoriaIdDoc) => {
+    e.preventDefault();
+    console.log("Formulario enviado:", formData);
+    console.log("id:", asesoriaIdDoc);
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/docAsesoriasUpdate/${asesoriaIdDoc}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+      const data = await response.json();
+      alert("Updated successfully:");
+      resetForm();
+      // Cerrar el formulario de actualización
+      sethideForm(true);
+
+      // Actualizar la asesoría en el estado de docAsesorias
+      setDocAsesorias((prevDocs) => {
+        const updatedDocs = prevDocs.map((doc) =>
+          doc._id === data._id ? data : doc
+        );
+        return updatedDocs;
+      });
+
+      // Reabrir la fila de la asesoría recién actualizada para mostrar los detalles actualizados
+      setExpandedDocRowAsesoria(asesoriaIdDoc); // Asegurarse de que se muestren los detalles actualizados
+      setExpandedDocRowAsesoriaUpdate(null); // Cerrar el formulario después de actualizar
+    } catch (error) {
+      console.error("Error updating document:", error);
+    }
+  };
+
+  // Función para manejar el clic en el ícono de edición
+  const mostrarUpdateForm = (asesoriaId) => {
+    // Mostrar el formulario de actualización solo si el formulario no está oculto
+    if (expandedRowDocAsesoriaUpdate === asesoriaId) {
+      setExpandedDocRowAsesoriaUpdate(null); // Si ya está expandido, cerrar el formulario
+    } else {
+      setExpandedDocRowAsesoriaUpdate(asesoriaId); // Abrir formulario de actualización
+    }
+    sethideForm(false); // Asegurarse de que el formulario no esté oculto cuando se edita
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -336,10 +456,292 @@ function ClientesAsignados() {
         setDocAsesorias(dataDocAsesorias);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false); // Desactivar el estado de carga
       }
     };
     fetchData();
-  }, []);
+  }, [reload, hideForm]);
+
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value,
+  //   }));
+  // };
+
+  const formatFecha = (fecha) => {
+    if (!fecha) return ""; // Manejar valores nulos o indefinidos
+    const dateObj = new Date(fecha);
+    return dateObj.toISOString().split("T")[0]; // Devuelve el formato YYYY-MM-DD
+  };
+
+  useEffect(() => {
+    if (currentDocAsesoria) {
+      setAsesoria_id(currentDocAsesoria.asesoria_id);
+      setFecha(formatFecha(currentDocAsesoria.fecha));
+      setAsesor_id(currentDocAsesoria.asesor_id);
+      setTema_principal(currentDocAsesoria.tema_principal);
+      setDocumentos_compartidos(currentDocAsesoria.documentos_compartidos);
+      setTemas_tratados(currentDocAsesoria.temas_tratados);
+      setObjetivos_acordados(currentDocAsesoria.objetivos_acordados);
+      setTalleres_recomendados(currentDocAsesoria.talleres_recomendados);
+      setObservaciones_adicionales(
+        currentDocAsesoria.observaciones_adicionales
+      );
+      setFoto(currentDocAsesoria.foto);
+    }
+  }, [currentDocAsesoria]);
+
+  const renderDocUpdate = (docAsesoria) => {
+    console.log("docAsesoria", currentDocAsesoria);
+    return (
+      <form
+        onSubmit={(e) => handleSubmitUpdate(e, docAsesoria._id)}
+        className="max-w-2xl mx-auto space-y-4 p-6 bg-white border shadow-lg rounded-lg"
+      >
+        <h2 className="text-2xl font-semibold mb-4">
+          Actualizar documentación Asesoría
+        </h2>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="asesoria_id"
+            x
+            className="block text-sm font-medium"
+            style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+          >
+            Asesoría
+          </label>
+          <input
+            type="text"
+            id="asesoria_id"
+            name="asesoria_id"
+            value={asesoria_id}
+            onChange={(ev) => setAsesor_id(ev.target.value)}
+            className="w-full p-2 border rounded-md"
+            disabled
+            style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="cliente_id" className="block text-sm font-medium">
+            Cliente
+          </label>
+          <input
+            type="text"
+            id="cliente_id"
+            name="cliente_id"
+            value={cliente_id}
+            onChange={(ev) => setCliente_id(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+            disabled
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="asesor_id"
+            className="block text-sm font-medium"
+            style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+          >
+            Asesor
+          </label>
+          <input
+            type="text"
+            id="asesor_id"
+            name="asesor_id"
+            value={asesor_id}
+            onChange={(ev) => setAsesor_id(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+            disabled
+            style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="fecha" className="block text-sm font-medium">
+            Fecha
+          </label>
+          <input
+            type="date"
+            id="fecha"
+            name="fecha"
+            value={fecha}
+            onChange={(ev) => setFecha(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="hora" className="block text-sm font-medium">
+            Hora
+          </label>
+          <input
+            type="time"
+            id="hora"
+            name="hora"
+            value={hora}
+            onChange={(ev) => setHora(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="duracion_sesion"
+            className="block text-sm font-medium"
+          >
+            Duración de la sesión
+          </label>
+          <input
+            type="text"
+            id="duracion_sesion"
+            name="duracion_sesion"
+            value={duracion_sesion}
+            onChange={(ev) => setDuracion_sesion(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="tema_principal" className="block text-sm font-medium">
+            Tema principal
+          </label>
+          <input
+            type="text"
+            id="tema_principal"
+            name="tema_principal"
+            value={tema_principal}
+            onChange={(ev) => setTema_principal(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="documentos_compartidos"
+            className="block text-sm font-medium"
+          >
+            Documentos Compartidos
+          </label>
+          <textarea
+            id="documentos_compartidos"
+            name="documentos_compartidos"
+            value={documentos_compartidos}
+            onChange={(ev) => setDocumentos_compartidos(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="temas_tratados" className="block text-sm font-medium">
+            Temas tratados
+          </label>
+          <textarea
+            id="temas_tratados"
+            name="temas_tratados"
+            value={temas_tratados}
+            onChange={(ev) => setTemas_tratados(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="objetivos_acordados"
+            className="block text-sm font-medium"
+          >
+            Objetivos Acordados
+          </label>
+          <textarea
+            id="objetivos_acordados"
+            name="objetivos_acordados"
+            value={objetivos_acordados}
+            onChange={(ev) => setObjetivos_acordados(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="talleres_recomendados"
+            className="block text-sm font-medium"
+          >
+            Talleres recomendados
+          </label>
+          <textarea
+            id="talleres_recomendados"
+            name="talleres_recomendados"
+            value={talleres_recomendados}
+            onChange={(ev) => setTalleres_recomendados(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="observaciones_adicionales"
+            className="block text-sm font-medium"
+          >
+            Observaciones Adicionales
+          </label>
+          <textarea
+            id="observaciones_adicionales"
+            name="observaciones_adicionales"
+            value={observaciones_adicionales}
+            onChange={(ev) => setObservaciones_adicionales(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="estado" className="block text-sm font-medium">
+            Estado
+          </label>
+          <select
+            id="estado"
+            name="estado"
+            value={estado}
+            onChange={(ev) => setEstado(ev.target.value)}
+            className="w-full p-2 border rounded-md text-sm"
+          >
+            <option value="Pendiente">Pendiente</option>
+            <option value="Completada">Completada</option>
+            <option value="Cancelada">Cancelada</option>
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="foto"
+            className="block text-sm font-medium"
+            style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+          >
+            Foto
+          </label>
+          <input
+            type="text"
+            id="foto"
+            name="foto"
+            value={foto}
+            onChange={(ev) => setFoto(ev.target.value)}
+            className="w-full p-2 border rounded-md"
+            style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full border hover:bg-emerald-100 text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
+        >
+          Actualizar Asesoría
+        </button>
+      </form>
+    );
+  };
 
   return (
     <div>
@@ -373,6 +775,7 @@ function ClientesAsignados() {
                   </Link>
                 </td>
               </tr>
+              {/* Informacion del cliente */}
               {expandedRow === index && (
                 <tr>
                   <td
@@ -429,6 +832,7 @@ function ClientesAsignados() {
                   </td>
                 </tr>
               )}
+              {/* Asesorias del cliente */}
               {expandedRowAsesoria === index && (
                 <tr>
                   <td
@@ -459,6 +863,7 @@ function ClientesAsignados() {
                               className="px-4 border shadow-md bg-gray-50"
                             >
                               <div className="mt-3 py-1 h-fit">
+                                {/* Asesoria empresarial */}
                                 {asesoria.asesor_empresarial_id === asesorId &&
                                   asesoria.cliente_id ===
                                     cliente.cliente_id && (
@@ -476,8 +881,9 @@ function ClientesAsignados() {
                                         className="mt-2 flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-emerald-100"
                                       >
                                         <IoIosAddCircle className="text-xl" />
-                                        Nueva sesión de asesoría
+                                        Documentar nueva sesión de asesoría
                                       </button>
+                                      {/* Formulario nueva doc asesoria */}
                                       {expandedRowNewAsesoria ===
                                         `${index}-empresarial` && (
                                         <div className="mt-4">
@@ -496,93 +902,219 @@ function ClientesAsignados() {
                                           )}
                                         </div>
                                       )}
-                                      {/* {docAsesorias.map(
-                                        (docAsesoria, index) => (
-                                          <div key={index} className="mb-6">
-                                            <p>
-                                              Cliente en docAsesoria:{" "}
-                                              {docAsesoria.cliente_id._id}
-                                            </p>
-                                            <p>
-                                              Cliente esperado:{" "}
-                                              {cliente.cliente_id._id}
-                                            </p>
-                                            <p>
-                                              Asesor en docAsesoria:{" "}
-                                              {docAsesoria.asesor_id}
-                                            </p>
-                                            <p>Asesor esperado: {asesorId}</p>
-                                            <p>
-                                              Nombre asesoría:{" "}
-                                              {
-                                                docAsesoria.asesoria_id
-                                                  ?.nombre_asesoria
-                                              }
-                                            </p>
-                                          </div>
-                                        )
-                                      )} */}
-                                      <div className="flex">
+
+                                      {/* Listar asesorias */}
+                                      <div className="flex flex-wrap m-3">
                                         {docAsesorias
                                           .filter((docAsesoria) => {
-                                            // Validar propiedades anidadas
                                             return (
                                               docAsesoria &&
                                               docAsesoria.cliente_id._id ===
                                                 cliente.cliente_id._id &&
-                                              docAsesoria.asesor_id ==
+                                              docAsesoria.asesor_id ===
                                                 asesorId &&
                                               docAsesoria.asesoria_id
-                                                ?.nombre_asesoria ==
+                                                ?.nombre_asesoria ===
                                                 "Asesoria Empresarial"
                                             );
                                           })
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className=" mt-3 max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-6"
-                                              style={{
-                                                backgroundColor:
-                                                  doc.estado === "Pendiente"
-                                                    ? "#FADBD8"
-                                                    : "#B2F7EF",
-                                              }}
+                                              className={`m-3 cursor-pointer mt-3 max-w-md mx-auto rounded-lg shadow-lg p-6 mb-6 ${
+                                                expandedRowDocAsesoria ===
+                                                doc._id
+                                                  ? "bg-white w-full max-w-screen-xl"
+                                                  : ""
+                                              }`}
+                                              onClick={() =>
+                                                mostrarDetallesAsesoria(doc._id)
+                                              }
                                             >
-                                              <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                                                {doc.asesoria_id
-                                                  ?.nombre_asesoria || "N/A"}
-                                              </h3>
-                                              <p className="text-sm text-gray-500 mb-1">
-                                                <span className="font-medium text-gray-600">
-                                                  Tema:
-                                                </span>{" "}
-                                                {doc.tema_principal ||
-                                                  "No especificado"}
-                                              </p>
-                                              <p className="text-sm text-gray-500 mb-1">
-                                                <span className="font-medium text-gray-600">
-                                                  Fecha:
-                                                </span>{" "}
-                                                {doc.fecha || "No especificada"}
-                                              </p>
-                                              <p className="text-sm text-gray-500 mb-1">
-                                                <span className="font-medium text-gray-600">
-                                                  Hora:
-                                                </span>{" "}
-                                                {doc.hora || "No especificada"}
-                                              </p>
-                                              <p className="text-sm text-gray-500">
-                                                <span className="font-medium text-gray-600">
-                                                  Estado:
-                                                </span>{" "}
-                                                {doc.estado ||
-                                                  "No especificado"}
-                                              </p>
+                                              {/* Mostrar detalles y el icono de edición solo si la tarjeta está expandida */}
+                                              {expandedRowDocAsesoria ===
+                                                doc._id && (
+                                                <div className="flex justify-between">
+                                                  <h1
+                                                    className="mr-2"
+                                                    style={{
+                                                      backgroundColor:
+                                                        doc.estado ===
+                                                        "Pendiente"
+                                                          ? "red"
+                                                          : "green",
+                                                      width: "15px",
+                                                      height: "15px",
+                                                      borderRadius: "50%",
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                    }}
+                                                  ></h1>
+                                                  <FaRegEdit
+                                                    className="h-5 w-5"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation(); // Prevenir el clic en la tarjeta
+                                                      mostrarUpdateForm(
+                                                        doc._id
+                                                      ); // Mostrar el formulario de actualización
+                                                    }}
+                                                  />
+                                                </div>
+                                              )}
+
+                                              {/* Mostrar detalles o formulario de actualización */}
+                                              {expandedRowDocAsesoria ===
+                                              doc._id ? (
+                                                <div className="space-y-4">
+                                                  {expandedRowDocAsesoriaUpdate ===
+                                                    doc._id && !hideForm ? (
+                                                    <div
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // Evita que el evento haga bubbling
+                                                        setcurrentDocAsesoria(
+                                                          doc
+                                                        ); // Actualiza el estado con el documento actual
+                                                      }}
+                                                    >
+                                                      {renderDocUpdate(doc)}{" "}
+                                                      {/* Formulario de actualización */}
+                                                    </div>
+                                                  ) : (
+                                                    <>
+                                                      <h3 className="text-md font-semibold">
+                                                        Detalles de la Asesoría
+                                                      </h3>
+                                                      <p>
+                                                        <strong>Fecha:</strong>{" "}
+                                                        {new Date(
+                                                          doc.fecha
+                                                        ).toLocaleDateString()}
+                                                      </p>
+                                                      <p>
+                                                        <strong>Hora:</strong>{" "}
+                                                        {doc.hora}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Duración:
+                                                        </strong>{" "}
+                                                        {doc.duracion_sesion ||
+                                                          "No especificada"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Tema principal:
+                                                        </strong>{" "}
+                                                        {doc.tema_principal ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Temas tratados:
+                                                        </strong>{" "}
+                                                        {doc.temas_tratados ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Objetivos acordados:
+                                                        </strong>{" "}
+                                                        {doc.objetivos_acordados ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Observaciones
+                                                          adicionales:
+                                                        </strong>{" "}
+                                                        {doc.observaciones_adicionales ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>Estado:</strong>{" "}
+                                                        {doc.estado ||
+                                                          "No especificado"}
+                                                      </p>
+                                                    </>
+                                                  )}
+                                                </div>
+                                              ) : (
+                                                <div className="flex flex-row justify-between items-start">
+                                                  <div className="mt-3">
+                                                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                      {doc.asesoria_id
+                                                        ?.nombre_asesoria ||
+                                                        "N/A"}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-500 mb-1">
+                                                      <span className="font-medium text-gray-600">
+                                                        Tema:
+                                                      </span>{" "}
+                                                      {doc.tema_principal ||
+                                                        "No especificado"}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 mb-1">
+                                                      <span className="font-medium text-gray-600">
+                                                        Fecha:
+                                                      </span>{" "}
+                                                      {doc.fecha
+                                                        ? new Date(
+                                                            doc.fecha
+                                                          ).toLocaleDateString(
+                                                            "es-ES"
+                                                          )
+                                                        : "No especificada"}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 mb-1">
+                                                      <span className="font-medium text-gray-600">
+                                                        Hora:
+                                                      </span>{" "}
+                                                      {doc.hora ||
+                                                        "No especificada"}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500">
+                                                      <span className="font-medium text-gray-600">
+                                                        Estado:
+                                                      </span>{" "}
+                                                      {doc.estado ||
+                                                        "No especificado"}
+                                                    </p>
+                                                  </div>
+                                                  <div className="flex justify-end items-center">
+                                                    <h1
+                                                      className="mr-2"
+                                                      style={{
+                                                        backgroundColor:
+                                                          doc.estado ===
+                                                          "Pendiente"
+                                                            ? "red"
+                                                            : "green",
+                                                        width: "15px",
+                                                        height: "15px",
+                                                        borderRadius: "50%",
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                      }}
+                                                    ></h1>
+                                                    <MdOutlineCancelPresentation
+                                                      className="h-5 w-5 cursor-pointer"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // Prevenir el clic en la tarjeta
+                                                        eliminarDoc(doc?._id);
+                                                      }}
+                                                    />
+                                                  </div>
+                                                </div>
+                                              )}
                                             </div>
                                           ))}
                                       </div>
                                     </div>
                                   )}
+                                {/* Asesoria financiera */}
                                 {asesoria.asesor_financiero_id === asesorId &&
                                   asesoria.cliente_id ===
                                     cliente.cliente_id && (
@@ -600,8 +1132,9 @@ function ClientesAsignados() {
                                         className="mt-2 flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-emerald-100"
                                       >
                                         <IoIosAddCircle className="text-xl" />
-                                        Nueva sesión de asesoría
+                                        Documentar nueva sesión de asesoría
                                       </button>
+                                      {/* Formulario nueva doc asesoria */}
                                       {expandedRowNewAsesoria ===
                                         `${index}-financiera` && (
                                         <div className="mt-4">
@@ -639,43 +1172,68 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className=" mt-3 max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-6"
+                                              className="m-3 flex flex-row  mt-3 max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-6"
+                                              style={{
+                                                backgroundColor:
+                                                  doc.estado === "Pendiente"
+                                                    ? "#FADBD8"
+                                                    : "#B2F7EF",
+                                              }}
                                             >
-                                              <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                                                {doc.asesoria_id
-                                                  ?.nombre_asesoria || "N/A"}
-                                              </h3>
-                                              <p className="text-sm text-gray-500 mb-1">
-                                                <span className="font-medium text-gray-600">
-                                                  Tema:
-                                                </span>{" "}
-                                                {doc.tema_principal ||
-                                                  "No especificado"}
-                                              </p>
-                                              <p className="text-sm text-gray-500 mb-1">
-                                                <span className="font-medium text-gray-600">
-                                                  Fecha:
-                                                </span>{" "}
-                                                {doc.fecha || "No especificada"}
-                                              </p>
-                                              <p className="text-sm text-gray-500 mb-1">
-                                                <span className="font-medium text-gray-600">
-                                                  Hora:
-                                                </span>{" "}
-                                                {doc.hora || "No especificada"}
-                                              </p>
-                                              <p className="text-sm text-gray-500">
-                                                <span className="font-medium text-gray-600">
-                                                  Estado:
-                                                </span>{" "}
-                                                {doc.estado ||
-                                                  "No especificado"}
-                                              </p>
+                                              <div className="mt-3">
+                                                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                  {doc.asesoria_id
+                                                    ?.nombre_asesoria || "N/A"}
+                                                </h3>
+                                                <p className="text-sm text-gray-500 mb-1">
+                                                  <span className="font-medium text-gray-600">
+                                                    Tema:
+                                                  </span>{" "}
+                                                  {doc.tema_principal ||
+                                                    "No especificado"}
+                                                </p>
+                                                <p className="text-sm text-gray-500 mb-1">
+                                                  <span className="font-medium text-gray-600">
+                                                    Fecha:
+                                                  </span>{" "}
+                                                  {doc.fecha
+                                                    ? new Date(
+                                                        doc.fecha
+                                                      ).toLocaleDateString(
+                                                        "es-ES"
+                                                      )
+                                                    : "No especificada"}
+                                                </p>
+                                                <p className="text-sm text-gray-500 mb-1">
+                                                  <span className="font-medium text-gray-600">
+                                                    Hora:
+                                                  </span>{" "}
+                                                  {doc.hora ||
+                                                    "No especificada"}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                  <span className="font-medium text-gray-600">
+                                                    Estado:
+                                                  </span>{" "}
+                                                  {doc.estado ||
+                                                    "No especificado"}
+                                                </p>
+                                              </div>
+                                              <div className="flex justify-end">
+                                                <MdOutlineCancelPresentation
+                                                  className="h-5 w-5 cursor-pointer"
+                                                  onClick={() =>
+                                                    eliminarDoc(doc?._id)
+                                                  }
+                                                />
+                                              </div>
                                             </div>
                                           ))}
                                       </div>
                                     </div>
                                   )}
+
+                                {/* Asesoria tecnologicas */}
                                 {asesoria.asesor_tecnologico_id === asesorId &&
                                   asesoria.cliente_id ===
                                     cliente.cliente_id && (
@@ -693,8 +1251,9 @@ function ClientesAsignados() {
                                         className="mt-2 flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-emerald-100"
                                       >
                                         <IoIosAddCircle className="text-xl" />
-                                        Nueva sesión de asesoría
+                                        Documentar nueva sesión de asesoría
                                       </button>
+                                      {/* Formulario nueva doc asesoria */}
                                       {expandedRowNewAsesoria ===
                                         `${index}-tecnologica` && (
                                         <div className="mt-4">
@@ -714,6 +1273,7 @@ function ClientesAsignados() {
                                         </div>
                                       )}
 
+                                      {/* Listar doc asesorias */}
                                       <div className="flex">
                                         {docAsesorias
                                           .filter((docAsesoria) => {
@@ -732,38 +1292,61 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className=" mt-3 max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-6"
+                                              className="m-3 flex flex-row  mt-3 max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-6"
+                                              style={{
+                                                backgroundColor:
+                                                  doc.estado === "Pendiente"
+                                                    ? "#FADBD8"
+                                                    : "#B2F7EF",
+                                              }}
                                             >
-                                              <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                                                {doc.asesoria_id
-                                                  ?.nombre_asesoria || "N/A"}
-                                              </h3>
-                                              <p className="text-sm text-gray-500 mb-1">
-                                                <span className="font-medium text-gray-600">
-                                                  Tema:
-                                                </span>{" "}
-                                                {doc.tema_principal ||
-                                                  "No especificado"}
-                                              </p>
-                                              <p className="text-sm text-gray-500 mb-1">
-                                                <span className="font-medium text-gray-600">
-                                                  Fecha:
-                                                </span>{" "}
-                                                {doc.fecha || "No especificada"}
-                                              </p>
-                                              <p className="text-sm text-gray-500 mb-1">
-                                                <span className="font-medium text-gray-600">
-                                                  Hora:
-                                                </span>{" "}
-                                                {doc.hora || "No especificada"}
-                                              </p>
-                                              <p className="text-sm text-gray-500">
-                                                <span className="font-medium text-gray-600">
-                                                  Estado:
-                                                </span>{" "}
-                                                {doc.estado ||
-                                                  "No especificado"}
-                                              </p>
+                                              <div className="mt-3">
+                                                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                  {doc.asesoria_id
+                                                    ?.nombre_asesoria || "N/A"}
+                                                </h3>
+                                                <p className="text-sm text-gray-500 mb-1">
+                                                  <span className="font-medium text-gray-600">
+                                                    Tema:
+                                                  </span>{" "}
+                                                  {doc.tema_principal ||
+                                                    "No especificado"}
+                                                </p>
+                                                <p className="text-sm text-gray-500 mb-1">
+                                                  <span className="font-medium text-gray-600">
+                                                    Fecha:
+                                                  </span>{" "}
+                                                  {doc.fecha
+                                                    ? new Date(
+                                                        doc.fecha
+                                                      ).toLocaleDateString(
+                                                        "es-ES"
+                                                      )
+                                                    : "No especificada"}
+                                                </p>
+                                                <p className="text-sm text-gray-500 mb-1">
+                                                  <span className="font-medium text-gray-600">
+                                                    Hora:
+                                                  </span>{" "}
+                                                  {doc.hora ||
+                                                    "No especificada"}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                  <span className="font-medium text-gray-600">
+                                                    Estado:
+                                                  </span>{" "}
+                                                  {doc.estado ||
+                                                    "No especificado"}
+                                                </p>
+                                              </div>
+                                              <div className="flex justify-end">
+                                                <MdOutlineCancelPresentation
+                                                  className="h-5 w-5 cursor-pointer"
+                                                  onClick={() =>
+                                                    eliminarDoc(doc?._id)
+                                                  }
+                                                />
+                                              </div>
                                             </div>
                                           ))}
                                       </div>

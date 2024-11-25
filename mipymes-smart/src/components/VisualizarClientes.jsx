@@ -746,14 +746,14 @@ function VisualizarClientes() {
                 </td>
                 <td className="py-2  gap-2 ">
                   {asignaciones.some(
-                    (asignacion) => asignacion.cliente_id._id === cliente._id
+                    (asignacion) => asignacion?.cliente_id?._id === cliente._id
                   ) ? (
                     // Si el cliente está en las asignaciones, busca el asesor y muestra un mensaje
                     <>
                       {asignaciones
                         .filter(
                           (asignacion) =>
-                            asignacion.cliente_id._id === cliente._id
+                            asignacion?.cliente_id?._id === cliente._id
                         )
                         .map((asignacion) => (
                           <div>

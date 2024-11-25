@@ -364,10 +364,10 @@ app.post("/registrarDocAsesoria", async (req, res) => {
       hora,
       duracion_sesion,
       tema_principal,
-      documentos_compartidos: [],
-      temas_tratados: [],
+      documentos_compartidos: null,
+      temas_tratados: null,
       objetivos_acordados: null,
-      talleres_recomendados: [],
+      talleres_recomendados: null,
       observaciones_adicionales: null,
       estado,
       foto: null,
@@ -412,7 +412,8 @@ app.get("/getAllDocAsesorias", async (req, res) => {
   try {
     const docAsesorias = await DocAsesorias.find()
       .populate("cliente_id")
-      .populate("asesoria_id");
+      .populate("asesoria_id")
+      .populate("talleres_recomendados");
 
     res.json(docAsesorias);
   } catch (error) {
@@ -1200,9 +1201,10 @@ app.delete("/deshacerAsignacion/:clienteId", async (req, res) => {
     const { clienteId } = req.params;
 
     // Buscar la asignación del cliente
-    const asignacion = await Asignaciones.findOne({
-      cliente_id: clienteId,
-    });
+    const [asignacion, docAsesorias] = await Promise.all([
+      Asignaciones.findOne({ cliente_id: clientId }),
+      DocAsesorias.findOne({ cliente_id: clientId }),
+    ]);
 
     if (!asignacion) {
       return res
@@ -1233,6 +1235,8 @@ app.delete("/deshacerAsignacion/:clienteId", async (req, res) => {
 
     // Eliminar la asignación del cliente
     await asignacion.deleteOne();
+    // Eliminar la asignación del cliente
+    await docAsesorias.deleteOne();
 
     res.status(200).json({ message: "Cliente desasignado exitosamente." });
   } catch (error) {
@@ -1385,11 +1389,80 @@ app.get("/estadisticas/registroClientes", async (req, res) => {
     res.json({ registroClientes });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({
-        message: "Error al generar estadísticas de registro de clientes",
-      });
+    res.status(500).json({
+      message: "Error al generar estadísticas de registro de clientes",
+    });
+  }
+});
+
+app.delete("/eliminarDocAsesoria/:docAsesoriaId", async (req, res) => {
+  const { docAsesoriaId } = req.params;
+  console.log("Recibido asesoriaId:", docAsesoriaId);
+
+  if (!mongoose.Types.ObjectId.isValid(docAsesoriaId)) {
+    return res.status(400).json({ error: "ID no válido" });
+  }
+
+  try {
+    const docAsesoria = await DocAsesorias.findOne({ _id: docAsesoriaId });
+
+    if (!docAsesoria) {
+      return res.status(404).json({ error: "No se encontró doc asesoria" });
+    }
+    // Eliminar doc asesoria según tu modelo de datos
+    await docAsesoria.deleteOne();
+    res.status(200).json({ message: "Documentacion eliminada exitosamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al eliminar la documentacion" });
+  }
+});
+
+app.put("/docAsesoriasUpdate/:asesoriaIdDoc", async (req, res) => {
+  try {
+    const { asesoriaIdDoc } = req.params;
+
+    if (!asesoriaIdDoc) {
+      return res.status(400).json({ error: "ID no proporcionado" });
+    }
+
+    const {
+      fecha,
+      hora,
+      duracion_sesion,
+      tema_principal,
+      documentos_compartidos,
+      temas_tratados,
+      objetivos_acordados,
+      talleres_recomendados,
+      observaciones_adicionales,
+      estado,
+    } = req.body; // El nuevo estado debe estar en el cuerpo de la solicitud
+
+    const updatedDocAsesoria = await DocAsesorias.findByIdAndUpdate(
+      asesoriaIdDoc,
+      {
+        fecha,
+        hora,
+        duracion_sesion,
+        tema_principal,
+        documentos_compartidos,
+        temas_tratados,
+        objetivos_acordados,
+        talleres_recomendados: null,
+        observaciones_adicionales,
+        estado,
+      }, // Actualiza el campo estado
+      { new: true } // Devuelve el cliente actualizado
+    );
+
+    if (!updatedDocAsesoria) {
+      return res.status(404).json({ error: "Doc asesoria no encontrado" });
+    }
+    res.json(updatedDocAsesoria);
+  } catch (error) {
+    console.error("Error en la actualización de la documentacion:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 

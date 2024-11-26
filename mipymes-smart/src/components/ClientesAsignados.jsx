@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { IoIosAddCircle } from "react-icons/io";
 import { MdOutlineCancelPresentation } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
+import { format } from "date-fns";
 
 function ClientesAsignados() {
   const [dataClientes, setDataClientes] = useState([]);
@@ -22,6 +23,7 @@ function ClientesAsignados() {
   const [hideForm, sethideForm] = useState(false);
   const [currentDocAsesoria, setcurrentDocAsesoria] = useState(null);
 
+  const [id, setId] = useState(false);
   const [cliente_id, setCliente_id] = useState("");
   const [asesoria_id, setAsesoria_id] = useState("");
   const [asesor_id, setAsesor_id] = useState("");
@@ -29,7 +31,6 @@ function ClientesAsignados() {
   const [hora, setHora] = useState("");
   const [duracion_sesion, setDuracion_sesion] = useState("");
   const [tema_principal, setTema_principal] = useState("");
-  const [tema_secundario, setTema_secundario] = useState("");
   const [documentos_compartidos, setDocumentos_compartidos] = useState("");
   const [temas_tratados, setTemas_tratados] = useState("");
   const [objetivos_acordados, setObjetivos_acordados] = useState("");
@@ -356,8 +357,28 @@ function ClientesAsignados() {
   // Manejar la actualización de la asesoría
   const handleSubmitUpdate = async (e, asesoriaIdDoc) => {
     e.preventDefault();
-    console.log("Formulario enviado:", formData);
-    console.log("id:", asesoriaIdDoc);
+
+    const dataDoc = {
+      asesoria_id,
+      cliente_id,
+      asesor_id,
+      fecha,
+      hora,
+      duracion_sesion,
+      tema_principal,
+      documentos_compartidos,
+      temas_tratados,
+      objetivos_acordados,
+      talleres_recomendados,
+      observaciones_adicionales,
+      estado,
+    };
+
+    if (!asesoriaIdDoc) {
+      return res.status(400).json({ error: "ID no proporcionado" });
+    }
+
+    console.log("dataDoc", dataDoc);
 
     try {
       const response = await fetch(
@@ -367,28 +388,36 @@ function ClientesAsignados() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(dataDoc),
         }
       );
-      const data = await response.json();
-      alert("Updated successfully:");
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const updatedDoc = await response.json();
+
+      // Mostrar notificación al usuario
+      alert("Asesoría actualizada exitosamente");
+
+      // Actualizar el estado local con el documento actualizado
+      setDocAsesorias((prevDocs) =>
+        prevDocs.map((doc) => (doc._id === updatedDoc._id ? updatedDoc : doc))
+      );
+
+      // Resetear el formulario y cerrar
       resetForm();
-      // Cerrar el formulario de actualización
       sethideForm(true);
 
-      // Actualizar la asesoría en el estado de docAsesorias
-      setDocAsesorias((prevDocs) => {
-        const updatedDocs = prevDocs.map((doc) =>
-          doc._id === data._id ? data : doc
-        );
-        return updatedDocs;
-      });
-
-      // Reabrir la fila de la asesoría recién actualizada para mostrar los detalles actualizados
-      setExpandedDocRowAsesoria(asesoriaIdDoc); // Asegurarse de que se muestren los detalles actualizados
-      setExpandedDocRowAsesoriaUpdate(null); // Cerrar el formulario después de actualizar
+      // Expandir la fila actualizada
+      setExpandedDocRowAsesoria(asesoriaIdDoc);
+      setExpandedDocRowAsesoriaUpdate(null);
     } catch (error) {
       console.error("Error updating document:", error);
+      alert(
+        "Hubo un error al actualizar la asesoría. Por favor, intenta nuevamente."
+      );
     }
   };
 
@@ -463,23 +492,40 @@ function ClientesAsignados() {
     fetchData();
   }, [reload, hideForm]);
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     [name]: value,
-  //   }));
-  // };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   const formatFecha = (fecha) => {
-    if (!fecha) return ""; // Manejar valores nulos o indefinidos
-    const dateObj = new Date(fecha);
-    return dateObj.toISOString().split("T")[0]; // Devuelve el formato YYYY-MM-DD
+    if (!fecha) return "";
+
+    try {
+      // Crear fecha y agregar un día
+      const dateObj = new Date(fecha);
+      dateObj.setDate(dateObj.getDate() + 1);
+
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const day = String(dateObj.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error("Error al formatear fecha:", error);
+      return "";
+    }
   };
 
   useEffect(() => {
     if (currentDocAsesoria) {
+      setId(currentDocAsesoria._id);
       setAsesoria_id(currentDocAsesoria.asesoria_id);
+      setCliente_id(currentDocAsesoria.cliente_id);
+      setHora(currentDocAsesoria.hora);
+      setDuracion_sesion(currentDocAsesoria.duracion_sesion);
       setFecha(formatFecha(currentDocAsesoria.fecha));
       setAsesor_id(currentDocAsesoria.asesor_id);
       setTema_principal(currentDocAsesoria.tema_principal);
@@ -491,6 +537,7 @@ function ClientesAsignados() {
         currentDocAsesoria.observaciones_adicionales
       );
       setFoto(currentDocAsesoria.foto);
+      setEstado(currentDocAsesoria.estado);
     }
   }, [currentDocAsesoria]);
 
@@ -498,7 +545,7 @@ function ClientesAsignados() {
     console.log("docAsesoria", currentDocAsesoria);
     return (
       <form
-        onSubmit={(e) => handleSubmitUpdate(e, docAsesoria._id)}
+        onSubmit={(e) => handleSubmitUpdate(e, id)}
         className="max-w-2xl mx-auto space-y-4 p-6 bg-white border shadow-lg rounded-lg"
       >
         <h2 className="text-2xl font-semibold mb-4">
@@ -527,7 +574,11 @@ function ClientesAsignados() {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="cliente_id" className="block text-sm font-medium">
+          <label
+            htmlFor="cliente_id"
+            className="block text-sm font-medium"
+            style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
+          >
             Cliente
           </label>
           <input
@@ -538,6 +589,7 @@ function ClientesAsignados() {
             onChange={(ev) => setCliente_id(ev.target.value)}
             className="w-full p-2 border rounded-md text-sm"
             disabled
+            style={{ position: "absolute", width: 0, height: 0, opacity: 0 }}
           />
         </div>
 
@@ -569,7 +621,7 @@ function ClientesAsignados() {
             type="date"
             id="fecha"
             name="fecha"
-            value={fecha}
+            value={fecha} // Aseguramos el formato YYYY-MM-DD
             onChange={(ev) => setFecha(ev.target.value)}
             className="w-full p-2 border rounded-md text-sm"
           />
@@ -927,9 +979,12 @@ function ClientesAsignados() {
                                                   ? "bg-white w-full max-w-screen-xl"
                                                   : ""
                                               }`}
-                                              onClick={() =>
-                                                mostrarDetallesAsesoria(doc._id)
-                                              }
+                                              onClick={() => {
+                                                mostrarDetallesAsesoria(
+                                                  doc._id
+                                                );
+                                                setcurrentDocAsesoria(doc);
+                                              }}
                                             >
                                               {/* Mostrar detalles y el icono de edición solo si la tarjeta está expandida */}
                                               {expandedRowDocAsesoria ===
@@ -972,9 +1027,7 @@ function ClientesAsignados() {
                                                     <div
                                                       onClick={(e) => {
                                                         e.stopPropagation(); // Evita que el evento haga bubbling
-                                                        setcurrentDocAsesoria(
-                                                          doc
-                                                        ); // Actualiza el estado con el documento actual
+                                                        // Actualiza el estado con el documento actual
                                                       }}
                                                     >
                                                       {renderDocUpdate(doc)}{" "}
@@ -987,9 +1040,7 @@ function ClientesAsignados() {
                                                       </h3>
                                                       <p>
                                                         <strong>Fecha:</strong>{" "}
-                                                        {new Date(
-                                                          doc.fecha
-                                                        ).toLocaleDateString()}
+                                                        {formatFecha(doc.fecha)}
                                                       </p>
                                                       <p>
                                                         <strong>Hora:</strong>{" "}
@@ -1059,11 +1110,7 @@ function ClientesAsignados() {
                                                         Fecha:
                                                       </span>{" "}
                                                       {doc.fecha
-                                                        ? new Date(
-                                                            doc.fecha
-                                                          ).toLocaleDateString(
-                                                            "es-ES"
-                                                          )
+                                                        ? formatFecha(doc.fecha)
                                                         : "No especificada"}
                                                     </p>
                                                     <p className="text-sm text-gray-500 mb-1">

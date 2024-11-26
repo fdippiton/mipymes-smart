@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const { default: mongoose } = require("mongoose");
+const multer = require("multer");
+
 // const Cookies = require("js-cookie");
 
 // Models
@@ -21,6 +23,7 @@ const Asignaciones = require("./models/Asignaciones");
 const app = express();
 const PORT = config.SERVER_PORT || 3000;
 const secretKey = config.SECRET_KEY;
+const upload = multer();
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(express.json());
 app.use(cookieParser());
@@ -1427,6 +1430,9 @@ app.put("/docAsesoriasUpdate/:asesoriaIdDoc", async (req, res) => {
     }
 
     const {
+      asesoria_id,
+      cliente_id,
+      asesor_id,
       fecha,
       hora,
       duracion_sesion,
@@ -1437,11 +1443,22 @@ app.put("/docAsesoriasUpdate/:asesoriaIdDoc", async (req, res) => {
       talleres_recomendados,
       observaciones_adicionales,
       estado,
-    } = req.body; // El nuevo estado debe estar en el cuerpo de la solicitud
+    } = req.body;
+
+    console.log("Datos recibidos en el backend:", req.body);
+
+    // Validación adicional si es necesario
+    const docAsesoria = await DocAsesorias.findById(asesoriaIdDoc);
+    if (!docAsesoria) {
+      return res.status(404).json({ error: "Doc asesoria no encontrado" });
+    }
 
     const updatedDocAsesoria = await DocAsesorias.findByIdAndUpdate(
       asesoriaIdDoc,
       {
+        asesoria_id,
+        cliente_id,
+        asesor_id,
         fecha,
         hora,
         duracion_sesion,
@@ -1449,35 +1466,19 @@ app.put("/docAsesoriasUpdate/:asesoriaIdDoc", async (req, res) => {
         documentos_compartidos,
         temas_tratados,
         objetivos_acordados,
-        talleres_recomendados: null,
+        talleres_recomendados,
         observaciones_adicionales,
         estado,
-      }, // Actualiza el campo estado
-      { new: true } // Devuelve el cliente actualizado
+      },
+      { new: true }
     );
 
-    if (!updatedDocAsesoria) {
-      return res.status(404).json({ error: "Doc asesoria no encontrado" });
-    }
-    res.json(updatedDocAsesoria);
+    res.status(200).json(updatedDocAsesoria);
   } catch (error) {
-    console.error("Error en la actualización de la documentacion:", error);
+    console.error("Error en la actualización de la documentación:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-
-// app.delete("/deshacerAsignacion", async (req, res) => {
-//   const { clienteId } = req.body;
-
-//   try {
-//     // Eliminar asignación según tu modelo de datos
-//     await Asignacion.deleteOne({ cliente_id: clienteId });
-//     res.status(200).json({ message: "Asignación eliminada exitosamente" });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Error al eliminar la asignación" });
-//   }
-// });
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

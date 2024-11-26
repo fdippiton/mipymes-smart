@@ -1204,10 +1204,8 @@ app.delete("/deshacerAsignacion/:clienteId", async (req, res) => {
     const { clienteId } = req.params;
 
     // Buscar la asignación del cliente
-    const [asignacion, docAsesorias] = await Promise.all([
-      Asignaciones.findOne({ cliente_id: clientId }),
-      DocAsesorias.findOne({ cliente_id: clientId }),
-    ]);
+    const asignacion = await Asignaciones.findOne({ cliente_id: clienteId });
+    const docAsesorias = await DocAsesorias.findOne({ cliente_id: clienteId });
 
     if (!asignacion) {
       return res
@@ -1223,23 +1221,24 @@ app.delete("/deshacerAsignacion/:clienteId", async (req, res) => {
     ].filter(Boolean); // Filtrar IDs válidos
 
     // Actualizar asesores en la base de datos
-    await Promise.all(
-      asesoresIds.map(async (asesorId) => {
-        await Asesores.findByIdAndUpdate(
-          asesorId,
-          {
-            $pull: { clientes_asignados: clienteId }, // Remover cliente
-            $inc: { max_clientes: 1 }, // Incrementar max_clientes
-          },
-          { new: true } // Opcional, para devolver el documento actualizado
-        );
-      })
-    );
+    for (const asesorId of asesoresIds) {
+      await Asesores.findByIdAndUpdate(
+        asesorId,
+        {
+          $pull: { clientes_asignados: clienteId }, // Remover cliente
+          $inc: { max_clientes: 1 }, // Incrementar max_clientes
+        },
+        { new: true } // Opcional, para devolver el documento actualizado
+      );
+    }
 
     // Eliminar la asignación del cliente
     await asignacion.deleteOne();
-    // Eliminar la asignación del cliente
-    await docAsesorias.deleteOne();
+
+    // Eliminar documentación del cliente solo si existe
+    if (docAsesorias) {
+      await docAsesorias.deleteOne();
+    }
 
     res.status(200).json({ message: "Cliente desasignado exitosamente." });
   } catch (error) {

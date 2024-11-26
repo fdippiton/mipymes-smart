@@ -437,6 +437,7 @@ function VisualizarClientes() {
   };
 
   const handleDeshacerAsignacion = async (clienteId) => {
+    console.log("Deshacer", clienteId);
     try {
       const response = await fetch(
         `http://localhost:3000/deshacerAsignacion/${clienteId}`,
@@ -452,9 +453,10 @@ function VisualizarClientes() {
         // Actualizar el estado para reflejar la eliminación
         setAsignaciones((prevAsignaciones) =>
           prevAsignaciones.filter(
-            (asignacion) => asignacion.cliente_id._id !== clienteId
+            (asignacion) => asignacion.cliente_id?._id !== clienteId
           )
         );
+
         alert("Asignación eliminada exitosamente.");
       } else {
         const error = await response.json();
@@ -584,23 +586,22 @@ function VisualizarClientes() {
             <div className="flex justify-between">
               <div className="py-2  gap-2">
                 <h6 className="text-sm font-bold mb-2">Asesores</h6>
-                {asignaciones.some(
+                {clienteSeleccionado &&
+                asignaciones.some(
                   (asignacion) =>
+                    asignacion.cliente_id &&
                     asignacion.cliente_id._id === clienteSeleccionado._id
                 ) ? (
-                  // Si el cliente está en las asignaciones, busca el asesor y muestra un mensaje
                   <>
                     {asignaciones
                       .filter(
                         (asignacion) =>
+                          asignacion.cliente_id &&
                           asignacion.cliente_id._id === clienteSeleccionado._id
                       )
                       .map((asignacion) => (
-                        <div>
-                          <span
-                            key={asignacion._id}
-                            className="flex flex-col space-y-2 w-fit text-xs"
-                          >
+                        <div key={asignacion._id}>
+                          <span className="flex flex-col space-y-2 w-fit text-xs">
                             <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
                               Asesoría empresarial:{" "}
                               {asignacion.asesor_empresarial_id?.nombre ||
@@ -619,7 +620,7 @@ function VisualizarClientes() {
                           </span>
                           <button
                             onClick={() =>
-                              handleDeshacerAsignacion(clienteSeleccionado._id)
+                              handleDeshacerAsignacion(clienteSeleccionado?._id)
                             }
                             className="flex items-center bg-red-400 p-5 rounded-md text-white px-5 py-2 mt-3 text-xs"
                           >
@@ -630,7 +631,6 @@ function VisualizarClientes() {
                       ))}
                   </>
                 ) : (
-                  // Si el cliente no está en las asignaciones, muestra el enlace para asignar
                   <Link
                     className="bg-gray-300 p-5 rounded-md text-black px-5 py-2 text-xs"
                     onClick={() => handleAsignarAsesor(clienteSeleccionado)}
@@ -779,6 +779,7 @@ function VisualizarClientes() {
                             </span>
                             <button
                               onClick={() =>
+                                cliente?._id &&
                                 handleDeshacerAsignacion(cliente._id)
                               }
                               className=" flex items-center bg-red-400 p-5 rounded-md text-white px-5 py-2 mt-3 text-xs"

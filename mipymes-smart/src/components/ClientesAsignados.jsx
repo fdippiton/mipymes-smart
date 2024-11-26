@@ -1167,13 +1167,13 @@ function ClientesAsignados() {
                                     cliente.cliente_id && (
                                     <div className="mb-6">
                                       <strong className="text-sm   rounded-md mb-0.5 block">
-                                        Financiera
+                                        Financiero
                                       </strong>
                                       <button
                                         onClick={() =>
                                           handleNewAsesoriaClick(
                                             index,
-                                            "financiera"
+                                            "financiero"
                                           )
                                         }
                                         className="mt-2 flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-emerald-100"
@@ -1183,97 +1183,225 @@ function ClientesAsignados() {
                                       </button>
                                       {/* Formulario nueva doc asesoria */}
                                       {expandedRowNewAsesoria ===
-                                        `${index}-financiera` && (
+                                        `${index}-empresarial` && (
                                         <div className="mt-4">
                                           {renderForm(
                                             asesorias
                                               .filter(
                                                 (asesoria) =>
                                                   asesoria.nombre_asesoria ===
-                                                  "Asesoría Financiera"
+                                                  "Asesoria Empresarial"
                                               )
                                               .map(
                                                 (asesoria) => asesoria._id
-                                              )[0], // Selecciona el primer _id de la asesoría que cumpla la condición,
+                                              )[0], // Selecciona el primer _id de la asesoría que cumpla la condición
                                             cliente.cliente_id._id,
                                             asesorId
                                           )}
                                         </div>
                                       )}
 
-                                      <div className="flex">
+                                      {/* Listar asesorias */}
+                                      <div className="flex flex-wrap m-3">
                                         {docAsesorias
                                           .filter((docAsesoria) => {
-                                            // Validar propiedades anidadas
                                             return (
                                               docAsesoria &&
                                               docAsesoria.cliente_id._id ===
                                                 cliente.cliente_id._id &&
-                                              docAsesoria.asesor_id ==
+                                              docAsesoria.asesor_id ===
                                                 asesorId &&
                                               docAsesoria.asesoria_id
-                                                ?.nombre_asesoria ==
+                                                ?.nombre_asesoria ===
                                                 "Asesoría Financiera"
                                             );
                                           })
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className="m-3 flex flex-row  mt-3 max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-6"
-                                              style={{
-                                                backgroundColor:
-                                                  doc.estado === "Pendiente"
-                                                    ? "#FADBD8"
-                                                    : "#B2F7EF",
+                                              className={`m-3 cursor-pointer mt-3 max-w-md mx-auto rounded-lg shadow-lg p-6 mb-6 ${
+                                                expandedRowDocAsesoria ===
+                                                doc._id
+                                                  ? "bg-white w-full max-w-screen-xl"
+                                                  : ""
+                                              }`}
+                                              onClick={() => {
+                                                mostrarDetallesAsesoria(
+                                                  doc._id
+                                                );
+                                                setcurrentDocAsesoria(doc);
                                               }}
                                             >
-                                              <div className="mt-3">
-                                                <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                                                  {doc.asesoria_id
-                                                    ?.nombre_asesoria || "N/A"}
-                                                </h3>
-                                                <p className="text-sm text-gray-500 mb-1">
-                                                  <span className="font-medium text-gray-600">
-                                                    Tema:
-                                                  </span>{" "}
-                                                  {doc.tema_principal ||
-                                                    "No especificado"}
-                                                </p>
-                                                <p className="text-sm text-gray-500 mb-1">
-                                                  <span className="font-medium text-gray-600">
-                                                    Fecha:
-                                                  </span>{" "}
-                                                  {doc.fecha
-                                                    ? new Date(
-                                                        doc.fecha
-                                                      ).toLocaleDateString(
-                                                        "es-ES"
-                                                      )
-                                                    : "No especificada"}
-                                                </p>
-                                                <p className="text-sm text-gray-500 mb-1">
-                                                  <span className="font-medium text-gray-600">
-                                                    Hora:
-                                                  </span>{" "}
-                                                  {doc.hora ||
-                                                    "No especificada"}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                  <span className="font-medium text-gray-600">
-                                                    Estado:
-                                                  </span>{" "}
-                                                  {doc.estado ||
-                                                    "No especificado"}
-                                                </p>
-                                              </div>
-                                              <div className="flex justify-end">
-                                                <MdOutlineCancelPresentation
-                                                  className="h-5 w-5 cursor-pointer"
-                                                  onClick={() =>
-                                                    eliminarDoc(doc?._id)
-                                                  }
-                                                />
-                                              </div>
+                                              {/* Mostrar detalles y el icono de edición solo si la tarjeta está expandida */}
+                                              {expandedRowDocAsesoria ===
+                                                doc._id && (
+                                                <div className="flex justify-between">
+                                                  <h1
+                                                    className="mr-2"
+                                                    style={{
+                                                      backgroundColor:
+                                                        doc.estado ===
+                                                        "Pendiente"
+                                                          ? "red"
+                                                          : "green",
+                                                      width: "15px",
+                                                      height: "15px",
+                                                      borderRadius: "50%",
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                    }}
+                                                  ></h1>
+                                                  <FaRegEdit
+                                                    className="h-5 w-5"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation(); // Prevenir el clic en la tarjeta
+                                                      mostrarUpdateForm(
+                                                        doc._id
+                                                      ); // Mostrar el formulario de actualización
+                                                    }}
+                                                  />
+                                                </div>
+                                              )}
+
+                                              {/* Mostrar detalles o formulario de actualización */}
+                                              {expandedRowDocAsesoria ===
+                                              doc._id ? (
+                                                <div className="space-y-4">
+                                                  {expandedRowDocAsesoriaUpdate ===
+                                                    doc._id && !hideForm ? (
+                                                    <div
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // Evita que el evento haga bubbling
+                                                        // Actualiza el estado con el documento actual
+                                                      }}
+                                                    >
+                                                      {renderDocUpdate(doc)}{" "}
+                                                      {/* Formulario de actualización */}
+                                                    </div>
+                                                  ) : (
+                                                    <>
+                                                      <h3 className="text-md font-semibold">
+                                                        Detalles de la Asesoría
+                                                      </h3>
+                                                      <p>
+                                                        <strong>Fecha:</strong>{" "}
+                                                        {formatFecha(doc.fecha)}
+                                                      </p>
+                                                      <p>
+                                                        <strong>Hora:</strong>{" "}
+                                                        {doc.hora}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Duración:
+                                                        </strong>{" "}
+                                                        {doc.duracion_sesion ||
+                                                          "No especificada"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Tema principal:
+                                                        </strong>{" "}
+                                                        {doc.tema_principal ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Temas tratados:
+                                                        </strong>{" "}
+                                                        {doc.temas_tratados ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Objetivos acordados:
+                                                        </strong>{" "}
+                                                        {doc.objetivos_acordados ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Observaciones
+                                                          adicionales:
+                                                        </strong>{" "}
+                                                        {doc.observaciones_adicionales ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>Estado:</strong>{" "}
+                                                        {doc.estado ||
+                                                          "No especificado"}
+                                                      </p>
+                                                    </>
+                                                  )}
+                                                </div>
+                                              ) : (
+                                                <div className="flex flex-row justify-between items-start">
+                                                  <div className="mt-3">
+                                                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                      {doc.asesoria_id
+                                                        ?.nombre_asesoria ||
+                                                        "N/A"}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-500 mb-1">
+                                                      <span className="font-medium text-gray-600">
+                                                        Tema:
+                                                      </span>{" "}
+                                                      {doc.tema_principal ||
+                                                        "No especificado"}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 mb-1">
+                                                      <span className="font-medium text-gray-600">
+                                                        Fecha:
+                                                      </span>{" "}
+                                                      {doc.fecha
+                                                        ? formatFecha(doc.fecha)
+                                                        : "No especificada"}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 mb-1">
+                                                      <span className="font-medium text-gray-600">
+                                                        Hora:
+                                                      </span>{" "}
+                                                      {doc.hora ||
+                                                        "No especificada"}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500">
+                                                      <span className="font-medium text-gray-600">
+                                                        Estado:
+                                                      </span>{" "}
+                                                      {doc.estado ||
+                                                        "No especificado"}
+                                                    </p>
+                                                  </div>
+                                                  <div className="flex justify-end items-center">
+                                                    <h1
+                                                      className="mr-2"
+                                                      style={{
+                                                        backgroundColor:
+                                                          doc.estado ===
+                                                          "Pendiente"
+                                                            ? "red"
+                                                            : "green",
+                                                        width: "15px",
+                                                        height: "15px",
+                                                        borderRadius: "50%",
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                      }}
+                                                    ></h1>
+                                                    <MdOutlineCancelPresentation
+                                                      className="h-5 w-5 cursor-pointer"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // Prevenir el clic en la tarjeta
+                                                        eliminarDoc(doc?._id);
+                                                      }}
+                                                    />
+                                                  </div>
+                                                </div>
+                                              )}
                                             </div>
                                           ))}
                                       </div>
@@ -1281,10 +1409,11 @@ function ClientesAsignados() {
                                   )}
 
                                 {/* Asesoria tecnologicas */}
+
                                 {asesoria.asesor_tecnologico_id === asesorId &&
                                   asesoria.cliente_id ===
                                     cliente.cliente_id && (
-                                    <div className="">
+                                    <div className="mb-6">
                                       <strong className="text-sm   rounded-md mb-0.5 block">
                                         Tecnológica
                                       </strong>
@@ -1314,86 +1443,213 @@ function ClientesAsignados() {
                                               .map(
                                                 (asesoria) => asesoria._id
                                               )[0], // Selecciona el primer _id de la asesoría que cumpla la condición
-                                            cliente.cliente_id,
+                                            cliente.cliente_id._id,
                                             asesorId
                                           )}
                                         </div>
                                       )}
 
-                                      {/* Listar doc asesorias */}
-                                      <div className="flex">
+                                      {/* Listar asesorias */}
+                                      <div className="flex flex-wrap m-3">
                                         {docAsesorias
                                           .filter((docAsesoria) => {
-                                            // Validar propiedades anidadas
                                             return (
                                               docAsesoria &&
                                               docAsesoria.cliente_id._id ===
                                                 cliente.cliente_id._id &&
-                                              docAsesoria.asesor_id ==
+                                              docAsesoria.asesor_id ===
                                                 asesorId &&
                                               docAsesoria.asesoria_id
-                                                ?.nombre_asesoria ==
+                                                ?.nombre_asesoria ===
                                                 "Asesoria Tecnológica"
                                             );
                                           })
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className="m-3 flex flex-row  mt-3 max-w-md mx-auto bg-white border border-gray-200 rounded-lg shadow-lg p-6 mb-6"
-                                              style={{
-                                                backgroundColor:
-                                                  doc.estado === "Pendiente"
-                                                    ? "#FADBD8"
-                                                    : "#B2F7EF",
+                                              className={`m-3 cursor-pointer mt-3 max-w-md mx-auto rounded-lg shadow-lg p-6 mb-6 ${
+                                                expandedRowDocAsesoria ===
+                                                doc._id
+                                                  ? "bg-white w-full max-w-screen-xl"
+                                                  : ""
+                                              }`}
+                                              onClick={() => {
+                                                mostrarDetallesAsesoria(
+                                                  doc._id
+                                                );
+                                                setcurrentDocAsesoria(doc);
                                               }}
                                             >
-                                              <div className="mt-3">
-                                                <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                                                  {doc.asesoria_id
-                                                    ?.nombre_asesoria || "N/A"}
-                                                </h3>
-                                                <p className="text-sm text-gray-500 mb-1">
-                                                  <span className="font-medium text-gray-600">
-                                                    Tema:
-                                                  </span>{" "}
-                                                  {doc.tema_principal ||
-                                                    "No especificado"}
-                                                </p>
-                                                <p className="text-sm text-gray-500 mb-1">
-                                                  <span className="font-medium text-gray-600">
-                                                    Fecha:
-                                                  </span>{" "}
-                                                  {doc.fecha
-                                                    ? new Date(
-                                                        doc.fecha
-                                                      ).toLocaleDateString(
-                                                        "es-ES"
-                                                      )
-                                                    : "No especificada"}
-                                                </p>
-                                                <p className="text-sm text-gray-500 mb-1">
-                                                  <span className="font-medium text-gray-600">
-                                                    Hora:
-                                                  </span>{" "}
-                                                  {doc.hora ||
-                                                    "No especificada"}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                  <span className="font-medium text-gray-600">
-                                                    Estado:
-                                                  </span>{" "}
-                                                  {doc.estado ||
-                                                    "No especificado"}
-                                                </p>
-                                              </div>
-                                              <div className="flex justify-end">
-                                                <MdOutlineCancelPresentation
-                                                  className="h-5 w-5 cursor-pointer"
-                                                  onClick={() =>
-                                                    eliminarDoc(doc?._id)
-                                                  }
-                                                />
-                                              </div>
+                                              {/* Mostrar detalles y el icono de edición solo si la tarjeta está expandida */}
+                                              {expandedRowDocAsesoria ===
+                                                doc._id && (
+                                                <div className="flex justify-between">
+                                                  <h1
+                                                    className="mr-2"
+                                                    style={{
+                                                      backgroundColor:
+                                                        doc.estado ===
+                                                        "Pendiente"
+                                                          ? "red"
+                                                          : "green",
+                                                      width: "15px",
+                                                      height: "15px",
+                                                      borderRadius: "50%",
+                                                      display: "flex",
+                                                      justifyContent: "center",
+                                                      alignItems: "center",
+                                                    }}
+                                                  ></h1>
+                                                  <FaRegEdit
+                                                    className="h-5 w-5"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation(); // Prevenir el clic en la tarjeta
+                                                      mostrarUpdateForm(
+                                                        doc._id
+                                                      ); // Mostrar el formulario de actualización
+                                                    }}
+                                                  />
+                                                </div>
+                                              )}
+
+                                              {/* Mostrar detalles o formulario de actualización */}
+                                              {expandedRowDocAsesoria ===
+                                              doc._id ? (
+                                                <div className="space-y-4">
+                                                  {expandedRowDocAsesoriaUpdate ===
+                                                    doc._id && !hideForm ? (
+                                                    <div
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // Evita que el evento haga bubbling
+                                                        // Actualiza el estado con el documento actual
+                                                      }}
+                                                    >
+                                                      {renderDocUpdate(doc)}{" "}
+                                                      {/* Formulario de actualización */}
+                                                    </div>
+                                                  ) : (
+                                                    <>
+                                                      <h3 className="text-md font-semibold">
+                                                        Detalles de la Asesoría
+                                                      </h3>
+                                                      <p>
+                                                        <strong>Fecha:</strong>{" "}
+                                                        {formatFecha(doc.fecha)}
+                                                      </p>
+                                                      <p>
+                                                        <strong>Hora:</strong>{" "}
+                                                        {doc.hora}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Duración:
+                                                        </strong>{" "}
+                                                        {doc.duracion_sesion ||
+                                                          "No especificada"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Tema principal:
+                                                        </strong>{" "}
+                                                        {doc.tema_principal ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Temas tratados:
+                                                        </strong>{" "}
+                                                        {doc.temas_tratados ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Objetivos acordados:
+                                                        </strong>{" "}
+                                                        {doc.objetivos_acordados ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Observaciones
+                                                          adicionales:
+                                                        </strong>{" "}
+                                                        {doc.observaciones_adicionales ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>Estado:</strong>{" "}
+                                                        {doc.estado ||
+                                                          "No especificado"}
+                                                      </p>
+                                                    </>
+                                                  )}
+                                                </div>
+                                              ) : (
+                                                <div className="flex flex-row justify-between items-start">
+                                                  <div className="mt-3">
+                                                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                      {doc.asesoria_id
+                                                        ?.nombre_asesoria ||
+                                                        "N/A"}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-500 mb-1">
+                                                      <span className="font-medium text-gray-600">
+                                                        Tema:
+                                                      </span>{" "}
+                                                      {doc.tema_principal ||
+                                                        "No especificado"}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 mb-1">
+                                                      <span className="font-medium text-gray-600">
+                                                        Fecha:
+                                                      </span>{" "}
+                                                      {doc.fecha
+                                                        ? formatFecha(doc.fecha)
+                                                        : "No especificada"}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 mb-1">
+                                                      <span className="font-medium text-gray-600">
+                                                        Hora:
+                                                      </span>{" "}
+                                                      {doc.hora ||
+                                                        "No especificada"}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500">
+                                                      <span className="font-medium text-gray-600">
+                                                        Estado:
+                                                      </span>{" "}
+                                                      {doc.estado ||
+                                                        "No especificado"}
+                                                    </p>
+                                                  </div>
+                                                  <div className="flex justify-end items-center">
+                                                    <h1
+                                                      className="mr-2"
+                                                      style={{
+                                                        backgroundColor:
+                                                          doc.estado ===
+                                                          "Pendiente"
+                                                            ? "red"
+                                                            : "green",
+                                                        width: "15px",
+                                                        height: "15px",
+                                                        borderRadius: "50%",
+                                                        display: "flex",
+                                                        justifyContent:
+                                                          "center",
+                                                        alignItems: "center",
+                                                      }}
+                                                    ></h1>
+                                                    <MdOutlineCancelPresentation
+                                                      className="h-5 w-5 cursor-pointer"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // Prevenir el clic en la tarjeta
+                                                        eliminarDoc(doc?._id);
+                                                      }}
+                                                    />
+                                                  </div>
+                                                </div>
+                                              )}
                                             </div>
                                           ))}
                                       </div>

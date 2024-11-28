@@ -175,11 +175,14 @@ function Signup() {
             Por favor, ingrese su correo electrónico y contraseña para
             posteriormente acceder a la plataforma.
           </p>
+          <h1 className="text-red-500 text-sm">* Obligatorio </h1>
 
           <div className="mt-10 gap-y-8 sm:grid-cols-6">
             <div className="sm:col-span-3">
               <div className="mt-2">
-                <label className="text-sm font-bold">Nombre del cliente</label>
+                <label className="text-sm font-bold">
+                  Nombre del cliente <span className="text-red-500">*</span>
+                </label>
                 <input
                   id="nombre-cliente"
                   name="nombre-cliente"
@@ -197,7 +200,9 @@ function Signup() {
 
             <div className=" sm:col-span-3">
               <div className="mt-2">
-                <label className="text-sm font-bold">Correo</label>
+                <label className="text-sm font-bold">
+                  Correo <span className="text-red-500">*</span>
+                </label>
                 <input
                   id="email"
                   name="email"
@@ -217,7 +222,9 @@ function Signup() {
 
             <div className="sm:col-span-3">
               <div className="mb-4 mt-2">
-                <label className="text-sm font-bold">Contraseña</label>
+                <label className="text-sm font-bold">
+                  Contraseña <span className="text-red-500">*</span>
+                </label>
 
                 <input
                   id="password"
@@ -236,7 +243,7 @@ function Signup() {
 
             <fieldset>
               <legend className="text-sm/6 font-semibold text-gray-900">
-                ¿Cómo se enteró del CMU?
+                ¿Cómo se enteró del CMU? <span className="text-red-500">*</span>
               </legend>
 
               <div className="mt-6 ">
@@ -366,7 +373,9 @@ function Signup() {
 
           <div className="sm:col-span-3">
             <div className="mt-2">
-              <label className="text-sm font-bold">Telefono</label>
+              <label className="text-sm font-bold">
+                Telefono <span className="text-red-500">*</span>
+              </label>
 
               <input
                 id="telefono-empresa"
@@ -390,7 +399,7 @@ function Signup() {
             <div className="sm:col-span-3">
               <div className="mt-2">
                 <label className="text-sm font-bold">
-                  Nombre de la empresa
+                  Nombre de la empresa <span className="text-red-500">*</span>
                 </label>
 
                 <input
@@ -412,7 +421,9 @@ function Signup() {
 
             <div className="sm:col-span-3">
               <div className="mt-2">
-                <label className="text-sm font-bold">Correo de empresa</label>
+                <label className="text-sm font-bold">
+                  Correo de empresa <span className="text-red-500">*</span>
+                </label>
 
                 <input
                   id="correo-empresa"
@@ -434,7 +445,8 @@ function Signup() {
             <div className=" sm:col-span-3">
               <div className="mt-2">
                 <label className="text-sm font-bold">
-                  Descripcion de los servicios o productos que ofrece
+                  Descripcion de los servicios o productos que ofrece{" "}
+                  <span className="text-red-500">*</span>
                 </label>
 
                 <textarea
@@ -452,7 +464,8 @@ function Signup() {
             <div className="sm:col-span-3">
               <div className="mt-2 mb-4">
                 <label className="text-sm font-bold">
-                  Rubro/sector de empresa
+                  Rubro/sector de empresa{" "}
+                  <span className="text-red-500">*</span>
                 </label>
 
                 <input
@@ -469,7 +482,8 @@ function Signup() {
 
             <fieldset>
               <legend className="text-sm/6 font-semibold text-gray-900">
-                Su empresa ha generado más de 8,000 pesos mensuales?
+                Su empresa ha generado más de 8,000 pesos mensuales?{" "}
+                <span className="text-red-500">*</span>
               </legend>
 
               <div className="mt-6 ">
@@ -515,7 +529,8 @@ function Signup() {
             </fieldset>
             <fieldset className="mt-8">
               <legend className="text-sm/6 font-semibold text-gray-900">
-                ¿Que servicios necesita actualmente?
+                ¿Que servicios necesita actualmente?{" "}
+                <span className="text-red-500">*</span>
               </legend>
               <div className="mt-6">
                 <div className="relative flex gap-x-3">

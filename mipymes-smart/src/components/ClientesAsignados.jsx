@@ -6,6 +6,7 @@ import { IoIosAddCircle } from "react-icons/io";
 import { MdOutlineCancelPresentation } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import { format } from "date-fns";
+import { MdExpandMore } from "react-icons/md";
 
 function ClientesAsignados() {
   const [dataClientes, setDataClientes] = useState([]);
@@ -546,9 +547,9 @@ function ClientesAsignados() {
     return (
       <form
         onSubmit={(e) => handleSubmitUpdate(e, id)}
-        className="max-w-2xl mx-auto space-y-4 p-6 bg-white border shadow-lg rounded-lg"
+        className="max-w-2xl mx-auto space-y-4 p-6"
       >
-        <h2 className="text-2xl font-semibold mb-4">
+        <h2 className="text-xl font-semibold mb-4">
           Actualizar documentación Asesoría
         </h2>
 
@@ -787,7 +788,7 @@ function ClientesAsignados() {
 
         <button
           type="submit"
-          className="w-full border hover:bg-emerald-100 text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
+          className="w-full border bg-emerald-400 text-white  hover:text-black hover:bg-emerald-100 text-sm border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-emerald-300"
         >
           Actualizar Asesoría
         </button>
@@ -816,15 +817,26 @@ function ClientesAsignados() {
                   className="px-3 py-2 font-normal"
                   onClick={() => handleRowClick(index)}
                 >
-                  {cliente.cliente_id.nombre}
+                  <div className="flex border w-52 px-10 py-3 items-center rounded-sm hover:bg-gray-200">
+                    <MdExpandMore className="mr-2" />
+                    {cliente.cliente_id.nombre}
+                  </div>
                 </td>
                 <td>
-                  <Link
-                    className="border border-gray-400 p-2 rounded-md"
+                  <div
+                    className="flex border w-52 px-10 py-3 items-center rounded-sm hover:bg-gray-200"
                     onClick={() => handleAsesoriaClick(index)}
                   >
+                    <MdExpandMore className="mr-2" />
                     Ver asesorias
-                  </Link>
+                  </div>
+                  {/* <Link
+                    className="border  hover:bg-gray-200 w-52 px-10 py-3 rounded-sm"
+                    onClick={() => handleAsesoriaClick(index)}
+                  >
+                    <MdExpandMore className="mr-2" />
+                    Ver asesorias
+                  </Link> */}
                 </td>
               </tr>
               {/* Informacion del cliente */}
@@ -989,7 +1001,7 @@ function ClientesAsignados() {
                                               {/* Mostrar detalles y el icono de edición solo si la tarjeta está expandida */}
                                               {expandedRowDocAsesoria ===
                                                 doc._id && (
-                                                <div className="flex justify-between">
+                                                <div className="flex justify-between ">
                                                   <h1
                                                     className="mr-2"
                                                     style={{
@@ -997,7 +1009,10 @@ function ClientesAsignados() {
                                                         doc.estado ===
                                                         "Pendiente"
                                                           ? "red"
-                                                          : "green",
+                                                          : doc.estado ===
+                                                            "Completada"
+                                                          ? "green"
+                                                          : "black", // Negro por defecto para otros estados
                                                       width: "15px",
                                                       height: "15px",
                                                       borderRadius: "50%",
@@ -1021,7 +1036,7 @@ function ClientesAsignados() {
                                               {/* Mostrar detalles o formulario de actualización */}
                                               {expandedRowDocAsesoria ===
                                               doc._id ? (
-                                                <div className="space-y-4">
+                                                <div className="space-y-4 py-3">
                                                   {expandedRowDocAsesoriaUpdate ===
                                                     doc._id && !hideForm ? (
                                                     <div
@@ -1035,7 +1050,7 @@ function ClientesAsignados() {
                                                     </div>
                                                   ) : (
                                                     <>
-                                                      <h3 className="text-md font-semibold">
+                                                      <h3 className="text-xl font-semibold">
                                                         Detalles de la Asesoría
                                                       </h3>
                                                       <p>
@@ -1136,7 +1151,10 @@ function ClientesAsignados() {
                                                           doc.estado ===
                                                           "Pendiente"
                                                             ? "red"
-                                                            : "green",
+                                                            : doc.estado ===
+                                                              "Completada"
+                                                            ? "green"
+                                                            : "black", // Negro por defecto para otros estados
                                                         width: "15px",
                                                         height: "15px",
                                                         borderRadius: "50%",
@@ -1146,11 +1164,45 @@ function ClientesAsignados() {
                                                         alignItems: "center",
                                                       }}
                                                     ></h1>
+                                                    {/* <MdOutlineCancelPresentation
+                                                      className="h-5 w-5 cursor-pointer"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // Prevenir el clic en la tarjeta
+                                                        doc.estado ===
+                                                        "Completada"
+                                                          ? alert(
+                                                              "No se puede eliminar una asesoria completada"
+                                                            )
+                                                          : eliminarDoc(
+                                                              doc?._id
+                                                            );
+                                                      }}
+                                                    /> */}
                                                     <MdOutlineCancelPresentation
                                                       className="h-5 w-5 cursor-pointer"
                                                       onClick={(e) => {
                                                         e.stopPropagation(); // Prevenir el clic en la tarjeta
-                                                        eliminarDoc(doc?._id);
+
+                                                        if (
+                                                          doc.estado ===
+                                                          "Completada"
+                                                        ) {
+                                                          // Mostrar alerta si la asesoría está completada
+                                                          alert(
+                                                            "No se puede eliminar una asesoría completada"
+                                                          );
+                                                        } else {
+                                                          // Confirmar si se desea eliminar
+                                                          const confirmacion =
+                                                            window.confirm(
+                                                              "¿Estás seguro de que deseas eliminar esta asesoría?"
+                                                            );
+                                                          if (confirmacion) {
+                                                            eliminarDoc(
+                                                              doc?._id
+                                                            );
+                                                          }
+                                                        }
                                                       }}
                                                     />
                                                   </div>
@@ -1183,14 +1235,14 @@ function ClientesAsignados() {
                                       </button>
                                       {/* Formulario nueva doc asesoria */}
                                       {expandedRowNewAsesoria ===
-                                        `${index}-empresarial` && (
+                                        `${index}-financiero` && (
                                         <div className="mt-4">
                                           {renderForm(
                                             asesorias
                                               .filter(
                                                 (asesoria) =>
                                                   asesoria.nombre_asesoria ===
-                                                  "Asesoria Empresarial"
+                                                  "Asesoría Financiera"
                                               )
                                               .map(
                                                 (asesoria) => asesoria._id
@@ -1243,7 +1295,10 @@ function ClientesAsignados() {
                                                         doc.estado ===
                                                         "Pendiente"
                                                           ? "red"
-                                                          : "green",
+                                                          : doc.estado ===
+                                                            "Completada"
+                                                          ? "green"
+                                                          : "black", // Negro por defecto para otros estados
                                                       width: "15px",
                                                       height: "15px",
                                                       borderRadius: "50%",
@@ -1382,7 +1437,10 @@ function ClientesAsignados() {
                                                           doc.estado ===
                                                           "Pendiente"
                                                             ? "red"
-                                                            : "green",
+                                                            : doc.estado ===
+                                                              "Completada"
+                                                            ? "green"
+                                                            : "black", // Negro por defecto para otros estados
                                                         width: "15px",
                                                         height: "15px",
                                                         borderRadius: "50%",
@@ -1396,7 +1454,27 @@ function ClientesAsignados() {
                                                       className="h-5 w-5 cursor-pointer"
                                                       onClick={(e) => {
                                                         e.stopPropagation(); // Prevenir el clic en la tarjeta
-                                                        eliminarDoc(doc?._id);
+
+                                                        if (
+                                                          doc.estado ===
+                                                          "Completada"
+                                                        ) {
+                                                          // Mostrar alerta si la asesoría está completada
+                                                          alert(
+                                                            "No se puede eliminar una asesoría completada"
+                                                          );
+                                                        } else {
+                                                          // Confirmar si se desea eliminar
+                                                          const confirmacion =
+                                                            window.confirm(
+                                                              "¿Estás seguro de que deseas eliminar esta asesoría?"
+                                                            );
+                                                          if (confirmacion) {
+                                                            eliminarDoc(
+                                                              doc?._id
+                                                            );
+                                                          }
+                                                        }
                                                       }}
                                                     />
                                                   </div>
@@ -1491,7 +1569,10 @@ function ClientesAsignados() {
                                                         doc.estado ===
                                                         "Pendiente"
                                                           ? "red"
-                                                          : "green",
+                                                          : doc.estado ===
+                                                            "Completada"
+                                                          ? "green"
+                                                          : "black", // Negro por defecto para otros estados
                                                       width: "15px",
                                                       height: "15px",
                                                       borderRadius: "50%",
@@ -1630,7 +1711,10 @@ function ClientesAsignados() {
                                                           doc.estado ===
                                                           "Pendiente"
                                                             ? "red"
-                                                            : "green",
+                                                            : doc.estado ===
+                                                              "Completada"
+                                                            ? "green"
+                                                            : "black", // Negro por defecto para otros estados
                                                         width: "15px",
                                                         height: "15px",
                                                         borderRadius: "50%",
@@ -1644,7 +1728,27 @@ function ClientesAsignados() {
                                                       className="h-5 w-5 cursor-pointer"
                                                       onClick={(e) => {
                                                         e.stopPropagation(); // Prevenir el clic en la tarjeta
-                                                        eliminarDoc(doc?._id);
+
+                                                        if (
+                                                          doc.estado ===
+                                                          "Completada"
+                                                        ) {
+                                                          // Mostrar alerta si la asesoría está completada
+                                                          alert(
+                                                            "No se puede eliminar una asesoría completada"
+                                                          );
+                                                        } else {
+                                                          // Confirmar si se desea eliminar
+                                                          const confirmacion =
+                                                            window.confirm(
+                                                              "¿Estás seguro de que deseas eliminar esta asesoría?"
+                                                            );
+                                                          if (confirmacion) {
+                                                            eliminarDoc(
+                                                              doc?._id
+                                                            );
+                                                          }
+                                                        }
                                                       }}
                                                     />
                                                   </div>

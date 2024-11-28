@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoMdAddCircle } from "react-icons/io";
 import { FaUndoAlt } from "react-icons/fa";
+import { CiSearch } from "react-icons/ci";
 
 function VisualizarClientes() {
   const [expandedRow, setExpandedRow] = useState(null);
@@ -471,6 +472,7 @@ function VisualizarClientes() {
 
   return (
     <div>
+      {/* Estadisticas top */}
       <div className="grid grid-cols-5 gap-4">
         <div
           className="rounded-md shadow cursor-pointer"
@@ -553,13 +555,27 @@ function VisualizarClientes() {
       </div>
 
       {/* Barra de búsqueda */}
-      <input
+      <div className="relative w-full mb-4 mt-8">
+        {/* Ícono de búsqueda */}
+        <CiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+
+        {/* Campo de entrada */}
+        <input
+          type="text"
+          placeholder="Buscar cliente..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="w-full p-2 pl-10 border text-sm border-gray-300 rounded-md"
+        />
+      </div>
+
+      {/* <input
         type="text"
-        placeholder="Buscar cliente..."
+        placeholder={`Buscar cliente...`}
         value={searchQuery}
         onChange={handleSearchChange}
         className="w-full p-2 border text-sm border-gray-300 rounded-md mb-4 mt-8"
-      />
+      /> */}
 
       {/* Lista dinámica de clientes */}
       {searchQuery && clientesFiltrados.length > 0 ? (

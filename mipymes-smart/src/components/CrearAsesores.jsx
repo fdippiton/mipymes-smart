@@ -47,6 +47,8 @@ function CrearAsesores() {
       method: "POST",
       body: JSON.stringify(data),
       headers: { "Content-Type": "application/json" },
+
+      credentials: "include", // Incluir cookies en la solicitud
     });
 
     if (response.status === 200) {

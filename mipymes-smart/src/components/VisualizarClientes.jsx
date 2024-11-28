@@ -416,6 +416,7 @@ function VisualizarClientes() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ clienteId: cliente._id }),
+          credentials: "include", // Incluir cookies en la solicitud
         }
       );
 
@@ -444,6 +445,7 @@ function VisualizarClientes() {
         `http://localhost:3000/deshacerAsignacion/${clienteId}`,
         {
           method: "DELETE",
+          credentials: "include", // Incluir cookies en la solicitud
         }
       );
 
@@ -467,6 +469,30 @@ function VisualizarClientes() {
     } catch (error) {
       console.error("Error al comunicarse con el servidor:", error);
       alert("Error al eliminar la asignación.");
+    }
+  };
+
+  const handleEnviarCorreo = async (cliente) => {
+    try {
+      const respuesta = await fetch("/enviar-correo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: cliente.contacto.email_cliente,
+          nombre: cliente.nombre,
+        }),
+      });
+
+      if (respuesta.ok) {
+        alert("Correo enviado exitosamente al cliente.");
+      } else {
+        alert("Hubo un problema al enviar el correo.");
+      }
+    } catch (error) {
+      console.error("Error al enviar el correo:", error);
+      alert("Error al enviar el correo.");
     }
   };
 
@@ -798,7 +824,7 @@ function VisualizarClientes() {
                                 cliente?._id &&
                                 handleDeshacerAsignacion(cliente._id)
                               }
-                              className=" flex items-center bg-red-400 p-5 rounded-md text-white px-5 py-2 mt-3 text-xs"
+                              className=" flex items-center bg-red-500 hover:bg-red-600 text-white mt-3 border border-gray-300 text-sm rounded p-1.5 pr-10 px-4"
                             >
                               {" "}
                               <FaUndoAlt className="mr-2" />
@@ -809,16 +835,16 @@ function VisualizarClientes() {
                     </>
                   ) : (
                     // Si el cliente no está en las asignaciones, muestra el enlace para asignar
-                    <Link
-                      className="bg-gray-300 p-5 rounded-md text-black px-5 py-2 text-xs"
+                    <button
+                      className="bg-gray-300 mt-3 border border-gray-300 hover:bg-gray-400 text-sm rounded p-1.5 px-4"
                       onClick={() => handleAsignarAsesor(cliente)}
                     >
                       Asignar Asesor
-                    </Link>
+                    </button>
                   )}
                 </td>
 
-                <td className="py-2">
+                <td className="py-2 flex justify-between">
                   <select
                     value={cliente.estado?._id} // Asegurarse de que el valor sea el id del estado
                     onChange={(e) =>
@@ -832,6 +858,15 @@ function VisualizarClientes() {
                       </option>
                     ))}
                   </select>
+                  {/* Mostrar el botón solo si el estado es "Activo" */}
+                  {cliente.estado?.estado_descripcion === "Activo" && (
+                    <button
+                      onClick={() => handleEnviarCorreo(cliente)}
+                      className="mr-6 bg-emerald-500 border border-gray-300 text-white text-sm rounded p-1.5  px-4 hover:bg-emerald-600"
+                    >
+                      Notificar cliente
+                    </button>
+                  )}
                 </td>
               </tr>
               {expandedRow === index && (

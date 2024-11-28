@@ -6,6 +6,14 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const { default: mongoose } = require("mongoose");
 const multer = require("multer");
+const nodemailer = require("nodemailer");
+const Cookies = require("js-cookie");
+const jwtDecode = require("jwt-decode");
+const { Parser } = require("papaparse");
+const PDFDocument = require("pdfkit");
+
+const fs = require("fs");
+const path = require("path");
 
 // const Cookies = require("js-cookie");
 
@@ -19,6 +27,7 @@ const Talleres = require("./models/Talleres");
 const Roles = require("./models/Roles");
 const Estados = require("./models/Estados");
 const Asignaciones = require("./models/Asignaciones");
+const HistorialCambios = require("./models/HistorialCambios");
 
 const app = express();
 const PORT = config.SERVER_PORT || 3000;
@@ -40,6 +49,17 @@ mongoose.connection.on("connected", () => {
 mongoose.connection.on("error", (error) => {
   console.error("Error al conectar a MongoDB:", error);
 });
+
+// Función para registrar un cambio
+const registrarCambio = async (usuario, accion, detalles) => {
+  try {
+    const nuevoCambio = new HistorialCambios({ usuario, accion, detalles });
+    await nuevoCambio.save();
+    console.log("Cambio registrado exitosamente");
+  } catch (error) {
+    console.error("Error al registrar el cambio:", error);
+  }
+};
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -286,6 +306,26 @@ app.put("/updateEstadoCliente/:id", async (req, res) => {
     const { id } = req.params;
     const { estado } = req.body; // El nuevo estado debe estar en el cuerpo de la solicitud
 
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token no proporcionado" });
+    }
+
+    const adminDecoded = jwt.verify(token, secretKey);
+    const admin = await Administradores.findById(adminDecoded.id);
+    console.log(admin);
+
+    if (!admin) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+
+    const estado_descripcion = await Estados.findById(estado);
+    if (!estado_descripcion) {
+      return res.status(400).json({ error: "El estado no existe" });
+    }
+
     const updatedClient = await Clientes.findByIdAndUpdate(
       id,
       { estado }, // Actualiza el campo estado
@@ -295,6 +335,12 @@ app.put("/updateEstadoCliente/:id", async (req, res) => {
     if (!updatedClient) {
       return res.status(404).json({ error: "Cliente no encontrado" });
     }
+
+    await registrarCambio(
+      adminDecoded.id,
+      `${admin.nombre} ha cambiado el estado del cliente ${updatedClient.nombre} a ${estado_descripcion.estado_descripcion}`
+    );
+
     res.json(updatedClient);
   } catch (error) {
     console.error("Error en la actualización del estado:", error);
@@ -332,6 +378,25 @@ app.post("/registrarAsesor", async (req, res) => {
       rol: roleDoc._id,
     });
 
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token no proporcionado" });
+    }
+
+    const adminDecoded = jwt.verify(token, secretKey);
+    const admin = await Administradores.findById(adminDecoded.id);
+    console.log(admin);
+
+    if (!admin) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+
+    await registrarCambio(
+      adminDecoded.id,
+      `${admin.nombre} ha cambiado registrado un nuevo asesor ${nombre}`
+    );
     res.status(200).json(userDoc);
   } catch (error) {
     console.error(error);
@@ -616,6 +681,25 @@ app.post("/asignarClienteAAsesor", async (req, res) => {
       asesor_tecnologico_id: asesorDefinitivoTecnologico._id,
     });
 
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token no proporcionado" });
+    }
+
+    const adminDecoded = jwt.verify(token, secretKey);
+    const admin = await Administradores.findById(adminDecoded.id);
+    console.log(admin);
+
+    if (!admin) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+
+    await registrarCambio(
+      adminDecoded.id,
+      `${admin.nombre} ha asignado los asesores ${asesorDefinitivoEmpresarial.nombre}, ${asesorDefinitivoFinanciero.nombre} y ${asesorDefinitivoTecnologico.nombre}  al cliente ${cliente.nombre}`
+    );
     res.status(200).json({
       message: "Asignación realizada exitosamente",
       nuevaAsignacion,
@@ -1191,6 +1275,7 @@ app.put("/updateAsesor", async (req, res) => {
     if (!updatedAsesor) {
       return res.status(404).json({ error: "Cliente no encontrado" });
     }
+
     res.json(updatedAsesor);
   } catch (error) {
     console.error("Error en la actualización del estado:", error);
@@ -1239,6 +1324,30 @@ app.delete("/deshacerAsignacion/:clienteId", async (req, res) => {
     if (docAsesorias) {
       await docAsesorias.deleteOne();
     }
+
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token no proporcionado" });
+    }
+
+    const adminDecoded = jwt.verify(token, secretKey);
+    const admin = await Administradores.findById(adminDecoded.id);
+
+    if (!admin) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+
+    const cliente = await Clientes.findById(clienteId);
+    if (!cliente) {
+      return res.status(404).json({ error: "Cliente no encontrado" });
+    }
+
+    await registrarCambio(
+      adminDecoded.id,
+      `${admin.nombre} ha desasignado los asesores al cliente ${cliente.nombre}`
+    );
 
     res.status(200).json({ message: "Cliente desasignado exitosamente." });
   } catch (error) {
@@ -1476,6 +1585,106 @@ app.put("/docAsesoriasUpdate/:asesoriaIdDoc", async (req, res) => {
   } catch (error) {
     console.error("Error en la actualización de la documentación:", error);
     res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+app.post("/enviar-correo", async (req, res) => {
+  const { email, nombre } = req.body;
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "Gmail", // Cambia según tu proveedor de correo
+      auth: {
+        user: config.database.EMAIL_ADDRESS,
+        pass: config.database.EMAIL_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: config.database.EMAIL_ADDRESS,
+      to: email,
+      subject: "¡Tu cuenta ha sido activada!",
+      text: `Hola ${nombre}, tu cuenta ha sido activada. ¡Bienvenido a nuestro servicio!`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).send("Correo enviado exitosamente");
+  } catch (error) {
+    console.error("Error al enviar el correo:", error);
+    res.status(500).send("Error al enviar el correo");
+  }
+});
+
+app.get("/historial-cambios", async (req, res) => {
+  try {
+    const historial = await HistorialCambios.find()
+      .sort({ fecha: -1 })
+      .populate("usuario");
+    res.status(200).json(historial);
+  } catch (error) {
+    console.error("Error al obtener el historial:", error);
+    res.status(500).send("Error en el servidor.");
+  }
+});
+
+app.get("/estadisticas/reporte", async (req, res) => {
+  try {
+    // Generar las estadísticas como se hace actualmente
+    const clientesPorEstado = await Clientes.aggregate([
+      {
+        $lookup: {
+          from: "estados",
+          localField: "estado",
+          foreignField: "_id",
+          as: "estado",
+        },
+      },
+      { $unwind: "$estado" },
+      {
+        $group: {
+          _id: "$estado.estado_descripcion",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Crear un nuevo documento PDF
+    const doc = new PDFDocument({ size: "A4", margin: 50 });
+
+    // Establecer los encabezados HTTP para el archivo PDF
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=reporte.pdf");
+
+    // Pipe del documento PDF al response (esto enviará el archivo al cliente)
+    doc.pipe(res);
+
+    // Título del reporte
+    doc
+      .fontSize(18)
+      .text("Reporte de Estadísticas de Clientes", { align: "center" });
+    doc.moveDown();
+
+    // Tabla de los resultados (Clientes por Estado)
+    doc.fontSize(12).text("Clientes por Estado", { underline: true });
+    doc.moveDown();
+
+    // Encabezado de la tabla
+    doc.fontSize(10).text("Estado", 50, doc.y);
+    doc.text("Cantidad", 250, doc.y);
+    doc.moveDown();
+
+    // Datos de la tabla
+    clientesPorEstado.forEach((estado) => {
+      doc.text(estado._id, 50, doc.y);
+      doc.text(estado.count, 250, doc.y);
+      doc.moveDown();
+    });
+
+    // Finalizar el documento
+    doc.end();
+  } catch (error) {
+    console.error("Error al generar el reporte:", error);
+    res.status(500).json({ message: "Error al generar el reporte" });
   }
 });
 

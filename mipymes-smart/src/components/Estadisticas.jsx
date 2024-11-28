@@ -92,8 +92,8 @@ function Estadisticas() {
       {
         label: "Clientes por Estado",
         data: estadisticas.clientesPorEstado.map((estado) => estado.count),
-        backgroundColor: "#4caf50",
-        borderColor: "#388e3c",
+        backgroundColor: "#424874",
+        borderColor: "#424874",
         borderWidth: 1,
       },
     ],
@@ -109,11 +109,11 @@ function Estadisticas() {
           (servicio) => servicio.count
         ),
         backgroundColor: [
-          "#ffb74d",
-          "#f44336",
-          "#03a9f4",
-          "#e53935",
-          "#8e24aa",
+          "#424874",
+          "#DCD6F7",
+          "#A6B1E1",
+          "#CACFD6",
+          "#D6E5E3",
         ],
         hoverOffset: 4,
       },
@@ -127,8 +127,8 @@ function Estadisticas() {
       {
         label: "Clientes por Rubro",
         data: estadisticas.clientesPorRubro.map((rubro) => rubro.count),
-        backgroundColor: "#03a9f4",
-        borderColor: "#0288d1",
+        backgroundColor: "#A6B1E1",
+        borderColor: "#A6B1E1",
         borderWidth: 1,
       },
     ],
@@ -144,8 +144,8 @@ function Estadisticas() {
         data: asesoresEstadisticas.estadisticasPorAsesor.map(
           (asesor) => asesor.count
         ),
-        backgroundColor: "#03a9f4",
-        borderColor: "#0288d1",
+        backgroundColor: "#424874",
+        borderColor: "#424874",
         borderWidth: 1,
       },
     ],
@@ -161,16 +161,67 @@ function Estadisticas() {
         data: registroClientesEstadisticas.registroClientes.map(
           (registro) => registro.count
         ),
-        backgroundColor: "#f44336",
-        borderColor: "#d32f2f",
+        backgroundColor: "#A6B1E1",
+        borderColor: "#A6B1E1",
         borderWidth: 1,
       },
     ],
   };
 
+  const handleDescargarReporte = async () => {
+    try {
+      // Usamos fetch para obtener el archivo PDF como blob (binario)
+      const response = await fetch(
+        "http://localhost:3000/estadisticas/reporte",
+        {
+          method: "GET", // Método GET para solicitar el reporte
+        }
+      );
+
+      // Verificamos si la respuesta es exitosa (status 200)
+      if (
+        response.ok &&
+        response.headers.get("Content-Type") === "application/pdf"
+      ) {
+        // Convertir la respuesta en un blob (binario)
+        const blob = await response.blob();
+
+        // Crear una URL para el blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Crear un enlace para descargar el archivo PDF
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "reporte.pdf"); // Nombre del archivo descargado
+
+        // Simular un clic en el enlace para descargar el archivo
+        document.body.appendChild(link);
+        link.click();
+
+        // Limpiar el enlace después de la descarga
+        document.body.removeChild(link);
+
+        // Liberar el objeto URL creado
+        window.URL.revokeObjectURL(url);
+      } else {
+        console.error("Error al obtener el reporte:", response.status);
+        const text = await response.text();
+        console.error("Mensaje del servidor:", text);
+      }
+    } catch (error) {
+      console.error("Error al descargar el reporte:", error);
+    }
+  };
+
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Estadísticas</h2>
+      <button
+        onClick={handleDescargarReporte}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Descargar Reporte
+      </button>
 
       {/* Total de Clientes */}
       <p className="text-lg">

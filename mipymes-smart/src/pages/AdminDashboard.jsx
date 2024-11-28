@@ -12,6 +12,7 @@ import CrearAsesores from "../components/CrearAsesores";
 import Centro from "../assets/Centro.svg";
 import centromipymes from "../assets/centromipymes.png";
 import Estadisticas from "../components/Estadisticas";
+import HistorialCambios from "../components/HistorialCambios";
 
 const AdminDashboard = () => {
   const [visibleComponent, setVisibleComponent] = useState(null);
@@ -65,6 +66,16 @@ const AdminDashboard = () => {
               Generar reportes
             </span>
           </div>
+          <div
+            className="py-1.5 pl-2  rounded-lg text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
+            onClick={() => handleToggleComponent("Historial de cambios")}
+          >
+            <span className="flex items-center gap-2 ">
+              {" "}
+              <BiSolidReport className="w-4 h-4 text-gray-500" />
+              Historial de cambios
+            </span>
+          </div>
         </div>
 
         {/* Main Content */}
@@ -86,6 +97,9 @@ const AdminDashboard = () => {
             {visibleComponent === "Metas" && <Metas />}
             {visibleComponent === "Generar reportes" && <Estadisticas />}
             {visibleComponent === "Crear asesores" && <CrearAsesores />}
+            {visibleComponent === "Historial de cambios" && (
+              <HistorialCambios />
+            )}
           </div>
         </div>
       </div>

@@ -30,7 +30,7 @@ const Asignaciones = require("./models/Asignaciones");
 const HistorialCambios = require("./models/HistorialCambios");
 
 const app = express();
-const PORT = config.SERVER_PORT || 3000;
+const PORT = config.SERVER_PORT || 3001;
 const secretKey = config.SECRET_KEY;
 const upload = multer();
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
@@ -338,7 +338,7 @@ app.put("/updateEstadoCliente/:id", async (req, res) => {
 
     await registrarCambio(
       adminDecoded.id,
-      `${admin.nombre} ha cambiado el estado del cliente ${updatedClient.nombre} a ${estado_descripcion.estado_descripcion}`
+      `${admin.nombre} actualizó el estado del cliente ${updatedClient.nombre} a ${estado_descripcion.estado_descripcion}`
     );
 
     res.json(updatedClient);
@@ -1591,27 +1591,53 @@ app.put("/docAsesoriasUpdate/:asesoriaIdDoc", async (req, res) => {
 app.post("/enviar-correo", async (req, res) => {
   const { email, nombre } = req.body;
 
+  // Validación de entrada
+  if (!email || !nombre) {
+    return res
+      .status(400)
+      .json({ message: "Faltan datos obligatorios: email y nombre." });
+  }
+
   try {
+    // Crear cuenta de prueba en Ethereal
+    const testAccount = await nodemailer.createTestAccount();
+
+    // Configuración del transporte
     const transporter = nodemailer.createTransport({
-      service: "Gmail", // Cambia según tu proveedor de correo
+      host: testAccount.smtp.host,
+      port: testAccount.smtp.port,
+      secure: testAccount.smtp.secure, // true para 465, false para otros puertos
       auth: {
-        user: config.database.EMAIL_ADDRESS,
-        pass: config.database.EMAIL_PASSWORD,
+        user: testAccount.user, // Usuario de prueba
+        pass: testAccount.pass, // Contraseña de prueba
       },
     });
 
+    // Opciones del correo
     const mailOptions = {
-      from: config.database.EMAIL_ADDRESS,
-      to: email,
-      subject: "¡Tu cuenta ha sido activada!",
-      text: `Hola ${nombre}, tu cuenta ha sido activada. ¡Bienvenido a nuestro servicio!`,
+      from: '"Soporte" <soporte@dippitonpiton.com>', // Remitente
+      to: email, // Destinatario
+      subject: "¡Tu solicitud ha sido aprobada!", // Asunto
+      text: `Hola ${nombre}, tu solicitud ha sido aprobada. ¡Bienvenid@ a MiPymes Unphu Smart!`, // Contenido en texto plano
+      html: `<p>Hola <strong>${nombre}</strong>, tu solicitud ha sido aprobada. ¡Bienvenidd@ a MiPymes Unphu Smart!</p>`, // Contenido en HTML
     };
 
-    await transporter.sendMail(mailOptions);
-    res.status(200).send("Correo enviado exitosamente");
+    // Enviar correo
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log("Correo enviado:", info.messageId); // ID del mensaje enviado
+    console.log("Vista previa del correo:", nodemailer.getTestMessageUrl(info)); // URL del correo
+
+    res.status(200).json({
+      message: "Correo enviado exitosamente (prueba).",
+      previewUrl: nodemailer.getTestMessageUrl(info), // Incluimos la URL de vista previa
+    });
   } catch (error) {
-    console.error("Error al enviar el correo:", error);
-    res.status(500).send("Error al enviar el correo");
+    console.error("Error detallado al enviar el correo:", error);
+    res.status(500).json({
+      message: "Error interno al enviar el correo.",
+      error: error.message,
+    });
   }
 });
 

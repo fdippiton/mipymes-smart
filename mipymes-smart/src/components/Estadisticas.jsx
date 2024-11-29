@@ -41,7 +41,7 @@ function Estadisticas() {
   useEffect(() => {
     const fetchEstadisticas = async () => {
       try {
-        const response = await fetch("http://localhost:3000/estadisticas");
+        const response = await fetch("http://localhost:3001/estadisticas");
         const data = await response.json();
         setEstadisticas(data);
       } catch (error) {
@@ -52,7 +52,7 @@ function Estadisticas() {
     const fetchAsesoresEstadisticas = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/estadisticas/asesores"
+          "http://localhost:3001/estadisticas/asesores"
         );
         const data = await response.json();
         setAsesoresEstadisticas(data);
@@ -64,7 +64,7 @@ function Estadisticas() {
     const fetchRegistroClientesEstadisticas = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/estadisticas/registroClientes"
+          "http://localhost:3001/estadisticas/registroClientes"
         );
         const data = await response.json();
         setRegistroClientesEstadisticas(data);
@@ -172,7 +172,7 @@ function Estadisticas() {
     try {
       // Usamos fetch para obtener el archivo PDF como blob (binario)
       const response = await fetch(
-        "http://localhost:3000/estadisticas/reporte",
+        "http://localhost:3001/estadisticas/reporte",
         {
           method: "GET", // Método GET para solicitar el reporte
         }

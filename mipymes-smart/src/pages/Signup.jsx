@@ -136,7 +136,7 @@ function Signup() {
     if (validarFormulario()) {
       alert("Formulario enviado con éxito.");
       // Aquí puedes manejar la lógica de envío de datos
-      const response = await fetch("http://localhost:3000/registrar", {
+      const response = await fetch("http://localhost:3001/registrar", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" },

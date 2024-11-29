@@ -19,6 +19,7 @@ function VisualizarClientes() {
   const [clientesActivos, setClientesActivos] = useState([]);
   const [clientesInactivos, setClientesInactivos] = useState([]);
   const [clientesCerrados, setClientesCerrados] = useState([]);
+  const [notificarUsuario, setNotificarUsuario] = useState(false);
 
   const navigate = useNavigate();
 
@@ -29,7 +30,7 @@ function VisualizarClientes() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/getAllClientes", {
+        const response = await fetch("http://localhost:3001/getAllClientes", {
           credentials: "include", // Incluir cookies en la solicitud
         });
 
@@ -67,7 +68,7 @@ function VisualizarClientes() {
       try {
         // Realizar la primera solicitud para obtener los estados
         const responseEstados = await fetch(
-          "http://localhost:3000/allEstados",
+          "http://localhost:3001/allEstados",
           {
             credentials: "include", // Incluir cookies en la solicitud
           }
@@ -82,7 +83,7 @@ function VisualizarClientes() {
 
         // Realizar la segunda solicitud para obtener las asignaciones
         const responseAsignaciones = await fetch(
-          "http://localhost:3000/getAllAsignaciones",
+          "http://localhost:3001/getAllAsignaciones",
           {
             credentials: "include", // Incluir cookies en la solicitud
           }
@@ -106,7 +107,7 @@ function VisualizarClientes() {
   const handleEstadoChange = async (clienteId, nuevoEstadoId) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/updateEstadoCliente/${clienteId}`,
+        `http://localhost:3001/updateEstadoCliente/${clienteId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -137,6 +138,19 @@ function VisualizarClientes() {
               : cliente
           )
         );
+
+        const currCliente = clientesFiltrados.find((c) => c._id === clienteId);
+
+        // Si el estado se cambia a "Activo", se ejecuta el envío de correo
+        const estadoActivo = estados.find(
+          (estado) => estado.estado_descripcion === "Activo"
+        );
+        console.log(estadoActivo);
+
+        if (estadoActivo && nuevoEstadoId === estadoActivo._id) {
+          // Si el estado es "Activo", enviar el correo automáticamente
+          await handleEnviarCorreo(currCliente);
+        }
       } else {
         console.error("Error updating estado:", response.statusText);
       }
@@ -148,7 +162,7 @@ function VisualizarClientes() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/getAllAsesores", {
+        const response = await fetch("http://localhost:3001/getAllAsesores", {
           credentials: "include", // Incluir cookies en la solicitud
         });
 
@@ -232,7 +246,7 @@ function VisualizarClientes() {
 
   //     try {
   //       const response = await fetch(
-  //         `http://localhost:3000/asignarClienteAAsesor`,
+  //         `http://localhost:3001/asignarClienteAAsesor`,
   //         {
   //           method: "POST",
   //           headers: { "Content-Type": "application/json" },
@@ -374,7 +388,7 @@ function VisualizarClientes() {
 
   //   try {
   //     const response = await fetch(
-  //       "http://localhost:3000/asignarClienteAAsesor",
+  //       "http://localhost:3001/asignarClienteAAsesor",
   //       {
   //         method: "POST",
   //         headers: {
@@ -396,7 +410,7 @@ function VisualizarClientes() {
     const fetchAsignaciones = async () => {
       try {
         const responseAsignaciones = await fetch(
-          "http://localhost:3000/getAllAsignaciones",
+          "http://localhost:3001/getAllAsignaciones",
           {
             credentials: "include", // Incluir cookies en la solicitud
           }
@@ -409,7 +423,7 @@ function VisualizarClientes() {
     };
     try {
       const response = await fetch(
-        "http://localhost:3000/asignarClienteAAsesor",
+        "http://localhost:3001/asignarClienteAAsesor",
         {
           method: "POST",
           headers: {
@@ -442,7 +456,7 @@ function VisualizarClientes() {
     console.log("Deshacer", clienteId);
     try {
       const response = await fetch(
-        `http://localhost:3000/deshacerAsignacion/${clienteId}`,
+        `http://localhost:3001/deshacerAsignacion/${clienteId}`,
         {
           method: "DELETE",
           credentials: "include", // Incluir cookies en la solicitud
@@ -474,7 +488,7 @@ function VisualizarClientes() {
 
   const handleEnviarCorreo = async (cliente) => {
     try {
-      const respuesta = await fetch("/enviar-correo", {
+      const respuesta = await fetch(`http://localhost:3001/enviar-correo`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -487,12 +501,15 @@ function VisualizarClientes() {
 
       if (respuesta.ok) {
         alert("Correo enviado exitosamente al cliente.");
+        setNotificarUsuario(true);
       } else {
-        alert("Hubo un problema al enviar el correo.");
+        const errorData = await respuesta.json(); // Capturamos la respuesta de error
+        console.error("Error del servidor:", errorData);
+        alert(`Error al enviar el correo: ${errorData.message}`);
       }
     } catch (error) {
-      console.error("Error al enviar el correo:", error);
-      alert("Error al enviar el correo.");
+      console.error("Error de red al enviar el correo:", error);
+      alert("Error de red al enviar el correo. Verifique la conexión.");
     }
   };
 
@@ -664,7 +681,7 @@ function VisualizarClientes() {
                             onClick={() =>
                               handleDeshacerAsignacion(clienteSeleccionado?._id)
                             }
-                            className="flex items-center bg-red-400 p-5 rounded-md text-white px-5 py-2 mt-3 text-xs"
+                            className="flex items-center bg-red-500 hover:bg-red-600 text-white mt-3 border border-gray-300 text-sm rounded p-1.5 pr-10 px-4"
                           >
                             <FaUndoAlt className="mr-2" />
                             Deshacer Asignación
@@ -673,12 +690,12 @@ function VisualizarClientes() {
                       ))}
                   </>
                 ) : (
-                  <Link
-                    className="bg-gray-300 p-5 rounded-md text-black px-5 py-2 text-xs"
+                  <button
+                    className="bg-gray-300 mt-3 border border-gray-300 hover:bg-gray-400 text-sm rounded p-1.5 px-4"
                     onClick={() => handleAsignarAsesor(clienteSeleccionado)}
                   >
                     Asignar Asesor
-                  </Link>
+                  </button>
                 )}
               </div>
 
@@ -849,7 +866,7 @@ function VisualizarClientes() {
                     value={cliente.estado?._id} // Asegurarse de que el valor sea el id del estado
                     onChange={(e) =>
                       handleEstadoChange(cliente._id, e.target.value)
-                    }
+                    } // Llamar a la función para cambiar el estado
                     className="bg-white border border-gray-300 text-sm rounded p-1.5 pr-10 px-4"
                   >
                     {estados.map((estado) => (
@@ -859,14 +876,16 @@ function VisualizarClientes() {
                     ))}
                   </select>
                   {/* Mostrar el botón solo si el estado es "Activo" */}
-                  {cliente.estado?.estado_descripcion === "Activo" && (
-                    <button
-                      onClick={() => handleEnviarCorreo(cliente)}
-                      className="mr-6 bg-emerald-500 border border-gray-300 text-white text-sm rounded p-1.5  px-4 hover:bg-emerald-600"
-                    >
-                      Notificar cliente
-                    </button>
-                  )}
+
+                  {/* {cliente.estado?.estado_descripcion === "Activo" &&
+                    notificarUsuario === false && (
+                      <button
+                        onClick={() => handleEnviarCorreo(cliente)}
+                        className="mr-6 bg-emerald-500 border border-gray-300 text-white text-sm rounded p-1.5 px-4 hover:bg-emerald-600"
+                      >
+                        Notificar cliente
+                      </button>
+                    )} */}
                 </td>
               </tr>
               {expandedRow === index && (

@@ -10,7 +10,7 @@ export function UserContextProvider({ children }) {
 
   const handleLogin = async (email, contrasena) => {
     try {
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch("http://localhost:3001/login", {
         method: "POST",
         body: JSON.stringify({ email, contrasena }),
         headers: { "Content-Type": "application/json" },
@@ -42,7 +42,7 @@ export function UserContextProvider({ children }) {
       if (token) {
         try {
           setAuthenticated(true);
-          const response = await fetch("http://localhost:3000/userInfo", {
+          const response = await fetch("http://localhost:3001/userInfo", {
             credentials: "include", // Incluir cookies en la solicitud
           });
 

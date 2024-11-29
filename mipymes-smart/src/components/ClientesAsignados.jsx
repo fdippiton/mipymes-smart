@@ -79,7 +79,7 @@ function ClientesAsignados() {
     e.preventDefault();
     console.log("Formulario enviado:", formData);
 
-    const response = await fetch("http://localhost:3000/registrarDocAsesoria", {
+    const response = await fetch("http://localhost:3001/registrarDocAsesoria", {
       method: "POST",
       body: JSON.stringify(formData),
       headers: { "Content-Type": "application/json" },
@@ -324,7 +324,7 @@ function ClientesAsignados() {
   const eliminarDoc = async (docAsesoriaId) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/eliminarDocAsesoria/${docAsesoriaId}`,
+        `http://localhost:3001/eliminarDocAsesoria/${docAsesoriaId}`,
         {
           method: "DELETE",
           credentials: "include", // Incluir cookies en la solicitud
@@ -383,7 +383,7 @@ function ClientesAsignados() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/docAsesoriasUpdate/${asesoriaIdDoc}`,
+        `http://localhost:3001/docAsesoriasUpdate/${asesoriaIdDoc}`,
         {
           method: "PUT",
           headers: {
@@ -441,7 +441,7 @@ function ClientesAsignados() {
 
       try {
         const response = await fetch(
-          "http://localhost:3000/getAllAsesorClientes",
+          "http://localhost:3001/getAllAsesorClientes",
           {
             credentials: "include", // Incluir cookies en la solicitud
           }
@@ -456,7 +456,7 @@ function ClientesAsignados() {
         // console.log(dataClientes);
 
         const responseAsesorias = await fetch(
-          "http://localhost:3000/getAllAsesorias",
+          "http://localhost:3001/getAllAsesorias",
           {
             credentials: "include", // Incluir cookies en la solicitud
           }
@@ -471,7 +471,7 @@ function ClientesAsignados() {
         setAsesorias(dataAsesorias);
 
         const responseDocAsesorias = await fetch(
-          "http://localhost:3000/getAllDocAsesorias",
+          "http://localhost:3001/getAllDocAsesorias",
           {
             credentials: "include", // Incluir cookies en la solicitud
           }

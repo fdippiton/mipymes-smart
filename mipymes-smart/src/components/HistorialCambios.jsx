@@ -7,7 +7,7 @@ function HistorialCambios() {
     const fetchHistorial = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/historial-cambios",
+          "http://localhost:3001/historial-cambios",
           {
             credentials: "include", // Incluir cookies en la solicitud
           }

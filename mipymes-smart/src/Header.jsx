@@ -34,7 +34,7 @@ export default function Header() {
       <nav>
         <div className="text-sm font-medium">{userInfo?.nombre}</div>
         <Menu as="div" className="relative inline-block text-left">
-          <MenuButton className="inline-flex items-center px-4 py-2 bg-white text-gray-700 hover:bg-gray-100 rounded-md  focus:ring-2 ">
+          <MenuButton className="inline-flex items-center px-4 py-2 border border-slate-300 bg-white text-gray-700 hover:bg-gray-100 rounded-md  focus:ring-2 ">
             Menu
             <ChevronDownIcon className="h-5 w-5 text-gray-400 ml-2" />
           </MenuButton>

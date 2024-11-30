@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { IoMdAddCircle } from "react-icons/io";
 import { FaUndoAlt } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
+import { MdExpandMore } from "react-icons/md";
 
 function VisualizarClientes() {
   const [expandedRow, setExpandedRow] = useState(null);
@@ -199,213 +200,6 @@ function VisualizarClientes() {
     setClientesFiltrados([]); // Limpia los resultados
   };
 
-  // const handleAsignarAsesor = async (cliente) => {
-  //   console.log("Cliente: " + cliente);
-  //   // Filtrar asesores que tienen las especialidades requeridas por el cliente
-  //   const asesoresDisponibles = await asesores.filter((asesor) => {
-  //     if (
-  //       !cliente.servicios_requeridos ||
-  //       !Array.isArray(cliente.servicios_requeridos)
-  //     ) {
-  //       // Si `servicios_requeridos` no existe o no es un arreglo, devolver falso y no incluir al asesor
-  //       return false;
-  //     }
-
-  //     // Verificar que todas las especialidades del asesor incluyan cada servicio requerido por el cliente
-  //     return cliente.servicios_requeridos.every((servicio) =>
-  //       asesor.especialidades.includes(servicio)
-  //     );
-  //   });
-
-  //   console.log("Asesores disponibles", asesoresDisponibles);
-
-  //   // // Filtrar los asesores que aún no han alcanzado su límite de clientes
-  //   const asesoresElegibles = asesoresDisponibles.filter(
-  //     (asesor) => asesor.clientes_asignados.length < asesor.max_clientes
-  //   );
-
-  //   console.log("Asesores elegibles", asesoresDisponibles);
-
-  //   // Si hay asesores elegibles, elegir el que tenga menos clientes asignados
-  //   if (asesoresElegibles.length > 0) {
-  //     const asesorSeleccionado = asesoresElegibles.reduce((prev, curr) =>
-  //       prev.clientes_asignados.length < curr.clientes_asignados.length
-  //         ? prev
-  //         : curr
-  //     );
-
-  //     // Actualizar el cliente con el asesor seleccionado
-  //     //  asignarClienteAAsesor(cliente._id, asesorSeleccionado._id);
-  //     // console.log("Asesor seleccionado:", asesorSeleccionado._id);
-  //     // console.log("cliente seleccionado:", cliente._id);
-
-  //     const dataToUpdates = {
-  //       clienteId: cliente._id,
-  //       asesorId: asesorSeleccionado._id,
-  //     };
-
-  //     try {
-  //       const response = await fetch(
-  //         `http://localhost:3001/asignarClienteAAsesor`,
-  //         {
-  //           method: "POST",
-  //           headers: { "Content-Type": "application/json" },
-  //           credentials: "include",
-  //           body: JSON.stringify(dataToUpdates),
-  //         }
-  //       );
-  //       if (response.ok) {
-  //         console.log(response.message);
-  //         alert("Asesor asignado correctamente");
-
-  //         // Actualizar las asignaciones para reflejar la nueva asignación
-  //         setAsignaciones((prevAsignaciones) => [
-  //           ...prevAsignaciones,
-  //           {
-  //             cliente_id: cliente,
-  //             asesor_id: asesorSeleccionado, // Guardar la asignación
-  //           },
-  //         ]);
-  //       } else {
-  //         console.error("Error updating estado:", response.statusText);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error updating estado:", error);
-  //     }
-
-  //     // // Actualizar los datos de los asesores en el estado
-  //     // setAsesores((prevAsesores) =>
-  //     //   prevAsesores.map((asesor) =>
-  //     //     asesor._id === asesorSeleccionado._id
-  //     //       ? {
-  //     //           ...asesor,
-  //     //           clientes_asignados: [...asesor.clientes_asignados, cliente._id],
-  //     //         }
-  //     //       : asesor
-  //     //   )
-  //     // );
-  //   } else {
-  //     alert("No hay asesores disponibles que cumplan con las condiciones.");
-  //   }
-  // };
-
-  // const handleAsignaAsesor = (e) => {
-  //   e.preventDefault();
-  //   handleAsignarAsesor(cliente);
-  // }
-
-  // const handleAsignarAsesor = async (cliente) => {
-  //   const asignadosTemporalmente = new Set();
-
-  //   const asignarAsesorEquitativo = (asesoresDisponibles) => {
-  //     if (asesoresDisponibles.length === 0) return null;
-
-  //     return asesoresDisponibles.reduce((prev, curr) => {
-  //       if (!prev) return curr;
-
-  //       const isPrevAssigned = asignadosTemporalmente.has(prev._id);
-  //       const isCurrAssigned = asignadosTemporalmente.has(curr._id);
-
-  //       if (isPrevAssigned && !isCurrAssigned) return curr;
-  //       if (!isPrevAssigned && isCurrAssigned) return prev;
-
-  //       const totalPrev =
-  //         prev.clientes_encuentros.length +
-  //         prev.clientes_asignados.length +
-  //         (isPrevAssigned ? 1 : 0);
-  //       const totalCurr =
-  //         curr.clientes_encuentros.length +
-  //         curr.clientes_asignados.length +
-  //         (isCurrAssigned ? 1 : 0);
-
-  //       return totalPrev < totalCurr ? prev : curr;
-  //     }, null);
-  //   };
-
-  //   // Filtrar asesores disponibles
-  //   const asesoresDisponiblesEmpresarial = asesores.filter(
-  //     (asesor) =>
-  //       asesor.especialidades.includes("Asesoría Empresarial") &&
-  //       asesor.clientes_encuentros.length +
-  //         (asignadosTemporalmente.has(asesor._id) ? 1 : 0) <
-  //         asesor.max_encuentros
-  //   );
-
-  //   const asesoresDisponiblesFinanciero = asesores.filter(
-  //     (asesor) =>
-  //       asesor.especialidades.includes("Asesoría Financiera") &&
-  //       asesor.clientes_encuentros.length +
-  //         (asignadosTemporalmente.has(asesor._id) ? 1 : 0) <
-  //         asesor.max_encuentros
-  //   );
-
-  //   const asesoresDisponiblesTecnologico = asesores.filter(
-  //     (asesor) =>
-  //       asesor.especialidades.includes("Asesoría Tecnologica") &&
-  //       asesor.clientes_encuentros.length +
-  //         (asignadosTemporalmente.has(asesor._id) ? 1 : 0) <
-  //         asesor.max_encuentros
-  //   );
-
-  //   // Asignar asesores para los encuentros iniciales
-  //   const asesorEmpresarial = asignarAsesorEquitativo(
-  //     asesoresDisponiblesEmpresarial
-  //   );
-  //   if (asesorEmpresarial) asignadosTemporalmente.add(asesorEmpresarial._id);
-
-  //   const asesorFinanciero = asignarAsesorEquitativo(
-  //     asesoresDisponiblesFinanciero
-  //   );
-  //   if (asesorFinanciero) asignadosTemporalmente.add(asesorFinanciero._id);
-
-  //   const asesorTecnologico = asignarAsesorEquitativo(
-  //     asesoresDisponiblesTecnologico
-  //   );
-  //   if (asesorTecnologico) asignadosTemporalmente.add(asesorTecnologico._id);
-
-  //   // Asignar asesores definitivos
-  //   const asesorDefinitivoEmpresarial = asignarAsesorEquitativo(
-  //     asesoresDisponiblesEmpresarial
-  //   );
-  //   const asesorDefinitivoFinanciero = asignarAsesorEquitativo(
-  //     asesoresDisponiblesFinanciero
-  //   );
-  //   const asesorDefinitivoTecnologico = asignarAsesorEquitativo(
-  //     asesoresDisponiblesTecnologico
-  //   );
-
-  //   const dataUpdated = {
-  //     clienteId: cliente._id,
-  //     asesorEmpresarialId: asesorEmpresarial._id,
-  //     asesorFinancieroId: asesorFinanciero._id,
-  //     asesorTecnologicoId: asesorTecnologico._id,
-  //     asesorDefinitivoEmpresarialId: asesorDefinitivoEmpresarial._id,
-  //     asesorDefinitivoFinancieroId: asesorDefinitivoFinanciero._id,
-  //     asesorDefinitivoTecnologicoId: asesorDefinitivoTecnologico._id,
-  //   };
-
-  //   console.log(dataUpdated);
-
-  //   try {
-  //     const response = await fetch(
-  //       "http://localhost:3001/asignarClienteAAsesor",
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify(dataUpdated),
-  //       }
-  //     );
-
-  //     const result = await response.json();
-  //     console.log(result);
-  //   } catch (error) {
-  //     console.error("Error al asignar asesores:", error);
-  //     alert("Error al asignar asesores.");
-  //   }
-  // };
-
   const handleAsignarAsesor = async (cliente) => {
     if (cliente.estado.estado_descripcion !== "Activo") {
       alert("No es posible asignarle asesores a cliente que no esta activo.");
@@ -526,7 +320,10 @@ function VisualizarClientes() {
           className="rounded-md shadow cursor-pointer"
           onClick={resetClientesFiltradosEstados}
         >
-          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-gray-300 text-gray-500">
+          <h2
+            className="rounded-md text-xl font-semibold p-4 h-28 "
+            style={{ backgroundColor: "#A8DADC" }}
+          >
             Clientes Totales
           </h2>
           <p className="text-3xl font-bold text-center py-2">
@@ -537,7 +334,10 @@ function VisualizarClientes() {
           onClick={() => handleClienteEstado("Activo")}
           className="rounded-md shadow cursor-pointer"
         >
-          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-green-500 text-emerald-700">
+          <h2
+            className="rounded-md text-xl font-semibold p-4 h-28"
+            style={{ color: "white", backgroundColor: "#457B9D" }}
+          >
             Activos
           </h2>
           <p className="text-3xl font-bold text-center py-2">
@@ -552,7 +352,7 @@ function VisualizarClientes() {
           onClick={() => handleClienteEstado("En proceso de contacto")}
           className="rounded-md shadow cursor-pointer"
         >
-          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-blue-800 text-blue-300">
+          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-blue-800 text-white">
             En proceso
           </h2>
           <p className="text-3xl font-bold text-center py-2">
@@ -568,7 +368,7 @@ function VisualizarClientes() {
           onClick={() => handleClienteEstado("Cerrado")}
           className="rounded-md shadow cursor-pointer"
         >
-          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-gray-400 text-white">
+          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-gray-200">
             Cerrados
           </h2>
           <p className="text-3xl font-bold text-center py-2">
@@ -585,7 +385,7 @@ function VisualizarClientes() {
         >
           <h2
             className="rounded-md text-xl font-semibold p-4 h-28"
-            style={{ color: "#e0bdcb", backgroundColor: "#9c1323" }}
+            style={{ color: "white", backgroundColor: "#E63946" }}
           >
             Inactivos
           </h2>
@@ -803,7 +603,10 @@ function VisualizarClientes() {
                   className="px-3 py-2 font-semibold"
                   onClick={() => handleRowClick(index)}
                 >
-                  {cliente.nombre}
+                  <div className="flex items-center border border-slate-300 p-0.5 rounded-md mr-5">
+                    <MdExpandMore className="px-2 h-8 w-8" />
+                    <span className="">{cliente.nombre}</span>
+                  </div>
                 </td>
                 <td className="py-2  gap-2 ">
                   {asignaciones.some(

@@ -249,7 +249,7 @@ function CrearAsesores() {
           <div className="mt-3 flex justify-start gap-x-6">
             <button
               type="submit"
-              className="rounded-md w-50 text-center text-sm bg-green-700 py-1.5 px-3  font-normal text-white shadow-sm hover:bg-verdementa focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="bg-gray-300 border border-gray-300 hover:bg-gray-400 text-sm rounded p-1.5 px-4"
             >
               Crear asesor
             </button>

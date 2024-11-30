@@ -30,7 +30,7 @@ const AdminDashboard = () => {
             Centro MiPymes - Admin Dashboard
           </h2>
           <div
-            className="py-1.5 pl-2  rounded-lg text-gray-800 font-normal text-14xs cursor-pointer hover:bg-gray-200"
+            className="py-2 border pl-2.5  rounded-md text-gray-800 font-normal text-14xs cursor-pointer hover:bg-gray-200"
             onClick={() => handleToggleComponent("Visualizar clientes")}
           >
             <span className="flex items-center gap-2 ">
@@ -39,7 +39,7 @@ const AdminDashboard = () => {
             </span>
           </div>
           <div
-            className="py-1.5 pl-2  rounded-lg text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
+            className="py-2 border pl-2.5  rounded-md text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
             onClick={() => handleToggleComponent("Crear asesores")}
           >
             {" "}
@@ -48,7 +48,7 @@ const AdminDashboard = () => {
             </span>
           </div>
           <div
-            className="py-1.5 pl-2  rounded-lg text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
+            className="py-2 border pl-2.5  rounded-md text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
             onClick={() => handleToggleComponent("Metas")}
           >
             <span className="flex items-center gap-2 ">
@@ -57,7 +57,7 @@ const AdminDashboard = () => {
             </span>
           </div>
           <div
-            className="py-1.5 pl-2  rounded-lg text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
+            className="py-2 border pl-2.5  rounded-md text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
             onClick={() => handleToggleComponent("Generar reportes")}
           >
             <span className="flex items-center gap-2 ">
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
             </span>
           </div>
           <div
-            className="py-1.5 pl-2  rounded-lg text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
+            className="py-2 border pl-2.5  rounded-md text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
             onClick={() => handleToggleComponent("Historial de cambios")}
           >
             <span className="flex items-center gap-2 ">

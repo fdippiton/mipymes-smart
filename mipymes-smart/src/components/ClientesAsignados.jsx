@@ -118,7 +118,7 @@ function ClientesAsignados() {
   const renderForm = (asesoria, clienteId, asesorId) => (
     <form
       onSubmit={handleSubmit}
-      className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg space-y-6"
+      className="max-w-4xl  p-6 bg-white shadow-lg rounded-lg space-y-6"
     >
       <h2 className="text-base font-semibold text-gray-700">
         Nueva sesión de Asesoría
@@ -800,7 +800,7 @@ function ClientesAsignados() {
     <div>
       {" "}
       {/* Clients List */}
-      <div className="bg-white p-6 rounded-lg shadow mt-8">
+      <div className="bg-white p-5 rounded-lg shadow mt-1">
         <h2 className="text-xl font-semibold mb-4">Mis clientes</h2>
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
@@ -985,7 +985,7 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className={`m-3 cursor-pointer mt-3 max-w-md mx-auto rounded-lg shadow-lg p-6 mb-6 ${
+                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 ${
                                                 expandedRowDocAsesoria ===
                                                 doc._id
                                                   ? "bg-white w-full max-w-screen-xl"
@@ -1271,7 +1271,7 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className={`m-3 cursor-pointer mt-3 max-w-md mx-auto rounded-lg shadow-lg p-6 mb-6 ${
+                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 ${
                                                 expandedRowDocAsesoria ===
                                                 doc._id
                                                   ? "bg-white w-full max-w-screen-xl"
@@ -1545,7 +1545,7 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className={`m-3 cursor-pointer mt-3 max-w-md mx-auto rounded-lg shadow-lg p-6 mb-6 ${
+                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 ${
                                                 expandedRowDocAsesoria ===
                                                 doc._id
                                                   ? "bg-white w-full max-w-screen-xl"

@@ -29,7 +29,7 @@ const AsesorDashboard = () => {
             Centro MiPymes - Asesor Dashboard
           </h2>
           <div
-            className="py-1.5 pl-2  rounded-lg text-gray-800 font-normal text-14xs cursor-pointer hover:bg-gray-200"
+            className="py-2 border pl-2.5  rounded-md text-gray-800 font-normal text-14xs cursor-pointer hover:bg-gray-200"
             onClick={() => handleToggleComponent("Clientes asignados")}
           >
             <span className="flex items-center gap-2 ">
@@ -38,7 +38,7 @@ const AsesorDashboard = () => {
             </span>
           </div>
           <div
-            className="py-1.5 pl-2  rounded-lg text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
+            className="py-2 border pl-2.5  rounded-md text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
             onClick={() => handleToggleComponent("Asesorias")}
           >
             {" "}

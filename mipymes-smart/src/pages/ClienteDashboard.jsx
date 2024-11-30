@@ -24,7 +24,7 @@ function ClienteDashboard() {
       <div className="w-72 bg-gray-50 shadow-lg p-6 flex flex-col space-y-1">
         <h2 className="text-xlfont-normal mb-4">Centro MiPymes - Dashboard</h2>
         <div
-          className="py-1.5 pl-2  rounded-lg text-gray-800 font-normal text-14xs cursor-pointer hover:bg-gray-200"
+          className="py-2 border pl-2.5  rounded-md text-gray-800 font-normal text-14xs cursor-pointer hover:bg-gray-200"
           onClick={() => handleToggleComponent("Mi perfil")}
         >
           <span className="flex items-center gap-2 ">
@@ -33,7 +33,7 @@ function ClienteDashboard() {
           </span>
         </div>
         <div
-          className="py-1.5 pl-2  rounded-lg text-gray-800 font-normal text-14xs cursor-pointer hover:bg-gray-200"
+          className="py-2 border pl-2.5  rounded-md text-gray-800 font-normal text-14xs cursor-pointer hover:bg-gray-200"
           onClick={() => handleToggleComponent("Asesorias")}
         >
           <span className="flex items-center gap-2 ">
@@ -43,7 +43,7 @@ function ClienteDashboard() {
           </span>
         </div>
         <div
-          className="py-1.5 pl-2  rounded-lg text-gray-800 font-normal text-14xs cursor-pointer hover:bg-gray-200"
+          className="py-2 border pl-2.5  rounded-md text-gray-800 font-normal text-14xs cursor-pointer hover:bg-gray-200"
           onClick={() => handleToggleComponent("Talleres")}
         >
           <span className="flex items-center gap-2 ">
@@ -55,7 +55,7 @@ function ClienteDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-grow relative p-6">
+      <div className="flex-grow relative px-3 py-1">
         {!visibleComponent && (
           <div
             className="absolute inset-0 bg-center bg-no-repeat z-0"

@@ -407,48 +407,53 @@ function VisualizarClientes() {
   // };
 
   const handleAsignarAsesor = async (cliente) => {
-    const fetchAsignaciones = async () => {
+    if (cliente.estado.estado_descripcion !== "Activo") {
+      alert("No es posible asignarle asesores a cliente que no esta activo.");
+    } else {
+      const fetchAsignaciones = async () => {
+        try {
+          const responseAsignaciones = await fetch(
+            "http://localhost:3001/getAllAsignaciones",
+            {
+              credentials: "include", // Incluir cookies en la solicitud
+            }
+          );
+          const data = await responseAsignaciones.json();
+          setAsignaciones(data);
+        } catch (error) {
+          console.error("Error al obtener asignaciones:", error);
+        }
+      };
+
       try {
-        const responseAsignaciones = await fetch(
-          "http://localhost:3001/getAllAsignaciones",
+        const response = await fetch(
+          "http://localhost:3001/asignarClienteAAsesor",
           {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ clienteId: cliente._id }),
             credentials: "include", // Incluir cookies en la solicitud
           }
         );
-        const data = await responseAsignaciones.json();
-        setAsignaciones(data);
-      } catch (error) {
-        console.error("Error al obtener asignaciones:", error);
-      }
-    };
-    try {
-      const response = await fetch(
-        "http://localhost:3001/asignarClienteAAsesor",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ clienteId: cliente._id }),
-          credentials: "include", // Incluir cookies en la solicitud
+
+        const result = await response.json();
+        console.log("asignaciones", asignaciones);
+
+        if (response.ok) {
+          // console.log("Asignación exitosa:", result);
+          alert("Asignación realizada exitosamente.");
+          // Reflejar la asignación en la lista
+          fetchAsignaciones();
+        } else {
+          console.error("Error del servidor:", result.error);
+          alert(`Error: ${result.error}`);
         }
-      );
-
-      const result = await response.json();
-      console.log("asignaciones", asignaciones);
-
-      if (response.ok) {
-        // console.log("Asignación exitosa:", result);
-        alert("Asignación realizada exitosamente.");
-        // Reflejar la asignación en la lista
-        fetchAsignaciones();
-      } else {
-        console.error("Error del servidor:", result.error);
-        alert(`Error: ${result.error}`);
+      } catch (error) {
+        console.error("Error en la solicitud:", error);
+        alert("Error al comunicarse con el servidor.");
       }
-    } catch (error) {
-      console.error("Error en la solicitud:", error);
-      alert("Error al comunicarse con el servidor.");
     }
   };
 
@@ -532,7 +537,7 @@ function VisualizarClientes() {
           onClick={() => handleClienteEstado("Activo")}
           className="rounded-md shadow cursor-pointer"
         >
-          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-emerald-400 text-emerald-700">
+          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-green-500 text-emerald-700">
             Activos
           </h2>
           <p className="text-3xl font-bold text-center py-2">
@@ -547,7 +552,7 @@ function VisualizarClientes() {
           onClick={() => handleClienteEstado("En proceso de contacto")}
           className="rounded-md shadow cursor-pointer"
         >
-          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-yellow-400 text-yellow-600">
+          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-blue-800 text-blue-300">
             En proceso
           </h2>
           <p className="text-3xl font-bold text-center py-2">
@@ -563,10 +568,7 @@ function VisualizarClientes() {
           onClick={() => handleClienteEstado("Cerrado")}
           className="rounded-md shadow cursor-pointer"
         >
-          <h2
-            className="rounded-md text-xl font-semibold p-4 h-28"
-            style={{ color: "#15315d", backgroundColor: "#7b94de" }}
-          >
+          <h2 className="rounded-md text-xl font-semibold p-4 h-28 bg-gray-400 text-white">
             Cerrados
           </h2>
           <p className="text-3xl font-bold text-center py-2">
@@ -659,7 +661,7 @@ function VisualizarClientes() {
                           asignacion.cliente_id._id === clienteSeleccionado._id
                       )
                       .map((asignacion) => (
-                        <div key={asignacion._id}>
+                        <div key={asignacion._id} className="">
                           <span className="flex flex-col space-y-2 w-fit text-xs">
                             <strong className="bg-emerald-100 text-emerald-800 p-0.5 rounded-md px-2">
                               Asesoría empresarial:{" "}
@@ -853,7 +855,7 @@ function VisualizarClientes() {
                   ) : (
                     // Si el cliente no está en las asignaciones, muestra el enlace para asignar
                     <button
-                      className="bg-gray-300 mt-3 border border-gray-300 hover:bg-gray-400 text-sm rounded p-1.5 px-4"
+                      className="bg-gray-300 border border-gray-300 hover:bg-gray-400 text-sm rounded p-1.5 px-4"
                       onClick={() => handleAsignarAsesor(cliente)}
                     >
                       Asignar Asesor

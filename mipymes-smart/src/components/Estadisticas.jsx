@@ -218,7 +218,7 @@ function Estadisticas() {
       <h2 className="text-2xl font-bold mb-4">Estadísticas</h2>
       <button
         onClick={handleDescargarReporte}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className="bg-gray-300 mt-3 border border-gray-300 hover:bg-gray-400 text-sm rounded p-1.5 px-4 mb-5"
       >
         Descargar Reporte
       </button>

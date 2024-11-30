@@ -1655,7 +1655,7 @@ app.get("/historial-cambios", async (req, res) => {
 
 app.get("/estadisticas/reporte", async (req, res) => {
   try {
-    // Generar las estadísticas como se hace actualmente
+    // Generar las estadísticas
     const clientesPorEstado = await Clientes.aggregate([
       {
         $lookup: {
@@ -1674,37 +1674,112 @@ app.get("/estadisticas/reporte", async (req, res) => {
       },
     ]);
 
-    // Crear un nuevo documento PDF
+    const clientesPorRubro = await Clientes.aggregate([
+      {
+        $group: {
+          _id: "$rubro",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const totalClientes = await Clientes.countDocuments();
+    const totalAsesores = await Asesores.countDocuments();
+
+    const totalClientesAsignados = await Asignaciones.countDocuments();
+    const promedioClientesPorAsesor =
+      totalAsesores > 0 ? totalClientesAsignados / totalAsesores : 0;
+
+    const serviciosRequeridos = await Clientes.aggregate([
+      { $unwind: "$servicios_requeridos" },
+      {
+        $group: {
+          _id: "$servicios_requeridos",
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { count: -1 } },
+    ]);
+
+    // Crear el PDF
     const doc = new PDFDocument({ size: "A4", margin: 50 });
 
-    // Establecer los encabezados HTTP para el archivo PDF
+    // Configurar encabezados para la descarga
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", "attachment; filename=reporte.pdf");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=reporte_estadisticas.pdf"
+    );
 
-    // Pipe del documento PDF al response (esto enviará el archivo al cliente)
+    // Pipe del documento al response
     doc.pipe(res);
 
-    // Título del reporte
+    // Encabezado principal
     doc
-      .fontSize(18)
-      .text("Reporte de Estadísticas de Clientes", { align: "center" });
+      .fontSize(20)
+      .text("Reporte de Estadísticas", { align: "center" })
+      .moveDown(0.5);
+    doc
+      .fontSize(12)
+      .text(`Generado por: MiPymes Unphu Smart`, { align: "center" });
+    doc
+      .fontSize(12)
+      .text(`Fecha: ${new Date().toLocaleString()}`, { align: "center" });
     doc.moveDown();
 
-    // Tabla de los resultados (Clientes por Estado)
-    doc.fontSize(12).text("Clientes por Estado", { underline: true });
+    // 1. Estadísticas Generales
+    doc
+      .fontSize(14)
+      .text("1. Estadísticas Generales", { underline: true })
+      .moveDown(0.5);
+    doc.text(`Total de Clientes: ${totalClientes}`);
+    doc.text(`Total de Asesores: ${totalAsesores}`);
+    doc.text(
+      `Promedio de Clientes por Asesor: ${promedioClientesPorAsesor.toFixed(2)}`
+    );
+
     doc.moveDown();
 
-    // Encabezado de la tabla
-    doc.fontSize(10).text("Estado", 50, doc.y);
-    doc.text("Cantidad", 250, doc.y);
-    doc.moveDown();
-
-    // Datos de la tabla
+    // 2. Clientes por Estado
+    doc
+      .fontSize(14)
+      .text("2. Clientes por Estado", { underline: true })
+      .moveDown(0.5);
     clientesPorEstado.forEach((estado) => {
-      doc.text(estado._id, 50, doc.y);
-      doc.text(estado.count, 250, doc.y);
-      doc.moveDown();
+      doc.text(`${estado._id}: ${estado.count} clientes`);
     });
+    doc.moveDown();
+
+    // 3. Clientes por Rubro
+    doc
+      .fontSize(14)
+      .text("3. Clientes por Rubro", { underline: true })
+      .moveDown(0.5);
+    clientesPorRubro.forEach((rubro) => {
+      doc.text(`${rubro._id || "Sin especificar"}: ${rubro.count} clientes`);
+    });
+    doc.moveDown();
+
+    // 4. Servicios más Requeridos
+    doc
+      .fontSize(14)
+      .text("4. Servicios más Requeridos", { underline: true })
+      .moveDown(0.5);
+    serviciosRequeridos.forEach((servicio) => {
+      doc.text(`${servicio._id}: ${servicio.count} solicitudes`);
+    });
+    doc.moveDown();
+
+    // Pie de página
+    doc.moveDown(2);
+    doc
+      .fontSize(10)
+      .text(
+        "Este reporte fue generado automáticamente por MiPymes Unphu Smart.",
+        {
+          align: "center",
+        }
+      );
 
     // Finalizar el documento
     doc.end();

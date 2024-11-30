@@ -19,7 +19,7 @@ function ClienteDashboard() {
   };
 
   return (
-    <div className="h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar */}
       <div className="w-72 bg-gray-50 shadow-lg p-6 flex flex-col space-y-1">
         <h2 className="text-xlfont-normal mb-4">Centro MiPymes - Dashboard</h2>

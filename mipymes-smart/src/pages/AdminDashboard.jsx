@@ -4,6 +4,9 @@ import { BsFillPeopleFill } from "react-icons/bs";
 import { GoGoal } from "react-icons/go";
 import { BiSolidReport } from "react-icons/bi";
 import { FaPeopleGroup } from "react-icons/fa6";
+import { GrWorkshop } from "react-icons/gr";
+import { FaHistory } from "react-icons/fa";
+
 import VisualizarClientes from "../components/VisualizarClientes";
 import Metas from "../components/Metas";
 import GenerarReportes from "../components/GenerarReportes";
@@ -13,6 +16,7 @@ import Centro from "../assets/Centro.svg";
 import centromipymes from "../assets/centromipymes.png";
 import Estadisticas from "../components/Estadisticas";
 import HistorialCambios from "../components/HistorialCambios";
+import Talleres from "../components/Talleres";
 
 const AdminDashboard = () => {
   const [visibleComponent, setVisibleComponent] = useState(null);
@@ -40,11 +44,11 @@ const AdminDashboard = () => {
           </div>
           <div
             className="py-2 border pl-2.5  rounded-md text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
-            onClick={() => handleToggleComponent("Crear asesores")}
+            onClick={() => handleToggleComponent("Asesores")}
           >
             {" "}
             <span className="flex items-center gap-2 ">
-              <FaPeopleGroup className="w-4 h-4 text-gray-500" /> Crear asesores
+              <FaPeopleGroup className="w-4 h-4 text-gray-500" /> Asesores
             </span>
           </div>
           <div
@@ -72,8 +76,18 @@ const AdminDashboard = () => {
           >
             <span className="flex items-center gap-2 ">
               {" "}
-              <BiSolidReport className="w-4 h-4 text-gray-500" />
+              <FaHistory className="w-4 h-4 text-gray-500" />
               Historial de cambios
+            </span>
+          </div>
+          <div
+            className="py-2 border pl-2.5  rounded-md text-gray-800 ont-normal text-14xs cursor-pointer hover:bg-gray-200"
+            onClick={() => handleToggleComponent("Talleres")}
+          >
+            <span className="flex items-center gap-2 ">
+              {" "}
+              <GrWorkshop className="w-4 h-4 text-gray-500" />
+              Talleres
             </span>
           </div>
         </div>
@@ -96,10 +110,11 @@ const AdminDashboard = () => {
             )}
             {visibleComponent === "Metas" && <Metas />}
             {visibleComponent === "Generar reportes" && <Estadisticas />}
-            {visibleComponent === "Crear asesores" && <CrearAsesores />}
+            {visibleComponent === "Asesores" && <CrearAsesores />}
             {visibleComponent === "Historial de cambios" && (
               <HistorialCambios />
             )}
+            {visibleComponent === "Talleres" && <Talleres />}
           </div>
         </div>
       </div>

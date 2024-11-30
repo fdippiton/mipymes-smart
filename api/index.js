@@ -1789,6 +1789,59 @@ app.get("/estadisticas/reporte", async (req, res) => {
   }
 });
 
+app.get("/getAllClienteDocAsesorias/:idCliente", async (req, res) => {
+  try {
+    // Obtén el idCliente desde los parámetros de la ruta
+    const { idCliente } = req.params;
+
+    // Encuentra las asesorías asociadas al cliente
+    const docAsesorias = await DocAsesorias.find({ cliente_id: idCliente })
+      .populate("cliente_id")
+      .populate("asesoria_id")
+      .populate("talleres_recomendados");
+
+    // Devuelve las asesorías como respuesta
+    res.json(docAsesorias);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/registrarTaller", async (req, res) => {
+  const { titulo, descripcion, fecha, instructor } = req.body;
+
+  // Validar los datos
+  if (!titulo || !descripcion || !fecha || !instructor) {
+    return res.status(400).json({ message: "Faltan datos" });
+  }
+
+  try {
+    // Crear el cliente con el rol asignado
+    const taller = await Talleres.create({
+      titulo,
+      descripcion,
+      fecha,
+      instructor,
+    });
+
+    res.status(200).json(taller);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al crear taller." });
+  }
+});
+
+app.get("/getTalleres", async (req, res) => {
+  try {
+    const talleres = await Talleres.find(); // Assuming Clients is a model for the clients collection
+    res.json(talleres);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

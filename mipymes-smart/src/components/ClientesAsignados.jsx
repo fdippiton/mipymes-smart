@@ -23,6 +23,7 @@ function ClientesAsignados() {
   const [reload, setReload] = useState(false);
   const [hideForm, sethideForm] = useState(false);
   const [currentDocAsesoria, setcurrentDocAsesoria] = useState(null);
+  const [selectedEstado, setSelectedEstado] = useState(""); // Estado seleccionado
 
   const [id, setId] = useState(false);
   const [cliente_id, setCliente_id] = useState("");
@@ -796,6 +797,10 @@ function ClientesAsignados() {
     );
   };
 
+  const handleEstadoChange = (e) => {
+    setSelectedEstado(e.target.value); // Actualiza el estado del filtro
+  };
+
   return (
     <div>
       {" "}
@@ -932,6 +937,33 @@ function ClientesAsignados() {
                                   asesoria.cliente_id ===
                                     cliente.cliente_id && (
                                     <div className="mb-6">
+                                      {/* Menú desplegable para filtrar por estado */}
+                                      <div className="mb-4">
+                                        <label
+                                          htmlFor="estado"
+                                          className="mr-2"
+                                        >
+                                          Filtrar por estado:
+                                        </label>
+                                        <select
+                                          id="estado"
+                                          value={selectedEstado}
+                                          onChange={handleEstadoChange}
+                                          className="border border-slate-300 rounded px-6 mt-3 pr-10 text-sm bg-gray-100 cursor-pointer"
+                                        >
+                                          <option value="">Todos</option>
+                                          <option value="Pendiente">
+                                            Pendiente
+                                          </option>
+                                          <option value="Completada">
+                                            Completada
+                                          </option>
+                                          <option value="Cancelada">
+                                            Cancelada
+                                          </option>
+                                          {/* Agrega más opciones según sea necesario */}
+                                        </select>
+                                      </div>
                                       <strong className="text-sm   rounded-md mb-0.5 block">
                                         Empresarial
                                       </strong>
@@ -947,6 +979,7 @@ function ClientesAsignados() {
                                         <IoIosAddCircle className="text-xl" />
                                         Documentar nueva sesión de asesoría
                                       </button>
+
                                       {/* Formulario nueva doc asesoria */}
                                       {expandedRowNewAsesoria ===
                                         `${index}-empresarial` && (
@@ -979,7 +1012,10 @@ function ClientesAsignados() {
                                                 asesorId &&
                                               docAsesoria.asesoria_id
                                                 ?.nombre_asesoria ===
-                                                "Asesoria Empresarial"
+                                                "Asesoria Empresarial" &&
+                                              (selectedEstado === "" ||
+                                                docAsesoria.estado ===
+                                                  selectedEstado) // Aplica el filtro por estado
                                             );
                                           })
                                           .map((doc, index) => (
@@ -1087,6 +1123,14 @@ function ClientesAsignados() {
                                                           Objetivos acordados:
                                                         </strong>{" "}
                                                         {doc.objetivos_acordados ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Documentos
+                                                          Compartidos:
+                                                        </strong>{" "}
+                                                        {doc.documentos_compartidos ||
                                                           "No especificado"}
                                                       </p>
                                                       <p>
@@ -1265,7 +1309,10 @@ function ClientesAsignados() {
                                                 asesorId &&
                                               docAsesoria.asesoria_id
                                                 ?.nombre_asesoria ===
-                                                "Asesoría Financiera"
+                                                "Asesoría Financiera" &&
+                                              (selectedEstado === "" ||
+                                                docAsesoria.estado ===
+                                                  selectedEstado)
                                             );
                                           })
                                           .map((doc, index) => (
@@ -1373,6 +1420,14 @@ function ClientesAsignados() {
                                                           Objetivos acordados:
                                                         </strong>{" "}
                                                         {doc.objetivos_acordados ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Documentos
+                                                          Compartidos:
+                                                        </strong>{" "}
+                                                        {doc.documentos_compartidos ||
                                                           "No especificado"}
                                                       </p>
                                                       <p>
@@ -1487,7 +1542,6 @@ function ClientesAsignados() {
                                   )}
 
                                 {/* Asesoria tecnologicas */}
-
                                 {asesoria.asesor_tecnologico_id === asesorId &&
                                   asesoria.cliente_id ===
                                     cliente.cliente_id && (
@@ -1539,7 +1593,10 @@ function ClientesAsignados() {
                                                 asesorId &&
                                               docAsesoria.asesoria_id
                                                 ?.nombre_asesoria ===
-                                                "Asesoria Tecnológica"
+                                                "Asesoria Tecnológica" &&
+                                              (selectedEstado === "" ||
+                                                docAsesoria.estado ===
+                                                  selectedEstado)
                                             );
                                           })
                                           .map((doc, index) => (
@@ -1647,6 +1704,14 @@ function ClientesAsignados() {
                                                           Objetivos acordados:
                                                         </strong>{" "}
                                                         {doc.objetivos_acordados ||
+                                                          "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Documentos
+                                                          Compartidos:
+                                                        </strong>{" "}
+                                                        {doc.documentos_compartidos ||
                                                           "No especificado"}
                                                       </p>
                                                       <p>

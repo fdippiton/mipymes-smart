@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { IoIosAddCircle } from "react-icons/io";
 import { MdOutlineCancelPresentation } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
-import { format } from "date-fns";
 import { MdExpandMore } from "react-icons/md";
 
 function ClientesAsignados() {
@@ -457,7 +455,6 @@ function ClientesAsignados() {
 
         const data = await response.json();
         setDataClientes(data); // Almacenar la información del perfil en el estado
-        // console.log(dataClientes);
 
         const responseAsesorias = await fetch(
           "http://localhost:3001/getAllAsesorias",
@@ -471,7 +468,6 @@ function ClientesAsignados() {
         }
 
         const dataAsesorias = await responseAsesorias.json();
-        // console.log(dataAsesorias);
         setAsesorias(dataAsesorias);
 
         const responseDocAsesorias = await fetch(
@@ -486,7 +482,6 @@ function ClientesAsignados() {
         }
 
         const dataDocAsesorias = await responseDocAsesorias.json();
-        console.log(dataDocAsesorias);
         setDocAsesorias(dataDocAsesorias);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -561,7 +556,6 @@ function ClientesAsignados() {
           (taller) => taller?._id !== tallerSeleccionado._id
         );
       }
-
       // Si no está, lo agregamos
       return [...talleresList, tallerSeleccionado];
     });
@@ -743,22 +737,6 @@ function ClientesAsignados() {
           />
         </div>
 
-        {/* <div className="space-y-2">
-          <label
-            htmlFor="talleres_recomendados"
-            className="block text-sm font-medium"
-          >
-            Talleres recomendados
-          </label>
-          <textarea
-            id="talleres_recomendados"
-            name="talleres_recomendados"
-            value={talleres_recomendados}
-            onChange={(ev) => setTalleres_recomendados(ev.target.value)}
-            className="w-full p-2 border rounded-md text-sm"
-          />
-        </div> */}
-
         <div className="space-y-4">
           <label
             htmlFor="talleres_recomendados"
@@ -868,7 +846,6 @@ function ClientesAsignados() {
 
         const data = await response.json();
         setTalleres(data); // Almacenar la información del perfil en el estado
-        console.log("talleres", data); // Mostrar la información en la consola
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -910,15 +887,9 @@ function ClientesAsignados() {
                     <MdExpandMore className="mr-2" />
                     Ver asesorias
                   </div>
-                  {/* <Link
-                    className="border  hover:bg-gray-200 w-52 px-10 py-3 rounded-sm"
-                    onClick={() => handleAsesoriaClick(index)}
-                  >
-                    <MdExpandMore className="mr-2" />
-                    Ver asesorias
-                  </Link> */}
                 </td>
               </tr>
+
               {/* Informacion del cliente */}
               {expandedRow === index && (
                 <tr>

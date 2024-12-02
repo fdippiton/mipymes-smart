@@ -1,8 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 export const UserContext = createContext({});
-import { jwtDecode } from "jwt-decode";
-import { Navigate, useNavigate } from "react-router-dom";
 
 export function UserContextProvider({ children }) {
   const [userInfo, setUserInfo] = useState({});
@@ -21,7 +19,6 @@ export function UserContextProvider({ children }) {
         const data = await response.json();
         setAuthenticated(true);
 
-        // setUserInfo(data); // Guarda la información del usuario si es necesario
         console.log("Login exitoso");
       } else {
         console.log("Login fallido");
@@ -29,12 +26,8 @@ export function UserContextProvider({ children }) {
       }
     } catch (error) {
       console.error("Error en la solicitud de login:", error);
-      // Opcionalmente, puedes lanzar el error para manejarlo en otro lugar
     }
   };
-
-  // const token = Cookies.get("token");
-  // console.log("Mi token", token);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,16 +52,6 @@ export function UserContextProvider({ children }) {
     };
     fetchData();
   }, [authenticated]);
-
-  // /* ------------------------------ Manejar login ----------------------------- */
-  // const handleLogin = (token) => {
-  //   localStorage.setItem("accessToken", token);
-  //   const decoded = jwtDecode(token);
-  //   console.log(decoded);
-
-  //   setAuthenticated(true);
-  //   setUser(decoded);
-  // };
 
   // /* ------------------------ Manejar cierre de sesion ------------------------ */
   const handleLogout = () => {

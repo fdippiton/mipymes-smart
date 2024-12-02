@@ -18,7 +18,6 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ClienteDashboard from "./pages/ClienteDashboard";
 import AsesorDashboard from "./pages/AsesorDashboard";
 import { UserContext } from "./UserContext";
-// import jwtDecode from "jwt-decode";
 
 const ProtectedRoute = ({
   element,
@@ -36,13 +35,6 @@ const ProtectedRoute = ({
 
   // Only return the element if the user is authenticated and has the required role
   return isAuthenticated && userRole === requiredRole ? element : null;
-  // if (!isAuthenticated) {
-  //   navigate("/login");
-  // }
-  // if (userRole !== requiredRole) {
-  //   navigate("/login");
-  // }
-  // return element;
 };
 
 function App() {
@@ -50,22 +42,6 @@ function App() {
   const [userRol, setUserRol] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   const handleRol = () => {
-  //     if (userInfo?.rol?.descripcion) {
-  //       // Asegúrate de que la propiedad "descripcion" exista en "rol"
-  //       console.log("Info user from app", userInfo);
-  //       const user = userInfo.rol.descripcion;
-  //       setUserRol(user);
-  //     }
-  //   };
-
-  //   // Solo ejecuta la función si userInfo está disponible y autenticado
-  //   if (authenticated && userInfo) {
-  //     handleRol();
-  //   }
-  // }, [userInfo, authenticated]);
 
   useEffect(() => {
     if (userInfo?.rol?.descripcion) {
@@ -83,9 +59,6 @@ function App() {
   if (loading) {
     return <div>Cargando...</div>; // Espera a que `userInfo` esté definido
   }
-  // console.log("Roles", userRol);
-  // console.log("AU", authenticated);
-  // console.log("userRol === 'Administrador'", userRol === "Administrador");
 
   return (
     <Routes>

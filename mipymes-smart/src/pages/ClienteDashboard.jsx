@@ -7,7 +7,6 @@ import { FaPersonChalkboard } from "react-icons/fa6";
 import { GiTeacher } from "react-icons/gi";
 import Centro from "../assets/Centro.svg";
 import { UserContext } from "../UserContext";
-import { Navigate } from "react-router-dom";
 
 function ClienteDashboard() {
   const [visibleComponent, setVisibleComponent] = useState(null);

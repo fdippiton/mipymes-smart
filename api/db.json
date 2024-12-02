@@ -1,13 +1,14 @@
 {
   "Roles": {
-    "rol_id": "rol id",
+    "_id": "rol id",
     "descripcion": "descripcion rol"
   },
 
-  "Administrador": {
-    "administrador_id": "administrador_id",
+  "Administradores": {
+    "_id": "administrador_id",
     "rol": "rol_id",
     "nombre": "Nombre del Administrador",
+    "contrasena": "Contrasena del Administrador",
     "contacto": {
       "email_cliente": "contacto@ejemplo.com",
       "telefono": "555-5555"
@@ -15,8 +16,8 @@
     "fecha_registro": "2024-10-23"
   },
 
-  "Cliente": {
-    "cliente_id": "cliente_id",
+  "Clientes": {
+    "_id": "cliente_id",
     "rol": "rol_id",
     "nombre": "Nombre de la Empresa",
     "contraseña": "xxxxxxxx",
@@ -42,12 +43,14 @@
       "RED SOCIAL BHD LEON",
       "Otro"
     ],
+    "estado": "estado",
     "ingresos": ""
   },
 
-  "Asesor": {
-    "asesor_id": "asesor_id",
+  "Asesores": {
+    "_id": "asesor_id",
     "nombre": "Nombre del Asesor",
+    "contrasena": "Contrasena del Administrador",
     "contacto": {
       "email": "asesor@ejemplo.com",
       "telefono": "555-5556"
@@ -57,13 +60,13 @@
     "max_clientes": 10
   },
 
-  "Asesoria": {
-    "asesoria_id": "asesoria id",
+  "Asesorias": {
+    "_id": "asesoria id",
     "nombre_asesoria": "xxxxxxxxxxxxxx"
   },
 
-  "DocAsesoria": {
-    "registro_asesoria_id": "asesoria_id",
+  "DocAsesorias": {
+    "_id": "docasesoria_id",
     "asesoria_id": "asesoria_id",
     "cliente_id": "cliente_id",
     "asesor_id": "asesor_id",
@@ -80,18 +83,34 @@
     "foto": ""
   },
 
-  "Taller": {
-    "taller_id": "taller_id",
+  "Talleres": {
+    "_id": "taller_id",
     "titulo": "Taller de Marketing Digital",
     "descripcion": "Aprender a desarrollar estrategias digitales efectivas",
     "fecha": "2024-12-05",
     "instructor": "Nombre del Instructor"
   },
 
-  "Asignacion": {
-    "asignacion_id": "asignacion_id",
+  "Asignaciones": {
+    "_id": "asignacion_id",
     "cliente_id": "cliente_id",
-    "asesor_id": "asesor_id",
+    "asesor_empresarial_id": "asesor_empresarial_id",
+    "asesor_financiero_id": "asesor_financiero_id",
+    "asesor_tecnologico_id": "asesor_tecnologico_id",
     "fecha_asignacion": "2024-10-23"
+  },
+  "Estados": {
+    "_id": "estado_id",
+    "estado_descripcion": "estado_descripcion"
+  },
+  "HistorialCambios": {
+    "_id": "historialCambios_id",
+    "accion": "accion",
+    "fecha": "fecha"
+  },
+  "HistorialCambiosAsesores": {
+    "_id": "historialCambiosAsesores_id",
+    "accion": "accion",
+    "fecha": "fecha"
   }
 }

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { GoGoal } from "react-icons/go";
 import { BiSolidReport } from "react-icons/bi";
@@ -9,11 +8,9 @@ import { FaHistory } from "react-icons/fa";
 
 import VisualizarClientes from "../components/VisualizarClientes";
 import Metas from "../components/Metas";
-import GenerarReportes from "../components/GenerarReportes";
 
 import CrearAsesores from "../components/CrearAsesores";
 import Centro from "../assets/Centro.svg";
-import centromipymes from "../assets/centromipymes.png";
 import Estadisticas from "../components/Estadisticas";
 import HistorialCambios from "../components/HistorialCambios";
 import Talleres from "../components/Talleres";

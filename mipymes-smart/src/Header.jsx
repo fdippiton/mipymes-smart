@@ -5,7 +5,7 @@ import { UserContext } from "./UserContext";
 import Centro from "./assets/Centro.svg";
 import centromipymes from "./assets/centromipymes.png";
 
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { Menu, MenuButton, MenuItem } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 export default function Header() {
@@ -13,6 +13,7 @@ export default function Header() {
     useContext(UserContext);
   const navigate = useNavigate();
 
+  /* --------------------------------- Logout --------------------------------- */
   const handleLogoutSumit = (e) => {
     e.preventDefault();
     handleLogout();

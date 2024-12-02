@@ -1,7 +1,6 @@
 import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 
 function Signup() {
   const [nombre, setNombre] = useState("");
@@ -38,7 +37,7 @@ function Signup() {
     }
   };
 
-  // Manejar el cambio de mensaje personalizado
+  /* --------------- Manejar el cambio de mensaje personalizado --------------- */
   const handleCustomMessageChange = (e) => {
     const newMessage = e.target.value;
     setCustomMessage(newMessage);
@@ -72,7 +71,7 @@ function Signup() {
     }
   };
 
-  // Function to handle custom message input change
+  /* ------------------- Handle custom message input change ------------------- */
   const handleCustomMessageChangeServicios = (event) => {
     const newMessage = event.target.value; // Get the new message
     setCustomMessageServicios(newMessage); // Update the custom message state
@@ -130,8 +129,6 @@ function Signup() {
       selectedOptionIngresos,
       selectedOptionsIServiciosNecesarios,
     };
-
-    console.log(data);
 
     if (validarFormulario()) {
       alert("Formulario enviado con éxito.");

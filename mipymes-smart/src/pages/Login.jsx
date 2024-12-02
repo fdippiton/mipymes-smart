@@ -1,12 +1,9 @@
 import React from "react";
 import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import Centro from "../assets/Centro.svg";
 import centromipymes from "../assets/centromipymes.png";
 import { UserContext } from "../UserContext";
-import { Navigate } from "react-router-dom";
-import Cookies from "js-cookie";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -59,8 +56,6 @@ function Login() {
       }
     }
   }, [userInfo, navigate]);
-
-  // console.log("Info recuperada", userInfo);
 
   return (
     <form className="px-16 py-8 h-screen" onSubmit={handleSubmit}>

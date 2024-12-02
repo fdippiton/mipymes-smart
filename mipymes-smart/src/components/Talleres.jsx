@@ -14,6 +14,7 @@ function Talleres() {
     titulo: "",
     descripcion: "",
     fecha: "",
+    hora: "",
     instructor: "",
   });
 
@@ -46,6 +47,7 @@ function Talleres() {
         titulo: "",
         descripcion: "",
         fecha: "",
+        hora: "",
         instructor: "",
       });
       setIsFormVisible(false);
@@ -165,6 +167,24 @@ function Talleres() {
                 required
               />
             </div>
+            {/* Hora */}
+            <div className="">
+              <label
+                htmlFor="hora"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Hora
+              </label>
+              <input
+                type="time"
+                id="hora"
+                name="hora"
+                value={newTaller.hora}
+                onChange={handleInputChange}
+                className="text-sm mt-1 p-2 w-full border border-gray-300 rounded-md"
+                required
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Instructor
@@ -232,6 +252,10 @@ function Talleres() {
                     : "Próximo evento"}
                 </span>
               </p>
+              <p className="text-sm text-gray-500 mb-1">
+                <span className="font-medium text-gray-600">Hora</span>{" "}
+                {taller.hora || "No especificado"}
+              </p>
             </div>
 
             {/* Detalles expandibles */}
@@ -244,6 +268,10 @@ function Talleres() {
                 <p>
                   <span className="font-medium">Fecha:</span>{" "}
                   {formatFecha(taller.fecha) || "No especificada"}
+                </p>
+                <p>
+                  <span className="font-medium">Hora:</span>{" "}
+                  {taller.hora || "No especificada"}
                 </p>
                 <p>
                   <span className="font-medium">Descripcion:</span>{" "}

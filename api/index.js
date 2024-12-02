@@ -28,6 +28,7 @@ const Roles = require("./models/Roles");
 const Estados = require("./models/Estados");
 const Asignaciones = require("./models/Asignaciones");
 const HistorialCambios = require("./models/HistorialCambios");
+const HistorialCambiosAsesores = require("./models/HistorialCambiosAsesores");
 
 const app = express();
 const PORT = config.SERVER_PORT || 3001;
@@ -54,6 +55,21 @@ mongoose.connection.on("error", (error) => {
 const registrarCambio = async (usuario, accion, detalles) => {
   try {
     const nuevoCambio = new HistorialCambios({ usuario, accion, detalles });
+    await nuevoCambio.save();
+    console.log("Cambio registrado exitosamente");
+  } catch (error) {
+    console.error("Error al registrar el cambio:", error);
+  }
+};
+
+// Función para registrar un cambio hecho por los asesores
+const registrarCambioAsesores = async (usuario, accion, detalles) => {
+  try {
+    const nuevoCambio = new HistorialCambiosAsesores({
+      usuario,
+      accion,
+      detalles,
+    });
     await nuevoCambio.save();
     console.log("Cambio registrado exitosamente");
   } catch (error) {
@@ -441,6 +457,34 @@ app.post("/registrarDocAsesoria", async (req, res) => {
       foto: null,
     });
 
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token no proporcionado" });
+    }
+
+    const asesorDecoded = jwt.verify(token, secretKey);
+    console.log("asesorDecoded", asesorDecoded);
+    const asesor = await Asesores.findById(asesorDecoded.id);
+    const cliente = await Clientes.findOne({
+      _id: cliente_id,
+    });
+
+    if (!asesor) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+    if (!cliente) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+
+    await registrarCambioAsesores(
+      asesorDecoded.id,
+      `${asesor.nombre} ha registrado una nueva asesoria con tema ${tema_principal} pautada para el ${fecha} para el cliente ${cliente.nombre}`
+    );
+
     res.status(200).json(asesoriaDoc);
   } catch (error) {
     console.error(error);
@@ -573,59 +617,6 @@ app.post("/asignarClienteAAsesor", async (req, res) => {
       return asesorMenosCargado;
     };
 
-    // Asignar asesores para encuentros iniciales
-    // const asesorEncuentroEmpresarial = asignarAsesorEquitativo(
-    //   "Asesoría Empresarial",
-    //   "encuentros"
-    // );
-    // const asesorEncuentroFinanciero = asignarAsesorEquitativo(
-    //   "Asesoría Financiera",
-    //   "encuentros"
-    // );
-    // const asesorEncuentroTecnologico = asignarAsesorEquitativo(
-    //   "Asesoría Tecnologica",
-    //   "encuentros"
-    // );
-
-    // console.log("Asesoría Empresarial encuentros", asesorEncuentroEmpresarial);
-    // console.log("Asesoría Financiera encuentros", asesorEncuentroFinanciero);
-    // console.log("Asesoría Tecnologica encuentros", asesorEncuentroTecnologico);
-
-    // if (
-    //   !asesorEncuentroEmpresarial ||
-    //   !asesorEncuentroFinanciero ||
-    //   !asesorEncuentroTecnologico
-    // ) {
-    //   return res.status(400).json({
-    //     error: "No hay asesores disponibles para encuentros.",
-    //   });
-    // }
-
-    // Actualizar datos de asesores de encuentros
-    // await Promise.all([
-    //   Asesores.updateOne(
-    //     { _id: asesorEncuentroEmpresarial._id },
-    //     {
-    //       $push: { clientes_encuentros: clienteId },
-    //       $inc: { max_encuentros: -1 },
-    //     }
-    //   ),
-    //   Asesores.updateOne(
-    //     { _id: asesorEncuentroFinanciero._id },
-    //     {
-    //       $push: { clientes_encuentros: clienteId },
-    //       $inc: { max_encuentros: -1 },
-    //     }
-    //   ),
-    //   Asesores.updateOne(
-    //     { _id: asesorEncuentroTecnologico._id },
-    //     {
-    //       $push: { clientes_encuentros: clienteId },
-    //       $inc: { max_encuentros: -1 },
-    //     }
-    //   ),
-    // ]);
-
     // Asignar asesores definitivos
     const asesorDefinitivoEmpresarial = asignarAsesorEquitativo(
       "Asesoría Empresarial",
@@ -639,10 +630,6 @@ app.post("/asignarClienteAAsesor", async (req, res) => {
       "Asesoría Tecnologica",
       "definitivos"
     );
-
-    // console.log("Asesoría Empresarial", asesorDefinitivoEmpresarial);
-    // console.log("Asesoría Financiera", asesorDefinitivoFinanciero);
-    // console.log("Asesoría Tecnologica", asesorDefinitivoTecnologico);
 
     if (
       !asesorDefinitivoEmpresarial ||
@@ -1515,13 +1502,36 @@ app.delete("/eliminarDocAsesoria/:docAsesoriaId", async (req, res) => {
   }
 
   try {
-    const docAsesoria = await DocAsesorias.findOne({ _id: docAsesoriaId });
+    const docAsesoria = await DocAsesorias.findOne({
+      _id: docAsesoriaId,
+    }).populate("cliente_id");
 
     if (!docAsesoria) {
       return res.status(404).json({ error: "No se encontró doc asesoria" });
     }
     // Eliminar doc asesoria según tu modelo de datos
     await docAsesoria.deleteOne();
+
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token no proporcionado" });
+    }
+
+    const asesorDecoded = jwt.verify(token, secretKey);
+    const asesor = await Asesores.findById(asesorDecoded.id);
+    console.log(asesor);
+
+    if (!asesor) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+
+    await registrarCambioAsesores(
+      asesorDecoded.id,
+      `${asesor.nombre} ha eliminado la documentacion de la asesoria ${docAsesoria.tema_principal} del cliente ${docAsesoria.cliente_id.nombre}`
+    );
+
     res.status(200).json({ message: "Documentacion eliminada exitosamente" });
   } catch (error) {
     console.error(error);
@@ -1579,6 +1589,35 @@ app.put("/docAsesoriasUpdate/:asesoriaIdDoc", async (req, res) => {
         estado,
       },
       { new: true }
+    );
+
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token no proporcionado" });
+    }
+
+    const asesorDecoded = jwt.verify(token, secretKey);
+    const asesor = await Asesores.findById(asesorDecoded.id);
+    const cliente = await Clientes.findOne({
+      _id: cliente_id,
+    });
+
+    if (!cliente) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+    console.log(asesor);
+
+    if (!asesor) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+
+    await registrarCambioAsesores(
+      asesorDecoded.id,
+      `${asesor.nombre} ha actualizado la asesoria ${tema_principal} del cliente ${cliente.nombre}`
     );
 
     res.status(200).json(updatedDocAsesoria);
@@ -1644,6 +1683,18 @@ app.post("/enviar-correo", async (req, res) => {
 app.get("/historial-cambios", async (req, res) => {
   try {
     const historial = await HistorialCambios.find()
+      .sort({ fecha: -1 })
+      .populate("usuario");
+    res.status(200).json(historial);
+  } catch (error) {
+    console.error("Error al obtener el historial:", error);
+    res.status(500).send("Error en el servidor.");
+  }
+});
+
+app.get("/historial-cambios-asesores", async (req, res) => {
+  try {
+    const historial = await HistorialCambiosAsesores.find()
       .sort({ fecha: -1 })
       .populate("usuario");
     res.status(200).json(historial);
@@ -1783,6 +1834,26 @@ app.get("/estadisticas/reporte", async (req, res) => {
 
     // Finalizar el documento
     doc.end();
+
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token no proporcionado" });
+    }
+
+    const adminDecoded = jwt.verify(token, secretKey);
+    const admin = await Administradores.findById(adminDecoded.id);
+    console.log(admin);
+
+    if (!admin) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+
+    await registrarCambio(
+      adminDecoded.id,
+      `${admin.nombre} ha descargado un reporte de estadisticas.`
+    );
   } catch (error) {
     console.error("Error al generar el reporte:", error);
     res.status(500).json({ message: "Error al generar el reporte" });
@@ -1809,7 +1880,7 @@ app.get("/getAllClienteDocAsesorias/:idCliente", async (req, res) => {
 });
 
 app.post("/registrarTaller", async (req, res) => {
-  const { titulo, descripcion, fecha, instructor } = req.body;
+  const { titulo, descripcion, fecha, hora, instructor } = req.body;
 
   // Validar los datos
   if (!titulo || !descripcion || !fecha || !instructor) {
@@ -1822,8 +1893,29 @@ app.post("/registrarTaller", async (req, res) => {
       titulo,
       descripcion,
       fecha,
+      hora,
       instructor,
     });
+
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token no proporcionado" });
+    }
+
+    const adminDecoded = jwt.verify(token, secretKey);
+    const admin = await Administradores.findById(adminDecoded.id);
+    console.log(admin);
+
+    if (!admin) {
+      return res
+        .status(403)
+        .json({ error: "No tienes permisos para realizar esta acción" });
+    }
+
+    await registrarCambio(
+      adminDecoded.id,
+      `${admin.nombre} ha registrado un nuevo taller titulado ${titulo} pautado para el ${fecha} a las ${hora}`
+    );
 
     res.status(200).json(taller);
   } catch (error) {

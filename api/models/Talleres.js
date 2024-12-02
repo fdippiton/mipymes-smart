@@ -5,6 +5,7 @@ const TalleresSchema = new Schema({
   titulo: { type: String, required: true },
   descripcion: { type: String, required: true },
   fecha: { type: Date, required: true },
+  hora: { type: String, required: true },
   instructor: { type: String, required: true },
 });
 

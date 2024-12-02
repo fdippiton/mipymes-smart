@@ -85,6 +85,7 @@ function ClientesAsignados() {
       method: "POST",
       body: JSON.stringify(formData),
       headers: { "Content-Type": "application/json" },
+      credentials: "include", // Incluir cookies en la solicitud
     });
 
     if (response.status === 200) {
@@ -392,6 +393,7 @@ function ClientesAsignados() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(dataDoc),
+          credentials: "include", // Incluir cookies en la solicitud
         }
       );
 

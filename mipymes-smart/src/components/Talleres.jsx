@@ -1,10 +1,14 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import { UserContext } from "../UserContext";
 
 function Talleres() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [talleres, setTalleres] = useState([]);
   const [expandedCard, setExpandedCard] = useState(null);
+  const { userInfo } = useContext(UserContext);
 
   const [newTaller, setNewTaller] = useState({
     titulo: "",
@@ -103,14 +107,19 @@ function Talleres() {
       <div>
         <h1 className="text-xl font-bold text-gray-800">Talleres</h1>
       </div>
-      <div className="mt-5">
-        <button
-          className="text-sm border w-52 px-10 py-3 items-center rounded-md hover:bg-gray-300 bg-gray-200"
-          onClick={() => setIsFormVisible(!isFormVisible)}
-        >
-          Nuevo taller
-        </button>
-      </div>
+
+      {userInfo &&
+        userInfo.rol &&
+        userInfo.rol.descripcion === "Administrador" && (
+          <div className="mt-5">
+            <button
+              className="text-sm border w-52 px-10 py-3 items-center rounded-md hover:bg-gray-300 bg-gray-200"
+              onClick={() => setIsFormVisible(!isFormVisible)}
+            >
+              Nuevo taller
+            </button>
+          </div>
+        )}
 
       {isFormVisible && (
         <div className="mt-6 bg-white shadow-md rounded-lg p-6">
@@ -210,7 +219,18 @@ function Talleres() {
 
               <p className="text-sm text-gray-500">
                 <span className="font-medium text-gray-600">Fecha:</span>{" "}
-                {formatFecha(taller.fecha) || "No especificada"}
+                {formatFecha(taller.fecha) || "No especificada"}{" "}
+                <span
+                  className={
+                    new Date(taller.fecha) < new Date()
+                      ? "text-red-500"
+                      : "text-green-500"
+                  }
+                >
+                  {new Date(taller.fecha) < new Date()
+                    ? "Evento concluido"
+                    : "Próximo evento"}
+                </span>
               </p>
             </div>
 

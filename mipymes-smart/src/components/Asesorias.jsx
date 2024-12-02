@@ -175,7 +175,45 @@ function Asesorias() {
                         <span className="font-medium">
                           Talleres recomendados:
                         </span>{" "}
-                        {asesoria.talleres_recomendados || "No especificado"}
+                        {Array.isArray(asesoria.talleres_recomendados) &&
+                        asesoria.talleres_recomendados.length > 0 ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+                            {asesoria.talleres_recomendados.map((taller) => (
+                              <div
+                                key={taller._id}
+                                className="bg-white shadow-md rounded-md p-4 border border-gray-200"
+                              >
+                                <h3 className="text-lg font-semibold text-gray-800">
+                                  {taller.titulo}
+                                </h3>
+                                <p className="text-sm text-gray-600 mt-2">
+                                  {taller.descripcion}
+                                </p>
+                                <p className="text-sm text-gray-500 mt-1">
+                                  Fecha:{" "}
+                                  {new Date(taller.fecha).toLocaleDateString()}{" "}
+                                  -{" "}
+                                  <span
+                                    className={
+                                      new Date(taller.fecha) < new Date()
+                                        ? "text-red-500"
+                                        : "text-green-500"
+                                    }
+                                  >
+                                    {new Date(taller.fecha) < new Date()
+                                      ? "Evento concluido"
+                                      : "Próximo evento"}
+                                  </span>
+                                </p>
+                                <p className="text-sm text-gray-500 mt-1">
+                                  Instructor: {taller.instructor}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500">No especificado</p>
+                        )}
                       </p>
                       <p>
                         <span className="font-medium">

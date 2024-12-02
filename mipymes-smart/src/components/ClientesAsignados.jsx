@@ -1074,7 +1074,7 @@ function ClientesAsignados() {
                                       )}
 
                                       {/* Listar asesorias */}
-                                      <div className="flex flex-wrap m-3 justify-start">
+                                      <div className="flex flex-wrap m-3">
                                         {docAsesorias
                                           .filter((docAsesoria) => {
                                             return (
@@ -1094,7 +1094,7 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 w-64 ${
+                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 ${
                                                 expandedRowDocAsesoria ===
                                                 doc._id
                                                   ? "bg-white w-full max-w-screen-xl"
@@ -1130,15 +1130,18 @@ function ClientesAsignados() {
                                                       alignItems: "center",
                                                     }}
                                                   ></h1>
-                                                  <FaRegEdit
-                                                    className="h-5 w-5"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation(); // Prevenir el clic en la tarjeta
-                                                      mostrarUpdateForm(
-                                                        doc._id
-                                                      ); // Mostrar el formulario de actualización
-                                                    }}
-                                                  />
+                                                  {doc.estado !==
+                                                    "Completada" && (
+                                                    <FaRegEdit
+                                                      className="h-5 w-5"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // Prevenir el clic en la tarjeta
+                                                        mostrarUpdateForm(
+                                                          doc._id
+                                                        ); // Mostrar el formulario de actualización
+                                                      }}
+                                                    />
+                                                  )}
                                                 </div>
                                               )}
 
@@ -1400,7 +1403,7 @@ function ClientesAsignados() {
                                       )}
 
                                       {/* Listar asesorias */}
-                                      <div className="flex flex-wrap m-3 justify-start">
+                                      <div className="flex flex-wrap m-3">
                                         {docAsesorias
                                           .filter((docAsesoria) => {
                                             return (
@@ -1420,7 +1423,7 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 w-64 ${
+                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 ${
                                                 expandedRowDocAsesoria ===
                                                 doc._id
                                                   ? "bg-white w-full max-w-screen-xl"
@@ -1438,7 +1441,7 @@ function ClientesAsignados() {
                                                 doc._id && (
                                                 <div className="flex justify-between">
                                                   <h1
-                                                    className="mr-2"
+                                                    className="mr-2 mb-3"
                                                     style={{
                                                       backgroundColor:
                                                         doc.estado ===
@@ -1456,15 +1459,18 @@ function ClientesAsignados() {
                                                       alignItems: "center",
                                                     }}
                                                   ></h1>
-                                                  <FaRegEdit
-                                                    className="h-5 w-5"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation(); // Prevenir el clic en la tarjeta
-                                                      mostrarUpdateForm(
-                                                        doc._id
-                                                      ); // Mostrar el formulario de actualización
-                                                    }}
-                                                  />
+                                                  {doc.estado !==
+                                                    "Completada" && (
+                                                    <FaRegEdit
+                                                      className="h-5 w-5"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // Prevenir el clic en la tarjeta
+                                                        mostrarUpdateForm(
+                                                          doc._id
+                                                        ); // Mostrar el formulario de actualización
+                                                      }}
+                                                    />
+                                                  )}
                                                 </div>
                                               )}
 
@@ -1485,7 +1491,7 @@ function ClientesAsignados() {
                                                     </div>
                                                   ) : (
                                                     <>
-                                                      <h3 className="text-md font-semibold">
+                                                      <h3 className="text-md font-semibold text-xl">
                                                         Detalles de la Asesoría
                                                       </h3>
                                                       <p>
@@ -1713,7 +1719,7 @@ function ClientesAsignados() {
                                       )}
 
                                       {/* Listar asesorias */}
-                                      <div className="flex flex-wrap m-3 justify-start">
+                                      <div className="flex flex-wrap m-3">
                                         {docAsesorias
                                           .filter((docAsesoria) => {
                                             return (
@@ -1733,7 +1739,7 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 w-64 ${
+                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 ${
                                                 expandedRowDocAsesoria ===
                                                 doc._id
                                                   ? "bg-white w-full max-w-screen-xl"
@@ -1769,15 +1775,18 @@ function ClientesAsignados() {
                                                       alignItems: "center",
                                                     }}
                                                   ></h1>
-                                                  <FaRegEdit
-                                                    className="h-5 w-5"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation(); // Prevenir el clic en la tarjeta
-                                                      mostrarUpdateForm(
-                                                        doc._id
-                                                      ); // Mostrar el formulario de actualización
-                                                    }}
-                                                  />
+                                                  {doc.estado !==
+                                                    "Completada" && (
+                                                    <FaRegEdit
+                                                      className="h-5 w-5"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation(); // Prevenir el clic en la tarjeta
+                                                        mostrarUpdateForm(
+                                                          doc._id
+                                                        ); // Mostrar el formulario de actualización
+                                                      }}
+                                                    />
+                                                  )}
                                                 </div>
                                               )}
 

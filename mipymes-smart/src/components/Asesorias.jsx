@@ -82,7 +82,7 @@ function Asesorias() {
               id="estado"
               value={selectedEstado}
               onChange={handleEstadoChange}
-              className="border border-slate-300 rounded px-4 py-2 text-sm bg-gray-100 cursor-pointer"
+              className="border border-slate-300 rounded px-10 py-2 text-sm bg-gray-100 cursor-pointer"
             >
               <option value="">Todos</option>
               <option value="Pendiente">Pendiente</option>

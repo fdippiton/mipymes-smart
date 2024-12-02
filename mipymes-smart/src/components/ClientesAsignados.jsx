@@ -24,6 +24,7 @@ function ClientesAsignados() {
   const [hideForm, sethideForm] = useState(false);
   const [currentDocAsesoria, setcurrentDocAsesoria] = useState(null);
   const [selectedEstado, setSelectedEstado] = useState(""); // Estado seleccionado
+  const [talleres, setTalleres] = useState([]);
 
   const [id, setId] = useState(false);
   const [cliente_id, setCliente_id] = useState("");
@@ -36,7 +37,7 @@ function ClientesAsignados() {
   const [documentos_compartidos, setDocumentos_compartidos] = useState("");
   const [temas_tratados, setTemas_tratados] = useState("");
   const [objetivos_acordados, setObjetivos_acordados] = useState("");
-  const [talleres_recomendados, setTalleres_recomendados] = useState("");
+  const [talleres_recomendados, setTalleres_recomendados] = useState([]);
   const [observaciones_adicionales, setObservaciones_adicionales] =
     useState("");
   const [estado, setEstado] = useState("");
@@ -53,10 +54,10 @@ function ClientesAsignados() {
     documentos_compartidos: "",
     temas_tratados: "",
     objetivos_acordados: "",
-    talleres_recomendados: "",
+    talleres_recomendados: [],
     observaciones_adicionales: "",
     estado: "",
-    foto: null,
+    foto: "",
   });
 
   const handleInputChange = (e) => {
@@ -541,7 +542,28 @@ function ClientesAsignados() {
       setFoto(currentDocAsesoria.foto);
       setEstado(currentDocAsesoria.estado);
     }
+    console.log("currentDocAsesoria", currentDocAsesoria);
   }, [currentDocAsesoria]);
+
+  // Función para manejar la selección de checkboxes
+  const handleCheckboxChange = (tallerSeleccionado) => {
+    setTalleres_recomendados((prevTalleres) => {
+      // Asegurar que prevTalleres sea un array
+      const talleresList = prevTalleres || [];
+
+      // Si el taller ya está en la lista, lo quitamos
+      if (
+        talleresList.find((taller) => taller?._id === tallerSeleccionado._id)
+      ) {
+        return talleresList.filter(
+          (taller) => taller?._id !== tallerSeleccionado._id
+        );
+      }
+
+      // Si no está, lo agregamos
+      return [...talleresList, tallerSeleccionado];
+    });
+  };
 
   const renderDocUpdate = (docAsesoria) => {
     console.log("docAsesoria", currentDocAsesoria);
@@ -719,7 +741,7 @@ function ClientesAsignados() {
           />
         </div>
 
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <label
             htmlFor="talleres_recomendados"
             className="block text-sm font-medium"
@@ -733,6 +755,36 @@ function ClientesAsignados() {
             onChange={(ev) => setTalleres_recomendados(ev.target.value)}
             className="w-full p-2 border rounded-md text-sm"
           />
+        </div> */}
+
+        <div className="space-y-4">
+          <label
+            htmlFor="talleres_recomendados"
+            className="block text-sm font-medium"
+          >
+            Talleres recomendados
+          </label>
+          <div className="space-y-2">
+            {talleres?.map((taller) => (
+              <div key={taller._id} className="flex items-center">
+                <input
+                  id={`taller-${taller._id}`}
+                  type="checkbox"
+                  checked={(talleres_recomendados || []).some(
+                    (recomendado) => recomendado?._id === taller._id
+                  )}
+                  onChange={() => handleCheckboxChange(taller)}
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                />
+                <label
+                  htmlFor={`taller-${taller._id}`}
+                  className="ml-2 text-sm text-gray-700"
+                >
+                  {taller.titulo}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -800,6 +852,27 @@ function ClientesAsignados() {
   const handleEstadoChange = (e) => {
     setSelectedEstado(e.target.value); // Actualiza el estado del filtro
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/getTalleres`, {
+          credentials: "include", // Incluir cookies en la solicitud
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        setTalleres(data); // Almacenar la información del perfil en el estado
+        console.log("talleres", data); // Mostrar la información en la consola
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div>
@@ -931,7 +1004,7 @@ function ClientesAsignados() {
                               key={asesoria._id}
                               className="px-4 border shadow-md bg-gray-50"
                             >
-                              <div className="mt-3 py-1 h-fit">
+                              <div className="mt-3 py-1 h-fit w-68">
                                 {/* Asesoria empresarial */}
                                 {asesoria.asesor_empresarial_id === asesorId &&
                                   asesoria.cliente_id ===
@@ -1001,7 +1074,7 @@ function ClientesAsignados() {
                                       )}
 
                                       {/* Listar asesorias */}
-                                      <div className="flex flex-wrap m-3">
+                                      <div className="flex flex-wrap m-3 justify-start">
                                         {docAsesorias
                                           .filter((docAsesoria) => {
                                             return (
@@ -1021,7 +1094,7 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 ${
+                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 w-64 ${
                                                 expandedRowDocAsesoria ===
                                                 doc._id
                                                   ? "bg-white w-full max-w-screen-xl"
@@ -1124,6 +1197,35 @@ function ClientesAsignados() {
                                                         </strong>{" "}
                                                         {doc.objetivos_acordados ||
                                                           "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Talleres recomendados:
+                                                        </strong>{" "}
+                                                        {Array.isArray(
+                                                          doc.talleres_recomendados
+                                                        ) &&
+                                                        doc
+                                                          .talleres_recomendados
+                                                          .length > 0
+                                                          ? doc.talleres_recomendados.map(
+                                                              (taller) => (
+                                                                <>
+                                                                  <span
+                                                                    key={
+                                                                      taller._id
+                                                                    }
+                                                                    className="mr-2"
+                                                                  >
+                                                                    {
+                                                                      taller.titulo
+                                                                    }
+                                                                  </span>
+                                                                  <br />
+                                                                </>
+                                                              )
+                                                            )
+                                                          : "No especificado"}
                                                       </p>
                                                       <p>
                                                         <strong>
@@ -1298,7 +1400,7 @@ function ClientesAsignados() {
                                       )}
 
                                       {/* Listar asesorias */}
-                                      <div className="flex flex-wrap m-3">
+                                      <div className="flex flex-wrap m-3 justify-start">
                                         {docAsesorias
                                           .filter((docAsesoria) => {
                                             return (
@@ -1318,7 +1420,7 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 ${
+                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 w-64 ${
                                                 expandedRowDocAsesoria ===
                                                 doc._id
                                                   ? "bg-white w-full max-w-screen-xl"
@@ -1421,6 +1523,35 @@ function ClientesAsignados() {
                                                         </strong>{" "}
                                                         {doc.objetivos_acordados ||
                                                           "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Talleres recomendados:
+                                                        </strong>{" "}
+                                                        {Array.isArray(
+                                                          doc.talleres_recomendados
+                                                        ) &&
+                                                        doc
+                                                          .talleres_recomendados
+                                                          .length > 0
+                                                          ? doc.talleres_recomendados.map(
+                                                              (taller) => (
+                                                                <>
+                                                                  <span
+                                                                    key={
+                                                                      taller._id
+                                                                    }
+                                                                    className="mr-2"
+                                                                  >
+                                                                    {
+                                                                      taller.titulo
+                                                                    }
+                                                                  </span>
+                                                                  <br />
+                                                                </>
+                                                              )
+                                                            )
+                                                          : "No especificado"}
                                                       </p>
                                                       <p>
                                                         <strong>
@@ -1582,7 +1713,7 @@ function ClientesAsignados() {
                                       )}
 
                                       {/* Listar asesorias */}
-                                      <div className="flex flex-wrap m-3">
+                                      <div className="flex flex-wrap m-3 justify-start">
                                         {docAsesorias
                                           .filter((docAsesoria) => {
                                             return (
@@ -1602,7 +1733,7 @@ function ClientesAsignados() {
                                           .map((doc, index) => (
                                             <div
                                               key={index}
-                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 ${
+                                              className={`m-3 cursor-pointer mt-3 max-w-md rounded-lg shadow-lg p-6 mb-6 w-64 ${
                                                 expandedRowDocAsesoria ===
                                                 doc._id
                                                   ? "bg-white w-full max-w-screen-xl"
@@ -1705,6 +1836,35 @@ function ClientesAsignados() {
                                                         </strong>{" "}
                                                         {doc.objetivos_acordados ||
                                                           "No especificado"}
+                                                      </p>
+                                                      <p>
+                                                        <strong>
+                                                          Talleres recomendados:
+                                                        </strong>{" "}
+                                                        {Array.isArray(
+                                                          doc.talleres_recomendados
+                                                        ) &&
+                                                        doc
+                                                          .talleres_recomendados
+                                                          .length > 0
+                                                          ? doc.talleres_recomendados.map(
+                                                              (taller) => (
+                                                                <>
+                                                                  <span
+                                                                    key={
+                                                                      taller._id
+                                                                    }
+                                                                    className="mr-2"
+                                                                  >
+                                                                    {
+                                                                      taller.titulo
+                                                                    }
+                                                                  </span>
+                                                                  <br />
+                                                                </>
+                                                              )
+                                                            )
+                                                          : "No especificado"}
                                                       </p>
                                                       <p>
                                                         <strong>

@@ -1157,6 +1157,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Tema principal:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.tema_principal ||
                                                           "No especificado"}
                                                       </p>
@@ -1164,6 +1165,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Temas tratados:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.temas_tratados ||
                                                           "No especificado"}
                                                       </p>
@@ -1171,6 +1173,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Objetivos acordados:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.objetivos_acordados ||
                                                           "No especificado"}
                                                       </p>
@@ -1178,6 +1181,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Talleres recomendados:
                                                         </strong>{" "}
+                                                        <br />
                                                         {Array.isArray(
                                                           doc.talleres_recomendados
                                                         ) &&
@@ -1208,6 +1212,7 @@ function ClientesAsignados() {
                                                           Documentos
                                                           Compartidos:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.documentos_compartidos ||
                                                           "No especificado"}
                                                       </p>
@@ -1216,11 +1221,13 @@ function ClientesAsignados() {
                                                           Observaciones
                                                           adicionales:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.observaciones_adicionales ||
                                                           "No especificado"}
                                                       </p>
                                                       <p>
                                                         <strong>Estado:</strong>{" "}
+                                                        <br />
                                                         {doc.estado ||
                                                           "No especificado"}
                                                       </p>
@@ -1486,6 +1493,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Tema principal:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.tema_principal ||
                                                           "No especificado"}
                                                       </p>
@@ -1493,6 +1501,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Temas tratados:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.temas_tratados ||
                                                           "No especificado"}
                                                       </p>
@@ -1500,6 +1509,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Objetivos acordados:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.objetivos_acordados ||
                                                           "No especificado"}
                                                       </p>
@@ -1507,6 +1517,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Talleres recomendados:
                                                         </strong>{" "}
+                                                        <br />
                                                         {Array.isArray(
                                                           doc.talleres_recomendados
                                                         ) &&
@@ -1537,6 +1548,7 @@ function ClientesAsignados() {
                                                           Documentos
                                                           Compartidos:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.documentos_compartidos ||
                                                           "No especificado"}
                                                       </p>
@@ -1545,11 +1557,13 @@ function ClientesAsignados() {
                                                           Observaciones
                                                           adicionales:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.observaciones_adicionales ||
                                                           "No especificado"}
                                                       </p>
                                                       <p>
                                                         <strong>Estado:</strong>{" "}
+                                                        <br />
                                                         {doc.estado ||
                                                           "No especificado"}
                                                       </p>
@@ -1795,6 +1809,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Duración:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.duracion_sesion ||
                                                           "No especificada"}
                                                       </p>
@@ -1802,6 +1817,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Tema principal:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.tema_principal ||
                                                           "No especificado"}
                                                       </p>
@@ -1809,6 +1825,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Temas tratados:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.temas_tratados ||
                                                           "No especificado"}
                                                       </p>
@@ -1816,6 +1833,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Objetivos acordados:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.objetivos_acordados ||
                                                           "No especificado"}
                                                       </p>
@@ -1823,6 +1841,7 @@ function ClientesAsignados() {
                                                         <strong>
                                                           Talleres recomendados:
                                                         </strong>{" "}
+                                                        <br />
                                                         {Array.isArray(
                                                           doc.talleres_recomendados
                                                         ) &&
@@ -1853,6 +1872,7 @@ function ClientesAsignados() {
                                                           Documentos
                                                           Compartidos:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.documentos_compartidos ||
                                                           "No especificado"}
                                                       </p>
@@ -1861,11 +1881,13 @@ function ClientesAsignados() {
                                                           Observaciones
                                                           adicionales:
                                                         </strong>{" "}
+                                                        <br />
                                                         {doc.observaciones_adicionales ||
                                                           "No especificado"}
                                                       </p>
                                                       <p>
                                                         <strong>Estado:</strong>{" "}
+                                                        <br />
                                                         {doc.estado ||
                                                           "No especificado"}
                                                       </p>

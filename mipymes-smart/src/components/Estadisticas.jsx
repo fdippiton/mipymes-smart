@@ -214,7 +214,7 @@ function Estadisticas() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 w-fit">
       <h2 className="text-2xl font-bold mb-4">Estadísticas</h2>
       <button
         onClick={handleDescargarReporte}
@@ -225,50 +225,62 @@ function Estadisticas() {
 
       {/* Total de Clientes */}
       <p className="text-lg">
-        Total de Clientes:{" "}
+        Clientes totales:{" "}
         {estadisticas.clientesPorEstado.reduce(
           (acc, estado) => acc + estado.count,
           0
         )}
       </p>
 
-      {/* Gráfico de Clientes por Estado */}
-      <h3 className="font-semibold text-lg mt-4">Clientes por Estado</h3>
-      <div className="mb-8" style={{ width: "600px", height: "250px" }}>
-        <Bar data={clientesPorEstadoData} />
-      </div>
+      <div className="flex flex-wrap justify-between">
+        {/* Gráfico de Clientes por Estado */}
+        <div>
+          <h3 className="font-semibold text-lg mt-4">Clientes por Estado</h3>
+          <div className="mb-8" style={{ width: "450px", height: "250px" }}>
+            <Bar data={clientesPorEstadoData} />
+          </div>
+        </div>
 
-      {/* Gráfico de Clientes por Rubro */}
-      <h3 className="font-semibold text-lg mt-4">Clientes por Rubro</h3>
-      <div className="mb-8" style={{ width: "600px", height: "250px" }}>
-        <Bar data={clientesPorRubroData} />
-      </div>
+        {/* Gráfico de Clientes por Rubro */}
+        <div>
+          <h3 className="font-semibold text-lg mt-4">Clientes por Rubro</h3>
+          <div className="mb-8" style={{ width: "450px", height: "250px" }}>
+            <Bar data={clientesPorRubroData} />
+          </div>
+        </div>
 
-      {/* Gráfico de Servicios Requeridos */}
-      <h3 className="font-semibold text-lg mt-4">Servicios Requeridos</h3>
-      <div className="mb-8" style={{ width: "600px", height: "400px" }}>
-        <Pie data={serviciosRequeridosData} />
-      </div>
+        {/* Gráfico de Servicios Requeridos */}
+        <div>
+          <h3 className="font-semibold text-lg mt-4">Servicios Requeridos</h3>
+          <div className="mb-8" style={{ width: "450px", height: "400px" }}>
+            <Pie data={serviciosRequeridosData} />
+          </div>
+        </div>
 
-      {/* Gráfico de Clientes por Asesor */}
-      <h3 className="font-semibold text-lg mt-4">Clientes por Asesor</h3>
+        {/* Gráfico de Clientes por Asesor */}
+        {/* <h3 className="font-semibold text-lg mt-4">Clientes por Asesor</h3>
       <div className="mb-8 " style={{ width: "600px", height: "250px" }}>
         <Bar data={clientesPorAsesorData} />
-      </div>
+      </div> */}
 
-      {/* Gráfico de Clientes Registrados */}
-      <h3 className="font-semibold text-lg mt-4">
-        Clientes Registrados en los Últimos 30, 60 y 90 Días
-      </h3>
-      <div className="mb-8" style={{ width: "600px", height: "250px" }}>
-        <Bar data={clientesRegistradosData} />
-      </div>
+        {/* Gráfico de Clientes Registrados */}
+        <div>
+          <h3 className="font-semibold text-lg mt-4">
+            Clientes Registrados en los Últimos 30, 60 y 90 Días
+          </h3>
+          <div className="mb-8" style={{ width: "450px", height: "250px" }}>
+            <Bar data={clientesRegistradosData} />
+          </div>
+        </div>
 
-      {/* Promedio de Clientes por Asesor */}
-      <h3 className="font-semibold text-lg mt-4">
-        Promedio de Clientes por Asesor
-      </h3>
-      <p>{estadisticas.promedioClientesPorAsesor.toFixed(2)}</p>
+        {/* Promedio de Clientes por Asesor */}
+        <div>
+          <h3 className="font-semibold text-lg mt-4">
+            Promedio de Clientes por Asesor
+          </h3>
+          <p>{estadisticas.promedioClientesPorAsesor.toFixed(2)}</p>
+        </div>
+      </div>
     </div>
   );
 }

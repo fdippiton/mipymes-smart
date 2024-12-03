@@ -1374,6 +1374,67 @@ app.get("/getTalleres", async (req, res) => {
   }
 });
 
+// Endpoint para obtener un resumen general de asesores
+app.get("/resumen-asesores", async (req, res) => {
+  try {
+    // Obtener asesores y sus clientes con estados poblados
+    const asesores = await Asesores.find().populate({
+      path: "clientes_asignados",
+      populate: { path: "estado", model: "Estados" },
+    });
+
+    // Preprocesar todos los estados disponibles
+    const estados = await Estados.find();
+    const estadoMap = estados.reduce((acc, estado) => {
+      acc[estado.estado_descripcion] = 0;
+      return acc;
+    }, {});
+
+    // Generar resumen para cada asesor
+    const resumen = asesores.map((asesor) => {
+      const estadosContados = { ...estadoMap }; // Copiar el mapa de estados inicial
+
+      // Contar los estados de los clientes asignados
+      asesor.clientes_asignados.forEach((cliente) => {
+        const descripcionEstado =
+          cliente.estado?.estado_descripcion || "Desconocido";
+        estadosContados[descripcionEstado] =
+          (estadosContados[descripcionEstado] || 0) + 1;
+      });
+
+      // Calcular total de clientes
+      const totalClientes = Object.values(estadosContados).reduce(
+        (sum, count) => sum + count,
+        0
+      );
+
+      // Excluir "En proceso de contacto" del progreso
+      const clientesRelevantes = Object.entries(estadosContados)
+        .filter(([estado]) => estado !== "En proceso de contacto")
+        .reduce((sum, [, count]) => sum + count, 0);
+
+      // Calcular progreso de la meta
+      const progresoMeta = (
+        (clientesRelevantes / asesor.max_clientes) *
+        100
+      ).toFixed(2);
+
+      return {
+        nombre: asesor.nombre,
+        max_clientes: asesor.max_clientes,
+        progreso_meta: parseFloat(progresoMeta),
+        total_clientes: totalClientes,
+        estados: estadosContados,
+      };
+    });
+
+    res.status(200).json(resumen);
+  } catch (error) {
+    console.error("Error al generar el resumen:", error.message);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
